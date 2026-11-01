@@ -20,14 +20,14 @@ interface Shot {
 }
 
 const SHOTS: Record<string, Shot> = {
-  hero: { pose: { az: 34, el: 20, dist: 0.8, target: null, explode: 0, focus: null }, shift: [0.17, 0.02], apart: 0, rest: 0 },
+  hero: { pose: { az: 34, el: 20, dist: 0.92, target: null, explode: 0, focus: null }, shift: [0.25, 0.04], apart: 0, rest: 0 },
   apart: { pose: { az: 28, el: 30, dist: 1.45, target: null, explode: 0, focus: null }, shift: [0, 0.08], apart: 1, rest: 0 },
-  propeller: { pose: { az: 46, el: 24, dist: 0.36, target: 'prop0', explode: 0, focus: 'propeller' }, shift: [0.2, 0], apart: 0, rest: 1.25 },
+  propeller: { pose: { az: 46, el: 24, dist: 0.42, target: 'prop0', explode: 0, focus: 'propeller' }, shift: [0.33, -0.02], apart: 0, rest: 1.25 },
   flight: { pose: { az: 22, el: 12, dist: 1.25, target: null, explode: 0, focus: null }, shift: [0, -0.04], apart: 0, rest: 0, flight: 1 },
   how: { pose: { az: 120, el: 14, dist: 1.5, target: null, explode: 0, focus: null }, shift: [0.1, 0.26], apart: 0, rest: 0 },
   results: { pose: { az: 0, el: 88, dist: 1.05, target: null, explode: 0, focus: null }, shift: [0, 0], apart: 0, rest: 0 },
   explore: { pose: { az: 32, el: 26, dist: 0.8, target: null, explode: 0, focus: null }, shift: [0, 0], apart: 0, rest: 0 },
-  project: { pose: { az: -40, el: 36, dist: 1.0, target: null, explode: 0, focus: null }, shift: [0.22, 0.05], apart: 0, rest: 0 },
+  project: { pose: { az: -40, el: 36, dist: 1.3, target: null, explode: 0, focus: null }, shift: [0.3, 0.3], apart: 0, rest: 0 },
 };
 
 /** Explode stage at which each part's label appears in the "Taken apart" scene. */
@@ -131,10 +131,31 @@ export function mountStage(reducedMotion: boolean) {
   // Flight scene: steer the drone with the mouse, or with the arrow keys.
   let kx = 0;
   let ky = 0;
+  // Reticle cursor: the dot sits on the pointer, the ring glides after it.
+  const reticle = document.querySelector<HTMLElement>('.reticle');
+  const dot = reticle?.querySelector<HTMLElement>('.reticle__dot');
+  const aim = { x: innerWidth / 2, y: innerHeight / 2, rx: innerWidth / 2, ry: innerHeight / 2 };
+  let reticleRaf = 0;
+  const glide = () => {
+    reticleRaf = 0;
+    if (!reticle || active !== 'flight') return;
+    const k = reducedMotion ? 1 : 0.18;
+    aim.rx += (aim.x - aim.rx) * k;
+    aim.ry += (aim.y - aim.ry) * k;
+    reticle.style.transform = `translate(${aim.rx.toFixed(1)}px, ${aim.ry.toFixed(1)}px)`;
+    if (dot) dot.style.transform = `translate(${(aim.x - aim.rx + 32).toFixed(1)}px, ${(aim.y - aim.ry + 32).toFixed(1)}px)`;
+    if (Math.abs(aim.x - aim.rx) + Math.abs(aim.y - aim.ry) > 0.3) reticleRaf = requestAnimationFrame(glide);
+  };
   window.addEventListener('pointermove', (e) => {
     if (active !== 'flight' || !viewer || e.pointerType === 'touch') return;
+    aim.x = e.clientX;
+    aim.y = e.clientY;
+    reticle?.classList.add('is-live');
+    if (!reticleRaf) reticleRaf = requestAnimationFrame(glide);
     viewer.setSteer((e.clientX / window.innerWidth) * 2 - 1, 1 - (e.clientY / window.innerHeight) * 2 - 0.2);
   });
+  window.addEventListener('pointerdown', () => reticle?.classList.add('is-down'));
+  window.addEventListener('pointerup', () => reticle?.classList.remove('is-down'));
   window.addEventListener('keydown', (e) => {
     if (active !== 'flight' || !viewer) return;
     const step = 0.25;

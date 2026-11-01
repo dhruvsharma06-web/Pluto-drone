@@ -8,8 +8,9 @@ Website preferences, asset contract and browser evidence for `apps/website/`.
 
 Design decisions (current, 2026-11-01):
 
-- Apple-style dark theme. True-black ground, white type, Playfair Display serif headlines with muted-violet italic accents, Archivo for UI text. Palette reference from the frontend owner: Jet Black #050505, Royal Amethyst #3B0A6B, Electric Cyan #00E5FF, used sparingly.
+- Apple-style dark theme, strictly black, white and purple (owner request: no other colours anywhere, including result states). Playfair Display for headlines only, Inter for all interface and body text, sentence case throughout (no tracked all-caps).
 - Seven full-screen scenes with CSS scroll-snap (desktop): Intro, Taken apart, The propeller, How it works, Results with fixture demo, Explore, Project. One persistent 3D canvas behind them moves the drone to a new shot per scene, with a soft dip-to-black transition and staggered blur-rise copy on every scene change.
 - Lighting and atmosphere: a gloss-black schematic drone, a gliding white key light, slow-breathing violet rim lights, and shader-based stage fog. The fog is domain-warped noise in a deep purple (#2B0B55): it hugs the floor, billows upward and evolves slowly, like smoke-machine haze.
 - The opening assembles the drone from its parts before the headline appears. "Taken apart" separates it in stages with part labels.
-- Results are told apart by glyph and shape (✓ ✕ ?) and their exact labels, not colour alone.
+- Results are told apart by glyph and shape (white ✓ circle, purple ✕ square, grey dashed ? ring) and their exact labels.
+- Flight scene uses a custom reticle cursor (rotating dashed ring, glides after the pointer); the fog reads as soft mist that climbs from the floor.

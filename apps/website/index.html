@@ -38,7 +38,6 @@
           <use href="#prop" x="66" y="-180" width="120" height="120" transform="rotate(63 126 -120)" />
         </g>
       </symbol>
-      <symbol id="spark" viewBox="0 0 24 24"><path d="M12 0c.6 6.2 5.8 11.4 12 12-6.2.6-11.4 5.8-12 12-.6-6.2-5.8-11.4-12-12C6.2 11.4 11.4 6.2 12 0z" /></symbol>
       <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 4.5 4.5M10.5 8v5M8 10.5h5" /></symbol>
       <symbol id="i-minus" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 4.5 4.5M8 10.5h5" /></symbol>
       <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /></symbol>
@@ -70,6 +69,13 @@
       <p class="visually-hidden" role="status" data-viewer-status></p>
     </figure>
     <div class="veil" aria-hidden="true"></div>
+    <div class="reticle" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <circle class="reticle__ring" cx="32" cy="32" r="24" />
+        <path class="reticle__ticks" d="M32 2v9M32 53v9M2 32h9M53 32h9" />
+      </svg>
+      <span class="reticle__dot"></span>
+    </div>
 
     <header class="bar">
       <a class="wordmark" href="#hero" aria-label="Pluto Inspector, back to top">Pluto <em>Inspector</em></a>
@@ -100,20 +106,14 @@
       <!-- 1. Hero -->
       <section class="scene scene--hero" id="hero" data-scene="hero" aria-labelledby="hero-title">
         <div class="hero__copy">
-          <p class="kicker" data-in>A pre-flight check for propellers</p>
-          <h1 id="hero-title" class="display" data-in>
-            Every <em>Propeller,</em> Verified.<svg class="spark" aria-hidden="true"><use href="#spark" /></svg>
-          </h1>
-          <p class="lede" data-in>Point the app at a disarmed drone. It checks every propeller against the verified reference — and tells you what to fix.</p>
-          <a class="orb" href="#apart" data-in><span>Explore</span></a>
+          <h1 id="hero-title" class="display" data-in>Every <em>propeller,</em> verified.</h1>
+          <p class="lede" data-in>Point the app at a disarmed drone. It checks every propeller against the verified reference and tells you what to fix.</p>
+          <div class="cta" data-in>
+            <a class="btn-pill" href="#how">How it works</a>
+            <a class="btn-link" href="#explore">Inspect the drone <span aria-hidden="true">›</span></a>
+          </div>
         </div>
-        <p class="vlabels" aria-hidden="true" data-in>Type<br />Position<br />Orientation</p>
-        <ol class="steps3" data-in>
-          <li><span>01</span><b>Disarm</b><i>Motors stopped first</i></li>
-          <li><span>02</span><b>Capture</b><i>Photo or live camera</i></li>
-          <li><span>03</span><b>Verify</b><i>Pass, Incorrect or Unable</i></li>
-        </ol>
-        <p class="note" data-in>Illustrative schematic</p>
+        <p class="note" data-in>Drone shown is an illustrative schematic.</p>
       </section>
 
       <!-- 2. Taken apart -->
@@ -128,13 +128,12 @@
       <section class="scene scene--prop" id="propeller" data-scene="propeller" aria-labelledby="prop-title">
         <div class="scene__copy scene__copy--left">
           <h2 id="prop-title" class="title" data-in>Right type. Right motor. <em>Right way up.</em></h2>
-          <ul class="chips" data-in>
-            <li>Wrong type</li>
-            <li>Swapped motors</li>
-            <li>Upside down</li>
-            <li>Unclear photo → <em>Unable to Verify</em></li>
-          </ul>
-          <p data-in>Where a blade comes to rest is never an error. What one photo cannot show is never guessed.</p>
+          <dl class="checks" data-in>
+            <div><dt>Type</dt><dd>The propeller made for that motor.</dd></div>
+            <div><dt>Position</dt><dd>On the motor the reference names.</dd></div>
+            <div><dt>Orientation</dt><dd>Seated the right way up, where the image shows it.</dd></div>
+          </dl>
+          <p data-in>A blade's resting angle is never an error. Anything one photo can't show ends in Unable to Verify.</p>
         </div>
       </section>
 
@@ -143,8 +142,8 @@
         <div class="scene__copy scene__copy--bottom">
           <h2 id="flight-title" class="title" data-in>Made to <em>fly.</em></h2>
           <p data-in>Checked on the ground first — every inspection happens disarmed, motors stopped.</p>
-          <p class="flight__hint" data-in>Move your mouse to steer · ← → keys, Shift + ↑ ↓ for height</p>
-          <p class="flight__note" data-in>Flight shown for illustration only</p>
+          <p class="flight__hint" data-in>Move the cursor to steer. Keyboard: <kbd>←</kbd> <kbd>→</kbd>, and <kbd>Shift</kbd> + <kbd>↑</kbd> <kbd>↓</kbd> for height.</p>
+          <p class="flight__note" data-in>Flight is shown for illustration only.</p>
         </div>
       </section>
 
@@ -153,10 +152,10 @@
         <div class="scene__copy scene__copy--left">
           <h2 id="how-title" class="title" data-in>How a check <em>works.</em></h2>
           <ol class="flow" data-in>
-            <li><span>01</span><b>Disarm and confirm</b><i>The app never arms the drone or spins a motor.</i></li>
-            <li><span>02</span><b>Photo or live camera</b><i>Whole drone in frame, in focus, in good light.</i></li>
-            <li><span>03</span><b>Find each propeller</b><i>Position, type and the orientation the image shows.</i></li>
-            <li><span>04</span><b>Compare and guide</b><i>Against the verified reference — then what to fix.</i></li>
+            <li><b>Disarm and confirm</b><span>The app never arms the drone or spins a motor.</span></li>
+            <li><b>Photo or live camera</b><span>Whole drone in frame, in focus, in good light.</span></li>
+            <li><b>Find each propeller</b><span>Position, type, and the orientation the image shows.</span></li>
+            <li><b>Compare and guide</b><span>Against the verified reference, then what to fix.</span></li>
           </ol>
         </div>
         <div class="phone" data-in>

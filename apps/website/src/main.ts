@@ -1,4 +1,4 @@
-import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/inter/opsz.css';
 import '@fontsource-variable/playfair-display/wght.css';
 import '@fontsource-variable/playfair-display/wght-italic.css';
 import './styles.css';

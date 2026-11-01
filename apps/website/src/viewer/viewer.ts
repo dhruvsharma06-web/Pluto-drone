@@ -333,7 +333,7 @@ export class DroneViewer {
       uniforms: {
         uTime: { value: 0 },
         uColor: { value: new THREE.Color(0x2b0b55) },
-        uStrength: { value: 2.6 },
+        uStrength: { value: 2.3 },
         uAspect: { value: 1 },
         uHole: { value: new THREE.Vector2(0.5, 0.4) },
         uStir: { value: 0 },
@@ -373,25 +373,26 @@ export class DroneViewer {
           mat2 rot = mat2(cos(ang), -sin(ang), sin(ang), cos(ang));
           vec2 dw = rot * dv + normalize(dv + 1e-4) * infl * 0.12;
           vec2 uv = dw / vec2(uAspect, 1.0) + uHole;
-          vec2 p = vec2(uv.x * uAspect, uv.y) * 2.0;
+          vec2 p = vec2(uv.x * uAspect, uv.y) * 1.25;
           float t = uTime * 0.065 * (1.0 + infl * 2.0);
           vec2 q = vec2(fbm(p + vec2(0.0, -t)), fbm(p + vec2(5.2, 1.3) - t * 0.7));
           vec2 r = vec2(fbm(p + 3.0 * q + vec2(1.7, 9.2) + t * 0.5), fbm(p + 3.0 * q + vec2(8.3, 2.8) - t * 0.4));
           float f = fbm(p + 2.6 * r + vec2(t * 0.6, -t));
           // Thickest at the floor, but a thinner haze still reaches the top of the frame.
-          float floorMask = mix(0.2, 1.0, smoothstep(0.9, 0.0, vUv.y));
+          float floorMask = mix(0.32, 1.0, smoothstep(1.0, 0.25, vUv.y));
           // Keep the middle of the frame clearer so smoke frames the content instead of covering it.
           floorMask *= mix(0.55, 1.0, smoothstep(0.12, 0.5, abs(vUv.x - 0.5)) + smoothstep(0.45, 0.0, vUv.y));
-          float d = pow(smoothstep(0.28, 0.95, f) * floorMask, 1.3);
+          float d = pow(smoothstep(0.2, 1.0, f) * floorMask, 1.1);
           // Cigar-like strands: thin ridged filaments, stretched upward, curling in the same flow.
           float wisp = fbm(vec2(p.x * 1.5, p.y * 0.75) + 2.4 * r + vec2(0.0, -t * 1.6));
-          float strand = pow(1.0 - abs(2.0 * wisp - 1.0), 10.0);
+          float strand = pow(1.0 - abs(2.0 * wisp - 1.0), 6.0);
           float wispMask = mix(0.35, 1.0, smoothstep(1.0, 0.0, vUv.y)) * smoothstep(0.38, 0.7, f);
-          d = d * 0.85 + strand * wispMask * 0.35;
+          d = d * 0.95 + strand * wispMask * 0.08;
           // Downwash clears a hollow under the rotors with a brighter churned rim.
           d *= 1.0 - 0.45 * uStir * exp(-rd * rd * 26.0);
           d += uStir * 0.18 * f * exp(-pow((rd - 0.18) * 10.0, 2.0));
-          vec3 col = uColor * d * uStrength + vec3(0.36, 0.26, 0.58) * strand * wispMask * 0.1 * uStrength;
+          // Mist pales slightly where it is densest, like light caught in vapour.
+          vec3 col = mix(uColor, vec3(0.2, 0.15, 0.3), smoothstep(0.3, 0.9, d)) * d * uStrength;
           gl_FragColor = vec4(col, 1.0);
         }`,
       transparent: false,
@@ -746,7 +747,7 @@ export class DroneViewer {
     if (this.fog) {
       const u = this.fog.material.uniforms;
       if (!rm) u.uTime.value = t;
-      u.uStrength.value = 2.6 * (this.light.env / 0.6) * (1 + 0.15 * k);
+      u.uStrength.value = 2.3 * (this.light.env / 0.6) * (1 + 0.15 * k);
       u.uStir.value = k;
       // Rotor wash centre: just below the drone, in screen space.
       const below = new THREE.Vector3(0, -0.55, 0);

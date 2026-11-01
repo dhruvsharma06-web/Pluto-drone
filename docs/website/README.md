@@ -6,13 +6,10 @@ Website preferences, asset contract and browser evidence for `apps/website/`.
 - [CHECKS.md](CHECKS.md): build, test, browser, accessibility and performance checks actually run.
 - [screenshots/](screenshots/): desktop and mobile captures from those checks.
 
-Design decisions:
+Design decisions (current, 2026-11-01):
 
-- Strictly black and white: true-black grounds, white type, white light only. The drone is gloss black (car-paint finish: near-black base, full clearcoat), lit by white key/rim light with soft white studio smoke. No frame or rings around the drone. Direction set by the frontend owner on 2026-11-01: cinematic, Apple-grade, big justified text, minimal copy, desktop-first.
-- Opening: the drone assembles from its parts on load, then the centred headline arrives. The key light glides so reflections sweep the gloss. Scroll captions move through airframe → body shell → arms → motors → propeller, with a right-edge progress rail.
-- Motion layer: word-reveal headings, blur-rise captions, scroll-driven lift-in for sections and grey-to-white lead text (CSS `animation-timeline: view()`, progressive enhancement), a header that turns solid with a blur on scroll, a results marquee band, and a card swap with staggered rise.
-- The result states are told apart by glyph and shape (✓ solid, ✕ square, ? dashed ring) and their exact labels, not by colour.
-- Explore section adapts the interaction model of the Myth Atlas reference (tabs, framed stage, tool rail, turn bar, notes card with staggered swap, expand, light preset) to our drone. None of its assets, copy or palette are used.
-- One type family: Archivo (variable, width axis for display sizes).
-- The result colours are always paired with a glyph and the exact label (Pass ✓, Incorrect Installation ✕, Unable to Verify ? with a dashed ring), never colour alone.
-- Motion: one entry reveal (stage light comes up, copy rises), section reveals once, story poses eased in the viewer. No scroll-jacking or propeller spinning. Everything is static under `prefers-reduced-motion`.
+- Apple-style dark theme. True-black ground, white type, Playfair Display serif headlines with muted-violet italic accents, Archivo for UI text. Palette reference from the frontend owner: Jet Black #050505, Royal Amethyst #3B0A6B, Electric Cyan #00E5FF, used sparingly.
+- Seven full-screen scenes with CSS scroll-snap (desktop): Intro, Taken apart, The propeller, How it works, Results with fixture demo, Explore, Project. One persistent 3D canvas behind them moves the drone to a new shot per scene, with a soft dip-to-black transition and staggered blur-rise copy on every scene change.
+- Lighting and atmosphere: a gloss-black schematic drone, a gliding white key light, slow-breathing violet rim lights, and shader-based stage fog. The fog is domain-warped noise in a deep purple (#2B0B55): it hugs the floor, billows upward and evolves slowly, like smoke-machine haze.
+- The opening assembles the drone from its parts before the headline appears. "Taken apart" separates it in stages with part labels.
+- Results are told apart by glyph and shape (✓ ✕ ?) and their exact labels, not colour alone.

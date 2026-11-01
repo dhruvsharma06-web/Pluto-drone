@@ -8,6 +8,9 @@ Contract: v1.0.0 (read-only consumer of `contracts/verification-result.schema.js
 
 ## Completed
 
+Latest structure (supersedes the long-scroll description below where they differ): seven full-screen snap scenes over one persistent 3D stage (src/stage.ts), Apple-style dark theme with serif headlines, shader stage fog in deep purple, dip-to-black scene transitions. Content was cut to one screen per topic; the APK line was removed from the hero at the owner's request (resources still state that downloads will be linked when released).
+
+
 A responsive one-page overview in `apps/website/` (Vite 6 + TypeScript + three.js 0.170, no framework):
 
 - **Opening**: full-screen, true-black cinematic stage. The schematic drone **assembles from its parts on load** (body → arms → motors → propellers, each labelled as it lands, camera dolly-in). Then an inspection HUD frame locks on with one scan sweep, and the headline reveals word by word.

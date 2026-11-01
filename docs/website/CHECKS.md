@@ -34,10 +34,13 @@ What the tests cover: exact result labels; no Pass with any missing evidence or 
 - Screenshots were taken while the app's browser pane was hidden, so CSS transitions were throttled and some frames are mid-animation.
 - The site is designed desktop-first, per the team's direction. Mobile was checked for overflow and readability only.
 
+## Latest pass (scene redesign)
+
+- Same commands re-run after the redesign: `npm run check` passes (tsc 0 errors, vitest 8/8, vite build).
+- Desktop 1440×900: all seven scenes visited. The intro assembles, then copy appears. Taken apart separates with labels. The propeller close-up shows the resting-angle label. Results and the demo render, Explore renders after the CSS fix, and Project renders. No console errors. With the fixed canvas and snap sections, page height is 7 viewports (≈6375 px at 900 px tall).
+- Not re-checked after the redesign: mobile layout, keyboard pass through every scene, reduced motion.
+
 ## Screenshots (captured)
 
-- `screenshots/desktop-1440-hero.jpg`: final black-and-white hero after assembly, with the progress rail and scroll cue.
-- `screenshots/desktop-1440-hero-assembly.jpg`: the assembly intro in progress, parts labelled as they land.
-- `screenshots/desktop-1440-story-propeller.jpg`: the last story step, a propeller close-up with the resting-angle label.
-- `screenshots/desktop-1440-exploded-view.jpg`: the scroll-scrubbed exploded view near full separation (before the spread was tightened slightly).
-- `screenshots/desktop-1440-explore-propellers-blue-palette.jpg`: the explore plate, Propellers tab, captured before the final switch from blue to white light. The layout is unchanged.
+- `screenshots/desktop-1440-hero-fog.jpg`: final intro with purple stage fog.
+- `screenshots/desktop-1440-taken-apart-earlier-lighting.jpg`, `...-propeller-earlier-lighting.jpg`, `...-results-earlier-lighting.jpg`: same scenes, captured before the lighting was darkened.

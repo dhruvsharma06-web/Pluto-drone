@@ -15,64 +15,62 @@ const TIPS: [number, number][] = [
   [0.63, -0.6],
 ];
 const ROOTS: [number, number][] = [
-  [0.19, 0.3],
-  [-0.19, 0.3],
-  [-0.19, -0.32],
-  [0.19, -0.32],
+  [0.235, 0.3],
+  [-0.235, 0.3],
+  [-0.2, -0.33],
+  [0.2, -0.33],
 ];
 /** Arbitrary resting angles: propellers stop wherever they stop. */
 const REST = [0.5, 2.2, 2.75, 1.1];
 
 function canopyGeometry(): THREE.BufferGeometry {
-  const w = 0.44;
-  const l = 0.98;
-  const r = 0.17;
-  const x0 = -w / 2, x1 = w / 2, y0 = -l / 2, y1 = l / 2;
+  // Top outline from the photos: narrow, squared-off back; wider, rounded nose.
+  const bw = 0.2; // half width at the back
+  const fw = 0.255; // half width at the nose
   const s = new THREE.Shape();
-  s.moveTo(x0 + r, y0);
-  s.lineTo(x1 - r, y0);
-  s.quadraticCurveTo(x1, y0, x1, y0 + r);
-  s.lineTo(x1, y1 - r);
-  s.quadraticCurveTo(x1, y1, x1 - r, y1);
-  s.lineTo(x0 + r, y1);
-  s.quadraticCurveTo(x0, y1, x0, y1 - r);
-  s.lineTo(x0, y0 + r);
-  s.quadraticCurveTo(x0, y0, x0 + r, y0);
+  s.moveTo(-bw + 0.09, 0.5);
+  s.lineTo(bw - 0.09, 0.5);
+  s.quadraticCurveTo(bw, 0.5, bw, 0.41);
+  s.lineTo(fw, -0.2);
+  s.bezierCurveTo(fw, -0.46, 0.13, -0.53, 0, -0.53);
+  s.bezierCurveTo(-0.13, -0.53, -fw, -0.46, -fw, -0.2);
+  s.lineTo(-bw, 0.41);
+  s.quadraticCurveTo(-bw, 0.5, -bw + 0.09, 0.5);
+  // Few bevel segments give the crisp chamfered side facets seen on the shell.
   const g = new THREE.ExtrudeGeometry(s, {
-    depth: 0.085,
+    depth: 0.09,
     bevelEnabled: true,
-    bevelThickness: 0.055,
-    bevelSize: 0.05,
-    bevelSegments: 10,
-    curveSegments: 28,
+    bevelThickness: 0.065,
+    bevelSize: 0.06,
+    bevelSegments: 3,
+    curveSegments: 36,
   });
   g.rotateX(-Math.PI / 2);
-  // Gentle taper toward one end and a shallow wedge, as in the photos.
+  // A shallow wedge: the shell rises slightly toward the back.
   const p = g.attributes.position;
   for (let i = 0; i < p.count; i++) {
     const z = p.getZ(i);
     const y = p.getY(i);
-    const t = (z + 0.55) / 1.1;
-    p.setX(i, p.getX(i) * (1 - 0.1 * t));
-    if (y > 0.05) p.setY(i, y + 0.03 * (1 - t));
+    if (y > 0.05) p.setY(i, y + 0.025 * (0.5 - z));
   }
+  g.computeVertexNormals();
   g.translate(0, 0.175, 0);
   return g;
 }
 
 function bladeGeometry(): THREE.BufferGeometry {
   const b = new THREE.Shape();
-  b.moveTo(0.02, -0.011);
-  b.bezierCurveTo(0.08, -0.03, 0.2, -0.032, 0.258, -0.008);
-  b.quadraticCurveTo(0.276, 0.004, 0.256, 0.016);
-  b.bezierCurveTo(0.19, 0.03, 0.08, 0.026, 0.02, 0.011);
-  b.lineTo(0.02, -0.011);
+  b.moveTo(0.02, -0.009);
+  b.bezierCurveTo(0.08, -0.024, 0.2, -0.026, 0.262, -0.007);
+  b.quadraticCurveTo(0.279, 0.004, 0.26, 0.014);
+  b.bezierCurveTo(0.19, 0.024, 0.08, 0.02, 0.02, 0.009);
+  b.lineTo(0.02, -0.009);
   const g = new THREE.ExtrudeGeometry(b, { depth: 0.006, bevelEnabled: false, curveSegments: 18 });
   g.rotateX(-Math.PI / 2);
   return g;
 }
 
-type Mats = Record<'body' | 'arm' | 'pod' | 'brass' | 'prop', THREE.MeshStandardMaterial>;
+type Mats = Record<'body' | 'arm' | 'pod' | 'brass' | 'prop' | 'screw', THREE.MeshStandardMaterial>;
 
 function materials(): Mats {
   // Deep gloss black, like automotive paint: near-black base, strong clearcoat
@@ -90,8 +88,10 @@ function materials(): Mats {
     body: gloss(0.16),
     arm: gloss(0.3),
     pod: gloss(0.28),
-    brass: new THREE.MeshStandardMaterial({ color: 0x1a1b1d, roughness: 0.14, metalness: 1 }),
+    // Motor cans are bright metal in the photos.
+    brass: new THREE.MeshStandardMaterial({ color: 0xd9dde2, roughness: 0.12, metalness: 1 }),
     prop: gloss(0.26),
+    screw: new THREE.MeshStandardMaterial({ color: 0xb8bcc2, roughness: 0.25, metalness: 1 }),
   };
 }
 
@@ -141,7 +141,9 @@ export function createSchematicDrone(): DroneAsset {
   const canG = new THREE.CylinderGeometry(0.033, 0.033, 0.085, 28);
   const shaftG = new THREE.CylinderGeometry(0.013, 0.013, 0.02, 16);
   const hubG = new THREE.CylinderGeometry(0.022, 0.022, 0.026, 20);
-  const capG = new THREE.SphereGeometry(0.016, 16, 10);
+  const capG = new THREE.ConeGeometry(0.017, 0.034, 16);
+  const screwG = new THREE.CylinderGeometry(0.017, 0.017, 0.008, 16);
+  const toothG = new THREE.BoxGeometry(0.018, 0.02, 0.012);
   const blade = bladeGeometry();
 
   const props: THREE.Group[] = [];
@@ -159,6 +161,7 @@ export function createSchematicDrone(): DroneAsset {
     beam.lookAt(to);
     arm.add(beam);
     arm.add(mesh(knuckle, m.arm, rx, 0.17, rz));
+    arm.add(mesh(screwG, m.screw, rx, 0.197, rz)); // screw head on the arm mount
     anchor(`arm${i}`, arm, (rx + tx) / 2, 0.16, (rz + tz) / 2, anchors);
     addPart('arm', arm, out.clone().multiplyScalar(0.1), out.clone().multiplyScalar(1.8).add(new THREE.Vector3(0, 0.4, 0)), 0.7);
 
@@ -167,6 +170,13 @@ export function createSchematicDrone(): DroneAsset {
     motor.position.set(tx, 0, tz);
     motor.add(mesh(podG, m.pod, 0, 0.085, 0));
     motor.add(mesh(collarG, m.pod, 0, 0.165, 0));
+    for (let k = 0; k < 6; k++) {
+      // Toothed motor clip around the collar.
+      const a = (k / 6) * Math.PI * 2;
+      const tooth = mesh(toothG, m.pod, Math.cos(a) * 0.066, 0.18, Math.sin(a) * 0.066);
+      tooth.rotation.y = -a;
+      motor.add(tooth);
+    }
     motor.add(mesh(canG, m.brass, 0, 0.2125, 0));
     motor.add(mesh(shaftG, m.pod, 0, 0.262, 0));
     anchor(`motor${i}`, motor, 0, 0.2, 0, anchors);
@@ -180,7 +190,7 @@ export function createSchematicDrone(): DroneAsset {
     const b1 = mesh(blade, m.prop, 0, -0.003, 0);
     const b2 = mesh(blade, m.prop, 0, -0.003, 0);
     b2.rotation.y = Math.PI;
-    prop.add(b1, b2, mesh(capG, m.prop, 0, 0.016, 0));
+    prop.add(b1, b2, mesh(capG, m.prop, 0, 0.028, 0));
     anchor(`prop${i}`, prop, 0, 0.01, 0, anchors);
     anchor(`propTip${i}`, prop, 0.2, 0, 0, anchors);
     addPart('propeller', prop, out.clone().multiplyScalar(0.24).add(new THREE.Vector3(0, 0.3, 0)), out.clone().multiplyScalar(1.6).add(new THREE.Vector3(0, 2.0, 0)), 0.9);

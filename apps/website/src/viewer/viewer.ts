@@ -40,14 +40,14 @@ const VIEWS: Record<ViewName, { az: number; el: number }> = {
 };
 
 const LIGHTING: Record<Lighting, { key: number; rim: number; hemi: number; env: number; exposure: number }> = {
-  bench: { key: 1.4, rim: 3.2, hemi: 0.06, env: 0.75, exposure: 1.0 },
+  bench: { key: 1.5, rim: 1.6, hemi: 0.04, env: 0.6, exposure: 1.0 },
   low: { key: 0.3, rim: 0.4, hemi: 0.05, env: 0.07, exposure: 0.8 },
 };
 
 const ZOOM_MIN = 0.55;
 const ZOOM_MAX = 3.4;
 const FOV = 26;
-const ACCENT = new THREE.Color(0xffffff);
+const ACCENT = new THREE.Color(0xa46bff);
 const KINDS: PartKind[] = ['body', 'arm', 'motor', 'propeller'];
 
 const damp = (cur: number, goal: number, rate: number, dt: number) => goal + (cur - goal) * Math.exp(-rate * dt);
@@ -93,8 +93,8 @@ export class DroneViewer {
   private envTex?: THREE.Texture;
   private textures: THREE.Texture[] = [];
   private key = new THREE.DirectionalLight(0xffffff, 2.6);
-  private rim = new THREE.DirectionalLight(0xffffff, 3.2);
-  private rim2 = new THREE.DirectionalLight(0xffffff, 2.2);
+  private rim = new THREE.DirectionalLight(0xa46bff, 3.2);
+  private rim2 = new THREE.DirectionalLight(0x6a1fd0, 2.2);
   private hemi = new THREE.HemisphereLight(0xffffff, 0x202326, 0.55);
   private fitDistance = 4.6;
 
@@ -120,7 +120,8 @@ export class DroneViewer {
   private lastInteraction = -Infinity;
   private assembly: { start: number; dur: number; landed: Set<PartKind> } | null = null;
   private staged = { cur: 0, goal: 0 };
-  private smoke: { sprite: THREE.Sprite; base: THREE.Vector3; spin: number; phase: number; opacity: number }[] = [];
+  private shift = { x: 0, y: 0, gx: 0, gy: 0 };
+  private fog?: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 
   // Loop and lifecycle.
   private raf = 0;
@@ -152,7 +153,7 @@ export class DroneViewer {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.setClearColor(0x000000, 0);
+    this.renderer.setClearColor(0x000000, this.opts.ground === 'dark' ? 1 : 0);
     const canvas = this.renderer.domElement;
     canvas.setAttribute('aria-hidden', 'true');
     canvas.className = 'viewer-canvas';
@@ -267,9 +268,9 @@ export class DroneViewer {
 
     if (this.opts.ground === 'dark') {
       const poolTex = radialTexture([
-        [0, 'rgba(255,255,255,0.10)'],
-        [0.5, 'rgba(255,255,255,0.03)'],
-        [1, 'rgba(255,255,255,0)'],
+        [0, 'rgba(120,60,200,0.07)'],
+        [0.5, 'rgba(120,60,200,0.02)'],
+        [1, 'rgba(140,70,230,0)'],
       ]);
       this.textures.push(poolTex);
       const pool = new THREE.Mesh(
@@ -281,7 +282,7 @@ export class DroneViewer {
       pool.renderOrder = -2;
       this.asset!.root.parent!.add(pool);
 
-      this.addSmoke();
+      this.addFog();
 
       // Soft overhead beam: a studio spotlight falling on the bench.
       const c = document.createElement('canvas');
@@ -289,8 +290,8 @@ export class DroneViewer {
       c.height = 128;
       const g = c.getContext('2d')!;
       const grd = g.createLinearGradient(0, 0, 0, 128);
-      grd.addColorStop(0, 'rgba(255,255,255,0)');
-      grd.addColorStop(1, 'rgba(255,255,255,0.5)');
+      grd.addColorStop(0, 'rgba(150,80,255,0)');
+      grd.addColorStop(1, 'rgba(150,80,255,0.45)');
       g.fillStyle = grd;
       g.fillRect(0, 0, 4, 128);
       const beamTex = new THREE.CanvasTexture(c);
@@ -301,7 +302,7 @@ export class DroneViewer {
         new THREE.MeshBasicMaterial({
           map: beamTex,
           transparent: true,
-          opacity: 0.05,
+          opacity: 0.0,
           depthWrite: false,
           side: THREE.DoubleSide,
           blending: THREE.AdditiveBlending,
@@ -313,46 +314,65 @@ export class DroneViewer {
     }
   }
 
-  /** White studio haze: soft sprites drifting slowly around and behind the drone. */
-  private addSmoke() {
-    const c = document.createElement('canvas');
-    c.width = c.height = 256;
-    const g = c.getContext('2d')!;
-    // Build a soft, irregular puff from many faint overlapping blobs.
-    let seed = 7;
-    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    for (let i = 0; i < 70; i++) {
-      const x = 128 + (rnd() - 0.5) * 120;
-      const y = 128 + (rnd() - 0.5) * 120;
-      const r = 30 + rnd() * 70;
-      const grd = g.createRadialGradient(x, y, 0, x, y, r);
-      grd.addColorStop(0, 'rgba(255,255,255,0.10)');
-      grd.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = grd;
-      g.fillRect(0, 0, 256, 256);
-    }
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    this.textures.push(tex);
-    const spots: [number, number, number, number, number][] = [
-      // x, y, z, scale, opacity
-      [-1.9, 0.8, -2.2, 3.4, 0.12],
-      [1.9, 1.0, -2.0, 3.6, 0.11],
-      [0.1, 1.7, -2.8, 4.2, 0.09],
-      [-2.6, 0.3, 0.2, 2.8, 0.07],
-      [2.7, 0.4, 0.4, 3.0, 0.07],
-      [-1.0, 2.3, -1.6, 2.6, 0.06],
-    ];
-    spots.forEach(([x, y, z, sc, op], i) => {
-      const m = new THREE.SpriteMaterial({ map: tex, color: 0xffffff, transparent: true, opacity: op, depthWrite: false });
-      m.rotation = i * 1.3;
-      const sp = new THREE.Sprite(m);
-      sp.position.set(x, y, z);
-      sp.scale.setScalar(sc);
-      sp.renderOrder = -4;
-      this.storyGroup.add(sp);
-      this.smoke.push({ sprite: sp, base: sp.position.clone(), spin: (i % 2 ? 1 : -1) * (0.015 + i * 0.004), phase: i * 1.7, opacity: op });
+  /**
+   * Stage fog: a full-screen layer of slowly evolving, domain-warped noise —
+   * the look of smoke-machine haze. Densest along the floor, billowing up and
+   * thinning out toward the top. Drawn first, so the drone always sits in front.
+   */
+  private addFog() {
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(0x2b0b55) },
+        uStrength: { value: 3.4 },
+        uAspect: { value: 1 },
+      },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = vec4(position.xy, 0.999, 1.0);
+        }`,
+      fragmentShader: /* glsl */ `
+        uniform float uTime;
+        uniform vec3 uColor;
+        uniform float uStrength;
+        uniform float uAspect;
+        varying vec2 vUv;
+        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float noise(vec2 p) {
+          vec2 i = floor(p), f = fract(p);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+        }
+        float fbm(vec2 p) {
+          float v = 0.0, a = 0.5;
+          mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+          for (int i = 0; i < 6; i++) { v += a * noise(p); p = m * p; a *= 0.5; }
+          return v;
+        }
+        void main() {
+          vec2 p = vec2(vUv.x * uAspect, vUv.y) * 2.0;
+          float t = uTime * 0.065;
+          vec2 q = vec2(fbm(p + vec2(0.0, -t)), fbm(p + vec2(5.2, 1.3) - t * 0.7));
+          vec2 r = vec2(fbm(p + 3.0 * q + vec2(1.7, 9.2) + t * 0.5), fbm(p + 3.0 * q + vec2(8.3, 2.8) - t * 0.4));
+          float f = fbm(p + 2.6 * r + vec2(t * 0.6, -t));
+          // Thickest at the floor, but a thinner haze still reaches the top of the frame.
+          float floorMask = mix(0.55, 1.0, smoothstep(1.0, 0.0, vUv.y));
+          float d = pow(smoothstep(0.28, 0.95, f) * floorMask, 1.3);
+          vec3 col = uColor * d * uStrength + vec3(0.32, 0.2, 0.55) * pow(d, 3.0) * 0.12 * uStrength;
+          gl_FragColor = vec4(col, 1.0);
+        }`,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
     });
+    const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+    quad.frustumCulled = false;
+    quad.renderOrder = -10;
+    this.scene.add(quad);
+    this.fog = quad;
   }
 
   // ---------- public controls ----------
@@ -442,6 +462,17 @@ export class DroneViewer {
     this.touch();
   }
 
+  /** Move the model within the frame (fractions of width/height; +x right, +y up). */
+  setShift(x: number, y: number) {
+    this.shift.gx = x;
+    this.shift.gy = y;
+    if (this.opts.reducedMotion) {
+      this.shift.x = x;
+      this.shift.y = y;
+    }
+    this.kick();
+  }
+
   /** Scroll-scrubbed staged explode (0 = assembled, 1 = every group separated). */
   setStaged(p: number) {
     this.staged.goal = Math.min(1, Math.max(0, p));
@@ -487,13 +518,20 @@ export class DroneViewer {
     if (!w || !h || !this.renderer) return;
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
+    if (this.fog) this.fog.material.uniforms.uAspect.value = w / h;
     // Keep the whole model in frame on narrow (portrait) stages.
     this.camera.fov = w / h < 1 ? Math.min(44, FOV / Math.max(w / h, 0.6)) : FOV;
-    const shift = this.opts.viewShiftY ?? 0;
-    if (shift) this.camera.setViewOffset(w, h, 0, h * shift, w, h);
-    else this.camera.clearViewOffset();
-    this.camera.updateProjectionMatrix();
+    if (this.opts.viewShiftY && !this.shift.gy) this.shift.y = this.shift.gy = this.opts.viewShiftY;
+    this.applyShift();
     this.kick();
+  }
+
+  private applyShift() {
+    const { clientWidth: w, clientHeight: h } = this.opts.container;
+    if (!w || !h) return;
+    if (Math.abs(this.shift.x) < 1e-4 && Math.abs(this.shift.y) < 1e-4) this.camera.clearViewOffset();
+    else this.camera.setViewOffset(w, h, -w * this.shift.x, h * this.shift.y, w, h);
+    this.camera.updateProjectionMatrix();
   }
 
   dispose() {
@@ -510,7 +548,6 @@ export class DroneViewer {
         (me.material as THREE.Material).dispose();
       }
     });
-    this.smoke.forEach((sm) => sm.sprite.material.dispose());
     this.textures.forEach((t) => t.dispose());
     this.envTex?.dispose();
     this.pmrem?.dispose();
@@ -634,16 +671,11 @@ export class DroneViewer {
     this.storyGroup.position.y = c.lift + Math.sin(t * 0.9) * 0.008 * this.idle;
     // Key light glides slowly so reflections sweep across the gloss.
     if (!rm) this.key.position.set(Math.cos(t * 0.18) * 4.5, 5, Math.sin(t * 0.18) * 4.5);
-    if (!rm)
-      for (const sm of this.smoke) {
-        (sm.sprite.material as THREE.SpriteMaterial).rotation += sm.spin * dt;
-        sm.sprite.position.set(
-          sm.base.x + Math.sin(t * 0.07 + sm.phase) * 0.35,
-          sm.base.y + Math.sin(t * 0.11 + sm.phase) * 0.15,
-          sm.base.z,
-        );
-        (sm.sprite.material as THREE.SpriteMaterial).opacity = sm.opacity * (0.8 + 0.2 * Math.sin(t * 0.2 + sm.phase)) * (this.light.env / 0.75);
-      }
+    if (this.fog) {
+      const u = this.fog.material.uniforms;
+      if (!rm) u.uTime.value = t;
+      u.uStrength.value = 3.4 * (this.light.env / 0.6);
+    }
 
     this.asset?.setExplode?.(c.explode);
     if (this.asset?.setExplodeStaged && Math.abs(this.staged.cur - this.staged.goal) > 1e-4) {
@@ -668,7 +700,7 @@ export class DroneViewer {
       if (Math.abs(f.hi - hiGoal) < 1e-3) f.hi = hiGoal;
       if (Math.abs(f.ghost - ghostGoal) < 1e-3) f.ghost = ghostGoal;
       for (const m of this.kindMats.get(k) ?? []) {
-        m.emissive.copy(ACCENT).multiplyScalar(0.16 * f.hi);
+        m.emissive.copy(ACCENT).multiplyScalar(0.18 * f.hi);
         m.opacity = 1 - 0.82 * f.ghost;
         const tr = f.ghost > 0.001;
         if (m.transparent !== tr) {
@@ -683,11 +715,21 @@ export class DroneViewer {
     const L = this.light, LG = this.lightGoal;
     for (const key of Object.keys(L) as (keyof typeof L)[]) L[key] = rm ? LG[key] : damp(L[key], LG[key], 3, dt);
     this.key.intensity = L.key;
-    this.rim.intensity = L.rim;
-    this.rim2.intensity = L.rim * 0.5;
+    // Breathing rim lights: cyan and amethyst pulse slowly out of phase.
+    const tt = performance.now() / 1000;
+    const breathe = (k: number, ph: number) => (rm ? 1 : 0.8 + 0.2 * Math.sin(tt * k + ph));
+    this.rim.intensity = L.rim * breathe(0.7, 0);
+    this.rim2.intensity = L.rim * 0.9 * breathe(0.5, 1.4);
     this.hemi.intensity = L.hemi;
     this.scene.environmentIntensity = L.env;
     this.renderer.toneMappingExposure = L.exposure;
+
+    const sh = this.shift;
+    if (Math.abs(sh.x - sh.gx) > 1e-4 || Math.abs(sh.y - sh.gy) > 1e-4) {
+      sh.x = rm ? sh.gx : damp(sh.x, sh.gx, 3.5, dt);
+      sh.y = rm ? sh.gy : damp(sh.y, sh.gy, 3.5, dt);
+      this.applyShift();
+    }
 
     // Camera orbit around the (possibly anchored) target.
     this.storyGroup.updateMatrixWorld(true);

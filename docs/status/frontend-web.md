@@ -40,3 +40,17 @@ Part-name restoration: restored Body shell, Arms, Motors and Propellers tags on 
 Copy cleanup requested by user: removed only the Flight cursor/keyboard instruction and its separate illustration sentence. Kept the ground-first/disarmed/stopped line and other site-wide illustrative disclosures. Removed CSS-generated How it works numbers and their empty column; all four rows, borders, titles and descriptions remain. Flight controls, 3D and animation code unchanged. npm run build and git diff --check pass.
 
 Initial-load label refinement: removed only the global stage onLanded label callback. Opening assembly still plays, but no part names appear on first load/refresh. Existing updateTags continues showing the four restored part labels only in the Taken apart scene. Its staged timing, anchors and animation remain unchanged. npm run build and git diff --check pass.
+
+## Results simplification
+
+Removed the exact phone-mockup caption “FIXTURE_1 — swap for the type the reference lists.” Kept Mockup labelling and its result diagram. Results now has a short heading and one-line meanings for the three exact outcomes. Preset buttons use plain labels (Pass, Incorrect, Unclear image, No reference) instead of filenames.
+
+| Before | After | Why |
+| --- | --- | --- |
+| Visible contract explanation, file names and every evidence/fault input | Four sample choices; evidence/fault controls under “Adjust the example” | Easier to understand and less visual clutter |
+| Always-visible fixture motor map, findings, reasons and JSON | Short status/summary, with “View example details” and nested “Technical data” | Keep full information available without overwhelming the first view |
+| Long result explanations and raw provenance in the main panel | One concise explanation and persistent “Demo · Simulated results” | Preserve meaning and honesty with less copy |
+
+The demo's evaluate/read/write/preset logic, stale-result clearing, real fixture payloads, correction guidance and exact status labels are retained. All controls remain in the form even when collapsed. Simulated-result labelling remains visible in both ready and updating states. Main details close when a new result replaces the old one. No engine/contract/3D/camera/scroll-animation changes.
+
+Validation: npm run check passes (TypeScript, 8/8 existing fixture-rule tests, Vite build); git diff --check clean. Viewed direct #results desktop 1440px and phone 390px browser renders via the installed Taste inspector (ignored .preview/results-focus); normal scrolling renders also captured. Phone flows vertically, desktop fits the compact overview. General site audit retains the previously documented unrelated findings; no clean whole-site audit or manual browser click-through claimed. Impeccable and Emil guidance used for hierarchy, progressive disclosure and retaining native details behavior.

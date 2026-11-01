@@ -169,39 +169,40 @@
           <p class="phone__title">Result</p>
           <p class="phone__verdict">Incorrect Installation</p>
           <svg class="phone__map" viewBox="-180 -180 360 360" aria-hidden="true"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /><circle cx="126" cy="124" r="34" class="phone__ring" /></svg>
-          <p class="phone__small">FIXTURE_1 — swap for the type the reference lists.</p>
         </div>
       </section>
 
       <!-- 5. Results + fixture demo -->
       <section class="scene scene--results" id="results" data-scene="results" aria-labelledby="results-title">
         <div class="results__head" data-in>
-          <h2 id="results-title" class="title">Three results. <em>Nothing in between.</em></h2>
+          <h2 id="results-title" class="title">Three <em>results.</em></h2>
         </div>
         <dl class="verdicts" data-in>
           <div class="verdict verdict--pass">
             <dt><span class="glyph" aria-hidden="true">✓</span>Pass</dt>
-            <dd>Every check observable, every propeller matches.</dd>
+            <dd>All required checks match the reference.</dd>
           </div>
           <div class="verdict verdict--fail">
             <dt><span class="glyph" aria-hidden="true">✕</span>Incorrect Installation</dt>
-            <dd>Clear evidence of at least one mismatch.</dd>
+            <dd>A confirmed installation mismatch.</dd>
           </div>
           <div class="verdict verdict--unable">
             <dt><span class="glyph" aria-hidden="true">?</span>Unable to Verify</dt>
-            <dd>No reference, or the image can't support a check. Never a guess.</dd>
+            <dd>More evidence or a reference is needed.</dd>
           </div>
         </dl>
 
         <div class="demo" id="demo" data-in>
           <form class="demo__controls" data-demo-form aria-label="Fixture demo inputs">
-            <p class="demo__flag"><b>Fixture demo</b> — the contract's rules on made-up inputs. No photo, no detector.</p>
-            <div class="preset-row" role="group" aria-label="Load a shared fixture file">
-              <button type="button" class="chip" data-preset="pass">pass.json</button>
-              <button type="button" class="chip" data-preset="incorrect">incorrect.json</button>
-              <button type="button" class="chip" data-preset="unclear">unclear.json</button>
-              <button type="button" class="chip" data-preset="pending">pending.json</button>
+            <p class="demo__flag"><b>Try an example</b></p>
+            <div class="preset-row" role="group" aria-label="Choose a simulated example">
+              <button type="button" class="chip" data-preset="pass">Pass</button>
+              <button type="button" class="chip" data-preset="incorrect">Incorrect</button>
+              <button type="button" class="chip" data-preset="unclear">Unclear image</button>
+              <button type="button" class="chip" data-preset="pending">No reference</button>
             </div>
+            <details class="demo__advanced">
+              <summary>Adjust the example</summary>
             <fieldset class="switches">
               <legend class="visually-hidden">Evidence in the image</legend>
               <label class="switch"><input type="checkbox" name="referenceLoaded" checked /><span>Reference</span></label>
@@ -224,6 +225,7 @@
                 </select>
               </label>
             </fieldset>
+            </details>
           </form>
           <div class="demo__out" data-demo-out aria-live="polite" aria-atomic="true">
             <noscript><p>The fixture demo needs JavaScript.</p></noscript>

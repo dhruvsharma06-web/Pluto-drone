@@ -1727,3 +1727,28 @@ html[data-scene='flight'] .reticle.is-live {
   .traits dt::after { display: none; }
   .traits dd { max-width: 55%; }
 }
+
+/* Results: a small set of examples first; technical controls stay optional. */
+.demo__controls { border-radius: 24px; padding: 24px; gap: 20px; }
+.demo__out { max-height: none; overflow: visible; padding: 24px; }
+.demo__out:has(.out__details[open]) {
+  max-height: max(360px, calc(100svh - 440px)); overflow-y: auto;
+}
+.demo .chip { font-family: var(--font); min-height: 44px; font-size: .95rem; }
+.demo__advanced summary, .out__details > summary {
+  min-height: 44px; display: flex; align-items: center; gap: 10px;
+  cursor: pointer; font-size: .95rem; font-weight: 500; color: var(--muted);
+}
+.demo__advanced summary::after, .out__details > summary::after { content: '+'; margin-left: auto; }
+.demo__advanced[open] > summary::after, .out__details[open] > summary::after { content: '−'; }
+.demo__advanced fieldset { margin-top: 16px; }
+.out__source { color: var(--muted); font-size: .9rem; }
+.out__why { color: var(--ink); font-size: 1rem; line-height: 1.6; text-align: left; }
+.out__details { border-top: 1px solid var(--line); padding-top: 8px; }
+.out__details .out__body, .out__details .reasons { margin-top: 20px; }
+.verdict { border-radius: 20px; }
+@media (max-width: 640px) {
+  .demo__controls, .demo__out { padding: 20px; border-radius: 20px; }
+  .out__body { grid-template-columns: 1fr; }
+  .out__verdict { flex-wrap: wrap; line-height: 1.2; }
+}

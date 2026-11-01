@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-01T04:45:44.751083+00:00",
+  "title": "Design System: Pluto Inspection",
+  "extensions": {
+    "motion": [
+      {
+        "name": "pointer-press",
+        "value": "scale(.98), 100ms press / 140ms release, Cubic(.23,1,.32,1)",
+        "purpose": "Pointer feedback only; disabled for Remove Animations."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "native-rail",
+        "value": "900dp"
+      },
+      {
+        "name": "two-column-content",
+        "value": "760dp"
+      }
+    ],
+    "shadows": []
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "Evidence in view",
+    "overview": "The user-approved graphite-and-ice direction is expressed through native Material 3 components.",
+    "keyCharacteristics": [
+      "Real image evidence paired with motor findings.",
+      "Quiet native navigation, blue primary action, semantic result colours.",
+      "System scaling and separate light/dark palettes."
+    ],
+    "rules": [],
+    "dos": [
+      "Do retain the simulated-results notice in every fixture view."
+    ],
+    "donts": [
+      "Don't fabricate model/dataset metrics, confidence or flight-clearance claims."
+    ]
+  },
+  "native": {
+    "platform": "Flutter Android",
+    "componentSource": "lib/src/",
+    "note": "Native Dart widgets are authoritative; no synthetic HTML component previews are claimed."
+  }
+}

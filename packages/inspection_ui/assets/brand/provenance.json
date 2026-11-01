@@ -1,0 +1,19 @@
+{
+  "origin": "Original vector geometry authored for this project; no generated photo, stock mark, or third-party brand asset.",
+  "name": "Rotor aperture",
+  "files": {
+    "pluto-adaptive-foreground.png": "f3317ff4af2b2578f5ce636c387cc7542498750d35f03f28e89d9bea0662030d",
+    "pluto-app-icon-1024.png": "c31fb044d901465f1c806f1fee24635915c3f9584c69c02d8fe6be1bf1314e9b",
+    "pluto-app-icon.svg": "205abe3aeb6ffd77794c39712cd208f19170cd64ffa73e0ac5fd19719f0df631",
+    "pluto-mark-white.svg": "1129c0cbdad43d3be4081db21602bb5c66d72866af52ec6c88d3613013b0bfdd",
+    "pluto-mark.svg": "c8f43c4e6a539ebe58259528b3900f7217b881e7004f552348bc6b79b4b1dfec",
+    "android/res/drawable/pluto_icon_foreground.xml": "2726f3f842652296d68adaa1dc340c7d3224d0c454027d15afee391d1174540c",
+    "android/res/mipmap-anydpi-v26/ic_launcher.xml": "9b0f06cc28e79bc4f17ee5eff6bc69fe023ae05723b5bd16e17fea2e19f67fed",
+    "android/res/mipmap-hdpi/ic_launcher.png": "d33334a158ce44df2112eb8e546b25bf714ba872e8fea347f2bafb815f98a9e9",
+    "android/res/mipmap-mdpi/ic_launcher.png": "df58529b4955f1143e92bd6398820f5e1abef7f8bd166ceaa2226454e70cf304",
+    "android/res/mipmap-xhdpi/ic_launcher.png": "c605bb1606cbe43b4729fafb9dcf1e6a13939aee62efca661b038254d0f456eb",
+    "android/res/mipmap-xxhdpi/ic_launcher.png": "3bb0fb0acaf72a8f71edd6047f529f773903b452594d8b83c2b5160d9f93eb7b",
+    "android/res/mipmap-xxxhdpi/ic_launcher.png": "66baaf2cca67c13384b98f1ece5047fb81e7faa78497b1d341c8869aec298968",
+    "android/res/values/pluto_brand.xml": "bbd262719e003789875c68e399711b61b44f064e5abc28b0f438a9f95b1c5bf2"
+  }
+}

@@ -15,6 +15,12 @@ window.setTimeout(reveal, reducedMotion ? 0 : 4800);
 document.addEventListener('drone:assembled', reveal, { once: true });
 
 initReveal();
+
+// Header turns solid once the page scrolls.
+const bar = document.querySelector<HTMLElement>('.bar');
+const onScroll = () => bar?.classList.toggle('is-scrolled', window.scrollY > 40);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
 initDemo(reducedMotion);
 mountStory(reducedMotion);
 mountExplore(reducedMotion);

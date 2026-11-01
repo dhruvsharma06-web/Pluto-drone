@@ -48,10 +48,20 @@ export function mountStory(reducedMotion: boolean) {
     stage.classList.add('is-acquiring');
   };
 
+  const dots = [...document.querySelectorAll<HTMLAnchorElement>('[data-progress] a')];
+  dots.forEach((d) =>
+    d.addEventListener('click', (e) => {
+      e.preventDefault();
+      steps[Number(d.dataset.go)]?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    }),
+  );
+
   const setActive = (i: number) => {
     const changed = i !== active;
     active = i;
     steps.forEach((s, k) => s.classList.toggle('is-active', k === i));
+    dots.forEach((d, k) => (k === i ? d.setAttribute('aria-current', 'step') : d.removeAttribute('aria-current')));
+    stage.closest('.story')?.classList.toggle('is-past-hero', i > 0);
     for (const t of tags) if (!t.land) t.el.classList.toggle('is-on', !!viewer && assembled && t.steps.includes(i));
     if (!viewer) return;
     viewer.applyPose(POSES[i] ?? POSES[0]);
@@ -81,7 +91,7 @@ export function mountStory(reducedMotion: boolean) {
     reducedMotion,
     ground: 'dark',
     homeDist: POSES[0].dist,
-    viewShiftY: narrow.matches ? 0.17 : 0.09,
+    viewShiftY: narrow.matches ? 0.12 : 0.02,
     assemble: true,
     onFrame: placeTags,
     onLanded: (kind) => {

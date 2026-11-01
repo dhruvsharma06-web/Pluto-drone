@@ -75,18 +75,23 @@ function bladeGeometry(): THREE.BufferGeometry {
 type Mats = Record<'body' | 'arm' | 'pod' | 'brass' | 'prop', THREE.MeshStandardMaterial>;
 
 function materials(): Mats {
+  // Deep gloss black, like automotive paint: near-black base, strong clearcoat
+  // so white light reads as crisp reflections rather than lifting the colour.
+  const gloss = (roughness: number) =>
+    new THREE.MeshPhysicalMaterial({
+      color: 0x010101,
+      roughness,
+      metalness: 0.15,
+      clearcoat: 1,
+      clearcoatRoughness: 0.04,
+      reflectivity: 0.6,
+    });
   return {
-    body: new THREE.MeshPhysicalMaterial({
-      color: 0x15171a,
-      roughness: 0.6,
-      metalness: 0.05,
-      clearcoat: 0.3,
-      clearcoatRoughness: 0.4,
-    }),
-    arm: new THREE.MeshStandardMaterial({ color: 0x1b1d20, roughness: 0.5, metalness: 0.05 }),
-    pod: new THREE.MeshStandardMaterial({ color: 0x1d1f22, roughness: 0.55, metalness: 0.05 }),
-    brass: new THREE.MeshStandardMaterial({ color: 0xe2c98f, roughness: 0.18, metalness: 1 }),
-    prop: new THREE.MeshStandardMaterial({ color: 0x17191c, roughness: 0.38, metalness: 0.04 }),
+    body: gloss(0.16),
+    arm: gloss(0.3),
+    pod: gloss(0.28),
+    brass: new THREE.MeshStandardMaterial({ color: 0x1a1b1d, roughness: 0.14, metalness: 1 }),
+    prop: gloss(0.26),
   };
 }
 

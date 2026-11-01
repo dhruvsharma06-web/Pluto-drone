@@ -10,8 +10,10 @@ Contract: v1.0.0 (read-only consumer of `contracts/verification-result.schema.js
 
 A responsive one-page overview in `apps/website/` (Vite 6 + TypeScript + three.js 0.170, no framework):
 
-- **Opening + scroll story** (sticky 3D stage): whole drone → arms/motors (parts separate) → propeller close-up → "right type, right place, right way up?" (top view; one propeller settles at a new resting angle to show that resting angle is not an error). Normal scrolling. Each step is plain HTML text; the viewer eases to the step's pose.
-- **Interactive viewer**: drag with inertia, touch drag, zoom buttons (×1.35), close-up, reset, Perspective/Top/Side views, a smooth 360° turn, component focus (body/arms/motors/propellers, synced text, `aria-pressed` + check mark, not colour only), separated-parts toggle, bench/low-light presets, keyboard (arrows, +/−, 0, T/S/P), expanded `<dialog>` (Esc/Close, focus returns, wheel and pinch zoom only there), fading drag hint, idle drift that pauses on interaction and resumes after ~1.8 s.
+- **Opening**: full-screen, true-black cinematic stage. The schematic drone **assembles from its parts on load** (body → arms → motors → propellers, each labelled as it lands, camera dolly-in). Then an inspection HUD frame locks on with one scan sweep, and the headline reveals word by word.
+- **Scroll story** (full-screen sticky stage with big captions scrolling over it): airframe → body shell → arms (separated) → motors → **the propeller** (close-up; one propeller settles at a new resting angle to show that resting angle is not an error). Normal scrolling. Each caption is plain HTML.
+- **Explore plate** (interaction model adapted from the Myth Atlas reference): component tabs with roving focus, a framed stage with blue corner brackets, a tool rail (zoom in/out, separate parts, low light, reset, expand), a turn bar (−90°, 360°, +90°, Top/Side/3/4), a large caption, and a notes card (eyebrow, big title, tags, lede, field notes with dotted leaders, close-up toggle) whose copy swaps with a staggered rise. Plus drag with inertia, double-click reset, keyboard (arrows, +/−, 0, T/S/P), expanded `<dialog>` (Esc/Close, focus returns, wheel and pinch zoom only there) and idle drift that pauses on interaction.
+- **Look**: strictly black and white. The drone is gloss black with white light and white studio smoke, with no border or rings. Apple-style centred hero, big type everywhere (minimum 18 px), justified running text, results marquee band, word-reveal headings, scroll-driven reveals, solid-on-scroll header, story progress rail and scroll cue.
 - **Progressive enhancement**: an SVG poster is always in the HTML; three.js loads on demand and replaces it only after the first frame. If WebGL is missing, loading fails or the context is lost, the poster stays and a status message is set. Rendering pauses offscreen and in hidden tabs; resources are released on dispose. DPR is capped at 2 (1.5 on small screens).
 - **Asset-independent scene interface** (`src/viewer/types.ts`), an **illustrative procedural schematic** (`schematic.ts`), and an adapter for a future approved GLB (`gltf.ts`), selected via `public/assets/manifest.json`.
 - **Content**: installation problems with drawings, the six-step pipeline split into Safety / Acquisition / Vision core / App screen, the three results with exact labels, labelled phone **mockups**, an architecture stack with real package paths, honest evidence (no metrics; requirement evidence table; known limits), resources with real links or "Not available yet", workstream roles (no names), and a footer.
@@ -41,13 +43,15 @@ See `docs/status/frontend-web.md` and `docs/website/CHECKS.md` for exact command
 
 - The schematic is not the supplied drone's geometry; there is no front view until a front convention exists.
 - The demo shows contract semantics, not detection quality.
-- Browser checks ran in Chromium (the desktop app's browser pane) only. No Safari/Firefox or real-phone run.
+- Browser checks ran in Chromium (the desktop app's browser pane) only. No Safari/Firefox or real-phone run. Reduced motion was not emulated. See docs/website/CHECKS.md.
+- Motor cans are drawn dark metal to fit the black-and-white direction; the team photos show brass-coloured motors. Schematic colours are not a claim about the hardware.
 - No deployment (not authorised).
 
 ## Teammate preferences and decisions
 
-- Optional question asked: may the site show cropped/downsized team photos, and is a light vs dark direction preferred? Pending an answer: photos stay reference-only.
-- Direction chosen: dark studio stage for the drone, light "bench" sections for reading, safety-yellow single accent, one type family (Archivo with width axis). Reference site idr-tech.vercel.app was inspected for scroll-led object storytelling; motionsites.ai was **not** inspected.
+- Optional question asked (photo use, visual direction). Photo use is not answered yet, so photos stay reference-only.
+- Frontend owner's direction (2026-11-01, final): desktop-first; strictly black and white, true black, gloss-black drone like car paint with white lighting and white smoke, no border around the drone, professional and Apple-like; cinematic with lots of motion; no small text; justified text; minimal copy, more visuals; drone centred and as large as possible; parts assemble into the drone on load; scroll through parts ending on the propeller; adopt the Myth Atlas interaction style.
+- Reference site idr-tech.vercel.app was inspected for scroll-led object storytelling; motionsites.ai was **not** inspected.
 - Working name "Pluto Inspector" (from the app package `pluto_inspector`); easy to replace (`index.html` text). It does not establish the exact variant.
 
 ## Shared change proposals

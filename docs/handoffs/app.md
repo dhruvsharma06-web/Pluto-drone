@@ -1,3 +1,5 @@
+Typography build d578cdc2044184dc661a1d2d4723edf1c3656b78: installed/launched successfully on connected Samsung; detailed scope in docs/app/FLUTTER_ALIGNMENT.md.
+
 ## Calmer typography — 1 November 2026
 
 User found the text overwhelming. Switched current headings to Inter, reduced headline 34→28sp, body/controls 17→16sp, softened title/safety weights, and simplified the start heading to “Inspect your drone.” Shortened only the illustration helper disclosure. Palette, rounded controls, safety meaning, result labels, camera and runtime logic unchanged. Impeccable/Emil guidance applied to hierarchy and readability.

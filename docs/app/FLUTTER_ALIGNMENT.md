@@ -44,3 +44,5 @@ Final APK built from clean source 67275ac59d4f31734111f8bfff55776ab6f18e66: 1842
 User found the text overwhelming. Switched current headings to Inter, reduced headline 34→28sp, body/controls 17→16sp, softened title/safety weights, and simplified the start heading to “Inspect your drone.” Shortened only the illustration helper disclosure. Palette, rounded controls, safety meaning, result labels, camera and runtime logic unchanged. Impeccable/Emil guidance applied to hierarchy and readability.
 
 UI analysis clean; all 25 UI tests pass, including four widths and 1.0x/1.5x text. Local 390px normal and 320px enlarged-text renders inspected. Device connected; updated APK installation recorded in the artifact follow-up.
+
+Typography APK source d578cdc2044184dc661a1d2d4723edf1c3656b78, SHA256 1d84d267336de7d722625c7d0f0fb3dd842210a03c50821f30f1e0362e49dc74. Signature verified; installed with data retained and launched successfully on Samsung SM-S731B. Native typography appearance/camera/inference not separately retested.

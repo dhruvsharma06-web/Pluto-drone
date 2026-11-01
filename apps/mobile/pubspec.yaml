@@ -21,3 +21,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/reference.json
+    - assets/models/propeller.onnx

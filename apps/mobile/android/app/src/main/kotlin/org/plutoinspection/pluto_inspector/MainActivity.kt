@@ -6,6 +6,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private var verificationChannel: MethodChannel? = null
+    @Volatile private var engine: PropellerEngine? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -18,10 +19,12 @@ class MainActivity : FlutterActivity() {
         ).also { channel ->
             channel.setMethodCallHandler { call, result ->
                 when (call.method) {
-                    // Explicit absence, not synthetic inference. ML's Android
-                    // adapter must replace this handler at final integration.
-                    "verify" -> result.error("ENGINE_UNAVAILABLE",
-                        "No Android verification engine/model is installed.", null)
+                    "verify" -> try {
+                        val current = engine ?: PropellerEngine(applicationContext).also { engine = it }
+                        result.success(current.verify(call.arguments as Map<*, *>))
+                    } catch (error: Throwable) {
+                        result.error("ENGINE_ERROR", error.message, null)
+                    }
                     else -> result.notImplemented()
                 }
             }
@@ -31,6 +34,8 @@ class MainActivity : FlutterActivity() {
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         verificationChannel?.setMethodCallHandler(null)
         verificationChannel = null
+        engine?.close()
+        engine = null
         super.cleanUpFlutterEngine(flutterEngine)
     }
 }

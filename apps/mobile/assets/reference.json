@@ -1,10 +1,18 @@
 {
   "schema_version": "1.0.0",
-  "reference_version": "pending",
-  "status": "pending",
-  "drone_variant": null,
-  "front_convention": null,
-  "source_evidence": [],
-  "supported_views": [],
-  "motors": []
+  "reference_version": "pluto-guide-2026-11-01",
+  "status": "verified",
+  "drone_variant": "Pluto (supplied organizer drone)",
+  "front_convention": "Head/front = wider end of the central body; narrower end = tail. Motor sides as seen from above with the head pointing away from the viewer.",
+  "source_evidence": [
+    "User-supplied annotated top-view guide (2026-11-01): CW/CCW per propeller",
+    "Arm mounts on supplied drone: screw-mount arms carry CW, hook-mount arms carry CCW"
+  ],
+  "supported_views": ["top_down"],
+  "motors": [
+    {"motor_id": "front_left", "expected_type": "cw", "expected_orientation": "not_assessed"},
+    {"motor_id": "front_right", "expected_type": "ccw", "expected_orientation": "not_assessed"},
+    {"motor_id": "rear_left", "expected_type": "ccw", "expected_orientation": "not_assessed"},
+    {"motor_id": "rear_right", "expected_type": "cw", "expected_orientation": "not_assessed"}
+  ]
 }

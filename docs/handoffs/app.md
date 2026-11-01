@@ -6,6 +6,8 @@ Owned paths: apps/mobile/, packages/inspection_runtime/, tools/, .github/workflo
 
 Contract: v1.0.0
 
+Latest device update: the indexed merged APK installed and launched successfully on Samsung SM-S731B, Android17/API37, arm64-v8a. Startup safety checkbox unchecked/Start disabled; camera permission initially ungranted. App-scoped sampled logs showed no matching fatal errors. User-assisted gallery selection is ongoing; no successful upload result or camera acceptance recorded yet. `docs/app/DEVICE_SMOKE.md` supersedes prior no-device statements below. Local screenshots stay in ignored build output; private photos must not enter Git.
+
 ## Completed and commit
 Combined APK source: `0f9c249faeb876f5e6d63d63f20959cf6c1096cc`, merging latest frontend `4c28f735d6a0ec0f1c07f8a3d04db9e413fdf55c` into `app/runtime` without conflicts at the user's explicit request (overriding the independent-development timing for this one branch). Original runtime: `e06f4362fc8eb73bbbbf0cb94ee31bebfc3b3ac4`. Subsequent docs/index/CI commit contains this handoff. No other role branches merged; no push, deployment or external message performed.
 

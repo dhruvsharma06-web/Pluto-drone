@@ -2,7 +2,9 @@
 
 Branch: `app/runtime`
 
-State: APP/RUNTIME CANDIDATE BUILT; REAL DETECTOR AND PHYSICAL VALIDATION BLOCKED.
+State: MERGED CANDIDATE INSTALLED/LAUNCHED ON PHONE; FULL DEVICE ACCEPTANCE AND REAL DETECTOR PENDING.
+
+Latest physical smoke: USB debugging authorized; APK installed and launched successfully on Samsung SM-S731B, Android17/API37, arm64-v8a. Initial unchecked safety gate/disabled Start observed; no matching fatal errors in sampled app logs. User is trying gallery upload; captured upload screen has not yet shown selected photo/result. Camera and complete acquisition/lifecycle tests remain pending. See `docs/app/DEVICE_SMOKE.md`; no private photo committed.
 
 Combined APK source commit: `0f9c249faeb876f5e6d63d63f20959cf6c1096cc`, merging latest `frontend/flutter` `4c28f735d6a0ec0f1c07f8a3d04db9e413fdf55c` at the user's explicit request. Earlier runtime implementation source: `e06f4362fc8eb73bbbbf0cb94ee31bebfc3b3ac4`.
 

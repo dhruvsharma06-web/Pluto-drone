@@ -1,5 +1,7 @@
 # Runtime validation — 1 November 2026
 
+Latest physical evidence: [device smoke report](DEVICE_SMOKE.md). The merged APK now installs and launches on Samsung SM-S731B / Android17 / API37 / arm64-v8a; startup safety gate observed. This supersedes prior no-ADB/no-install statements below. Full gallery/camera/lifecycle and detector validation remain pending.
+
 ## Latest combined frontend/runtime candidate
 
 At the user's explicit request, `frontend/flutter` (`4c28f735d6a0ec0f1c07f8a3d04db9e413fdf55c`) was fetched and merged without conflicts into `app/runtime`: **`0f9c249faeb876f5e6d63d63f20959cf6c1096cc`**. No other role branch was merged and no push/publication was performed. This supersedes the original frontend-baseline and independent-branch statements below.

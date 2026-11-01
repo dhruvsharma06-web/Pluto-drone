@@ -1,6 +1,6 @@
 # Physical Android acceptance — pending
 
-On 1 November 2026 the user connected a Samsung phone (Windows USB reports an S25 FE) and is completing debugging setup. ADB still reports no devices; installation and hardware tests remain pending. No Android version, tested ABI, camera compatibility, latency, FPS or detection accuracy is claimed. API 24+ and arm64-v8a are build configuration targets, not validated support.
+On 1 November 2026 the indexed APK installed and launched successfully on Samsung SM-S731B, Android17/API37, arm64-v8a. Initial unchecked safety gate and disabled Start were observed. See `DEVICE_SMOKE.md` for actual scope. Gallery/camera/permissions/lifecycle acceptance, latency, FPS and detection accuracy remain pending; one startup smoke test does not establish full device support.
 
 1. Record source commit, APK SHA-256, phone model/Android version and `adb shell getprop ro.product.cpu.abilist`. Use a supplied drone with motors stopped and follow its actual disarming procedure. The app cannot prove disarm and provides no drone control commands.
 2. Install the arm64 candidate with `adb install -r apps/mobile/build/app/outputs/flutter-apk/app-release.apk`; launch Pluto Inspection. Confirm it starts without a camera permission request until Live is chosen. No microphone/storage permission should be requested.

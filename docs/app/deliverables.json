@@ -16,6 +16,8 @@
     "signature_verified": true,
     "signing": "Android debug identity; hackathon sideload only",
     "physical_device_validated": false,
+    "physical_device_smoke_tested": true,
+    "physical_device_report": "docs/app/DEVICE_SMOKE.md",
     "shared_download": null
   },
   "reference": {

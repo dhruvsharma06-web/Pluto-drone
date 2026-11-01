@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'theme.dart';
 
 /// Original illustrative geometry, not the supplied drone configuration.
 /// Movement is the viewpoint, never powered propeller motion.
@@ -67,7 +68,7 @@ class _DroneStageState extends State<DroneStage>
                       tilt = Offset.zero;
                     }),
                 child: ColoredBox(
-                    color: const Color(0xff000000),
+                    color: inspectionJet,
                     child: Stack(fit: StackFit.expand, children: [
                       RepaintBoundary(
                           child: CustomPaint(painter: _StageGround())),
@@ -94,7 +95,8 @@ class _DroneStageState extends State<DroneStage>
                                 animation: scan,
                                 builder: (context, child) => CustomPaint(
                                     painter: _ScanPainter(
-                                        reduced ? .5 : scan.value)))),
+                                        reduced ? .5 : scan.value,
+                                        lit: true)))),
                       Positioned(
                           left: 22,
                           right: 22,
@@ -119,11 +121,29 @@ class _StageGround extends CustomPainter {
   @override
   void paint(Canvas canvas, Size s) {
     final area = Offset.zero & s;
-    canvas.drawRect(area, Paint()..color = Colors.black);
+    canvas.drawRect(area, Paint()..color = inspectionJet);
+    // A fixed studio light; the diagram moves beneath it during direct drag.
+    canvas.drawRect(
+        area,
+        Paint()
+          ..shader = const RadialGradient(
+            center: Alignment(-.35, -.35),
+            radius: .95,
+            colors: [inspectionViolet, Color(0xff1a0a28), inspectionJet],
+            stops: [0, .48, 1],
+          ).createShader(area));
+    canvas.drawRect(
+        area,
+        Paint()
+          ..shader = const RadialGradient(
+            center: Alignment(.85, .25),
+            radius: .65,
+            colors: [Color(0x2600e5ff), Colors.transparent],
+          ).createShader(area));
     final p = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1
-      ..color = const Color(0xff000000);
+      ..color = inspectionCyan;
     final r = Rect.fromLTWH(
         s.width * .12, s.height * .10, s.width * .76, s.height * .58);
     for (final (at, dx, dy) in [
@@ -156,7 +176,11 @@ class _DronePainter extends CustomPainter {
     final body = RRect.fromRectAndRadius(
         const Rect.fromLTWH(-27, -58, 54, 116), const Radius.circular(22));
     final arms = Paint()
-      ..color = const Color(0xffffffff)
+      ..shader = const LinearGradient(
+        colors: [inspectionCyan, Colors.white],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(const Rect.fromLTWH(-130, -90, 260, 180))
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
     for (final point in [
@@ -166,30 +190,36 @@ class _DronePainter extends CustomPainter {
       const Offset(92, 65)
     ]) {
       c.drawLine(Offset.zero, point, arms);
-      c.drawCircle(point, 12, Paint()..color = const Color(0xff000000));
+      c.drawCircle(point, 12, Paint()..color = inspectionJet);
       c.save();
       c.translate(point.dx, point.dy);
       c.rotate(point.dx * point.dy > 0 ? .4 : -.4);
       final blade = RRect.fromRectAndRadius(
           const Rect.fromLTWH(-42, -7, 84, 14), const Radius.circular(7));
-      c.drawRRect(blade, Paint()..color = Colors.white);
+      c.drawRRect(blade, Paint()..color = inspectionCyan);
       c.drawCircle(Offset.zero, 5, Paint()..color = const Color(0xffffffff));
       c.restore();
     }
-    c.drawRRect(body, Paint()..color = Colors.white);
+    c.drawRRect(
+        body,
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.white, inspectionCyan, inspectionViolet],
+          ).createShader(body.outerRect));
     c.drawRRect(
         RRect.fromRectAndRadius(
             const Rect.fromLTWH(-20, -51, 40, 102), const Radius.circular(16)),
-        Paint()..color = Colors.black);
+        Paint()..color = inspectionJet);
     c.drawLine(
         const Offset(-11, -29),
         const Offset(11, -29),
         Paint()
           ..strokeWidth = 2
           ..strokeCap = StrokeCap.round
-          ..color = const Color(0xffffffff));
-    c.drawCircle(
-        const Offset(0, 29), 3, Paint()..color = const Color(0xffffffff));
+          ..color = inspectionCyan);
+    c.drawCircle(const Offset(0, 29), 3, Paint()..color = inspectionCyan);
     c.restore();
   }
 
@@ -198,21 +228,34 @@ class _DronePainter extends CustomPainter {
 }
 
 class _ScanPainter extends CustomPainter {
-  _ScanPainter(this.progress);
+  _ScanPainter(this.progress, {this.lit = false});
   final double progress;
+  final bool lit;
   @override
   void paint(Canvas c, Size s) {
     final y = s.height * .12 + progress * s.height * .55;
+    if (lit) {
+      final band = Rect.fromLTWH(s.width * .13, y - 18, s.width * .74, 18);
+      c.drawRect(
+          band,
+          Paint()
+            ..shader = const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x003b0a6b), Color(0x803b0a6b)],
+            ).createShader(band));
+    }
     c.drawLine(
         Offset(s.width * .13, y),
         Offset(s.width * .87, y),
         Paint()
-          ..color = const Color(0xffffffff)
+          ..color = lit ? inspectionCyan : Colors.white
           ..strokeWidth = 1.5);
   }
 
   @override
-  bool shouldRepaint(_ScanPainter old) => old.progress != progress;
+  bool shouldRepaint(_ScanPainter old) =>
+      old.progress != progress || old.lit != lit;
 }
 
 /// Processing indication over real image evidence; never a detection result.

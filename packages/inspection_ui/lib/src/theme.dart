@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 
-const cameraGround = Colors.black;
+const inspectionJet = Color(0xff050505);
+const cameraGround = inspectionJet;
+const inspectionViolet = Color(0xff3b0a6b);
+const inspectionCyan = Color(0xff00e5ff);
+
+BoxDecoration inspectionBackdrop(ColorScheme colors) => BoxDecoration(
+      color: colors.surface,
+      gradient: RadialGradient(
+        center: Alignment.topRight,
+        radius: 1.25,
+        colors: [
+          colors.brightness == Brightness.dark
+              ? const Color(0xff250c3e)
+              : const Color(0xfff1eaff),
+          colors.surface,
+        ],
+        stops: const [0, .72],
+      ),
+    );
 ThemeData inspectionTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
   final ink = dark ? Colors.white : Colors.black;
-  final ground = dark ? Colors.black : Colors.white;
+  final ground = dark ? inspectionJet : Colors.white;
   final c = ColorScheme(
       brightness: brightness,
-      primary: ink,
-      onPrimary: ground,
-      secondary: ink,
+      primary: inspectionViolet,
+      onPrimary: Colors.white,
+      secondary: dark ? inspectionCyan : inspectionViolet,
       onSecondary: ground,
       error: ink,
       onError: ground,
@@ -23,8 +41,8 @@ ThemeData inspectionTheme(Brightness brightness) {
       onSurfaceVariant: ink,
       outline: ink,
       outlineVariant: ink,
-      primaryContainer: ground,
-      onPrimaryContainer: ink,
+      primaryContainer: inspectionViolet,
+      onPrimaryContainer: Colors.white,
       secondaryContainer: ground,
       onSecondaryContainer: ink,
       tertiary: ink,
@@ -41,40 +59,39 @@ ThemeData inspectionTheme(Brightness brightness) {
   final base = ThemeData(useMaterial3: true, colorScheme: c);
   return base.copyWith(
       scaffoldBackgroundColor: ground,
-      textTheme: base.textTheme
-          .apply(fontFamily: family, bodyColor: ink, displayColor: ink)
-          .copyWith(
-              headlineSmall: TextStyle(
-                  fontFamily: family,
-                  fontSize: 32,
-                  height: 1.12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -.5,
-                  color: ink),
-              titleLarge: TextStyle(
-                  fontFamily: family,
-                  fontSize: 24,
-                  height: 1.2,
-                  fontWeight: FontWeight.w700,
-                  color: ink),
-              titleMedium: TextStyle(
-                  fontFamily: family,
-                  fontSize: 20,
-                  height: 1.3,
-                  fontWeight: FontWeight.w500,
-                  color: ink),
-              titleSmall: TextStyle(
-                  fontFamily: family,
-                  fontSize: 18,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                  color: ink),
-              bodyLarge: TextStyle(
-                  fontFamily: family, fontSize: 18, height: 1.45, color: ink),
-              bodyMedium: TextStyle(
-                  fontFamily: family, fontSize: 18, height: 1.45, color: ink),
-              bodySmall: TextStyle(
-                  fontFamily: family, fontSize: 18, height: 1.4, color: ink)),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: c.secondary),
+      textTheme: base.textTheme.apply(fontFamily: family, bodyColor: ink, displayColor: ink).copyWith(
+          headlineSmall: TextStyle(
+              fontFamily: family,
+              fontSize: 32,
+              height: 1.12,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -.5,
+              color: ink),
+          titleLarge: TextStyle(
+              fontFamily: family,
+              fontSize: 24,
+              height: 1.2,
+              fontWeight: FontWeight.w700,
+              color: ink),
+          titleMedium: TextStyle(
+              fontFamily: family,
+              fontSize: 20,
+              height: 1.3,
+              fontWeight: FontWeight.w500,
+              color: ink),
+          titleSmall: TextStyle(
+              fontFamily: family,
+              fontSize: 18,
+              height: 1.35,
+              fontWeight: FontWeight.w500,
+              color: ink),
+          bodyLarge: TextStyle(
+              fontFamily: family, fontSize: 18, height: 1.45, color: ink),
+          bodyMedium: TextStyle(
+              fontFamily: family, fontSize: 18, height: 1.45, color: ink),
+          bodySmall: TextStyle(
+              fontFamily: family, fontSize: 18, height: 1.4, color: ink)),
       appBarTheme: AppBarTheme(
           backgroundColor: ground,
           foregroundColor: ink,
@@ -83,10 +100,12 @@ ThemeData inspectionTheme(Brightness brightness) {
           centerTitle: false),
       navigationBarTheme: NavigationBarThemeData(
           backgroundColor: ground,
-          indicatorColor: ink,
+          indicatorColor: c.primaryContainer,
           elevation: 0,
           iconTheme: WidgetStateProperty.resolveWith((s) => IconThemeData(
-              color: s.contains(WidgetState.selected) ? ground : ink)),
+              color: s.contains(WidgetState.selected)
+                  ? c.onPrimaryContainer
+                  : ink)),
           labelTextStyle: WidgetStatePropertyAll(TextStyle(
               fontFamily: family,
               fontSize: 18,
@@ -94,14 +113,13 @@ ThemeData inspectionTheme(Brightness brightness) {
               color: ink))),
       navigationRailTheme: NavigationRailThemeData(
           backgroundColor: ground,
-          indicatorColor: ink,
-          selectedIconTheme: IconThemeData(color: ground),
+          indicatorColor: c.primaryContainer,
+          selectedIconTheme: IconThemeData(color: c.onPrimaryContainer),
           unselectedIconTheme: IconThemeData(color: ink)),
-      filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(minimumSize: const Size(48, 60), backgroundColor: ink, foregroundColor: ground, disabledBackgroundColor: ground, disabledForegroundColor: ink, side: BorderSide(color: ink), textStyle: const TextStyle(fontFamily: family, fontSize: 18, fontWeight: FontWeight.w500), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), elevation: 0)),
+      filledButtonTheme: FilledButtonThemeData(style: FilledButton.styleFrom(minimumSize: const Size(48, 60), backgroundColor: c.primary, foregroundColor: c.onPrimary, disabledBackgroundColor: ground, disabledForegroundColor: ink, side: BorderSide(color: c.secondary), textStyle: const TextStyle(fontFamily: family, fontSize: 18, fontWeight: FontWeight.w500), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), elevation: 0)),
       outlinedButtonTheme: OutlinedButtonThemeData(style: OutlinedButton.styleFrom(minimumSize: const Size(48, 56), foregroundColor: ink, side: BorderSide(color: ink))),
       iconButtonTheme: IconButtonThemeData(style: IconButton.styleFrom(minimumSize: const Size(48, 48), foregroundColor: ink)),
-      segmentedButtonTheme: SegmentedButtonThemeData(style: ButtonStyle(minimumSize: const WidgetStatePropertyAll(Size(48, 54)), textStyle: const WidgetStatePropertyAll(TextStyle(fontFamily: family, fontSize: 18, fontWeight: FontWeight.w500)), foregroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? ground : ink), backgroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? ink : ground), side: WidgetStatePropertyAll(BorderSide(color: ink)), shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))))),
+      segmentedButtonTheme: SegmentedButtonThemeData(style: ButtonStyle(minimumSize: const WidgetStatePropertyAll(Size(48, 54)), textStyle: const WidgetStatePropertyAll(TextStyle(fontFamily: family, fontSize: 18, fontWeight: FontWeight.w500)), foregroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.onPrimaryContainer : ink), backgroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.primaryContainer : ground), side: WidgetStatePropertyAll(BorderSide(color: c.secondary)), shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))))),
       dividerTheme: DividerThemeData(color: ink, space: 1));
 }
 

@@ -31,3 +31,5 @@ Real Android/device verification remains pending: the initially connected device
 Default theme is now dark (override themeMode as needed). Camera framing scene supports drag-to-tilt; imported images and their annotations support pinch zoom. A scan sweep indicates actual processing only. Reduced-motion support and all existing safety/provenance states remain. See docs/frontend/REDESIGN.md.
 
 Latest user direction: true black/white authored UI and launcher branding, 32sp headings / 24sp title / 18sp controls and body. Removed tagline, setup-tip repetition, progress strip, decorative source captions and duplicate safety subtitle. Detailed instructions remain under Guide. Evidence photographs remain unfiltered. Controller/core separation and result/safety rules unchanged.
+
+Latest palette reference supersedes monochrome-only styling: #050505 jet black, #3B0A6B royal amethyst, #00E5FF electric cyan. Added directional stage lighting, cyan rim accents, amethyst selection/actions and subtle page illumination. Large type, concise copy, unfiltered evidence, issue boxes and controller/core separation remain. No new continuous motion or dependency.

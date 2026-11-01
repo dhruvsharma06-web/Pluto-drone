@@ -14,3 +14,5 @@ Latest user direction: true black and white, large text and minimal supporting c
 22 team-supplied drone photos arrived in the WhatsApp ZIP. One original was used only for local render review; public preview uses an original geometry diagram. It is unlabelled and does not establish a correct installation. No accuracy/model claim is supplied here.
 
 Latest user direction: true black/white authored UI and launcher branding, 32sp headings / 24sp title / 18sp controls and body. Removed tagline, setup-tip repetition, progress strip, decorative source captions and duplicate safety subtitle. Detailed instructions remain under Guide. Evidence photographs remain unfiltered. Controller/core separation and result/safety rules unchanged.
+
+Latest palette reference supersedes monochrome-only styling: #050505 jet black, #3B0A6B royal amethyst, #00E5FF electric cyan. Added directional stage lighting, cyan rim accents, amethyst selection/actions and subtle page illumination. Large type, concise copy, unfiltered evidence, issue boxes and controller/core separation remain. No new continuous motion or dependency.

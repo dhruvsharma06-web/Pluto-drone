@@ -29,11 +29,11 @@
   },
   "components": [],
   "narrative": {
-    "northStar": "Black and white. Clear decisions.",
-    "overview": "User-pinned monochrome interface with large text, concise controls and explicit safety/results.",
+    "northStar": "Jet black. Amethyst light. Cyan precision.",
+    "overview": "User-referenced black/amethyst/cyan palette, large type and concise native controls.",
     "keyCharacteristics": [
       "Real image evidence paired with motor findings.",
-      "Quiet native navigation, blue primary action, semantic result colours.",
+      "Amethyst actions, restrained cyan accents, exact outcome names and icons.",
       "System scaling and separate light/dark palettes."
     ],
     "rules": [],

@@ -18,3 +18,5 @@ Tap a box for a native, scrollable detail sheet with Where, Why and Correction. 
 | Image separate from viewing controls | Image and annotations zoom together | Preserve annotation coordinates while inspecting details |
 
 Controller/core separation, v1 schema and safety/result guards remain unchanged. Rendering and interaction evidence is recorded in VALIDATION.md. No native-device performance or real inference claim. Private photographs remain excluded from public Git.
+
+Latest palette reference supersedes monochrome-only styling: #050505 jet black, #3B0A6B royal amethyst, #00E5FF electric cyan. Added directional stage lighting, cyan rim accents, amethyst selection/actions and subtle page illumination. Large type, concise copy, unfiltered evidence, issue boxes and controller/core separation remain. No new continuous motion or dependency.

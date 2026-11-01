@@ -254,7 +254,7 @@ class _InspectionShellState extends State<_InspectionShell>
         appBar: AppBar(
             titleSpacing: expanded ? 24 : 20,
             title: Row(mainAxisSize: MainAxisSize.min, children: [
-              InspectionMark(color: colors.primary, size: 28),
+              InspectionMark(color: colors.secondary, size: 28),
               const SizedBox(width: 11),
               const Flexible(
                   child: Text('Pluto Inspection',
@@ -320,8 +320,8 @@ class _InspectionShellState extends State<_InspectionShell>
                             child: ClipRRect(
                                 borderRadius:
                                     BorderRadius.circular(expanded ? 16 : 0),
-                                child: ColoredBox(
-                                    color: colors.surfaceContainerLowest,
+                                child: DecoratedBox(
+                                    decoration: inspectionBackdrop(colors),
                                     child: page)))),
                   ])),
             ])),

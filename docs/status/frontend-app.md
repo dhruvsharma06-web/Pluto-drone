@@ -15,3 +15,5 @@ Latest user direction: true black/white authored UI and launcher branding, 32sp 
 PRISM behavior implemented: issue boxes open motor-specific Where/Why/Correction sheets; image coordinates and supplied observations only. Detail sheets close on new input/result, invalidation or backgrounding. No detector, model, dataset, reference mapping or shared schema changed.
 
 Final latest validation: analysis clean; all 18 UI checks passed. See docs/frontend/VALIDATION.md.
+
+Latest palette reference supersedes monochrome-only styling: #050505 jet black, #3B0A6B royal amethyst, #00E5FF electric cyan. Added directional stage lighting, cyan rim accents, amethyst selection/actions and subtle page illumination. Large type, concise copy, unfiltered evidence, issue boxes and controller/core separation remain. No new continuous motion or dependency.

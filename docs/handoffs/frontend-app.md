@@ -44,3 +44,5 @@ Supply motor_id, normalized bbox, finding and observed/expected type/orientation
 The v1 schema has no per-motor narrative-reason field. Current Why text is derived only from observed/expected differences; a mismatch without a supplied distinction says its specific reason was not supplied. Do not inject unscoped overall reasons into a particular motor. If the ML producer needs richer per-motor explanations (for example visible absence versus occlusion), coordinate an optional schema extension with app and UI consumers before emitting new fields. No shared schema changes were made here and no model/dataset choices were prescribed.
 
 Final latest validation: analysis clean; all 18 UI checks passed. See docs/frontend/VALIDATION.md.
+
+Latest palette reference supersedes monochrome-only styling: #050505 jet black, #3B0A6B royal amethyst, #00E5FF electric cyan. Added directional stage lighting, cyan rim accents, amethyst selection/actions and subtle page illumination. Large type, concise copy, unfiltered evidence, issue boxes and controller/core separation remain. No new continuous motion or dependency.

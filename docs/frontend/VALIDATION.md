@@ -10,3 +10,6 @@ Final local checks: 1 November 2026, Flutter 3.47.1 / Dart 3.13.1 on Windows.
 - git diff --check: clean.
 
 Native run was attempted but device disconnected before Flutter drive. Native smoke/screenshot driver is included. No camera/inference/reference accuracy, APK/device gestures or physical flight readiness claim is made. User photographs and photo-based local renders are excluded from public Git; the public preview uses an original illustrative geometry image.
+
+## Interactive redesign validation
+Final redesign: analysis clean, all 16 tests passed, including direct-manipulation settling and reduced-motion scan handling. Render outputs were refreshed in flutter-ui-v2. Native hardware still unverified.

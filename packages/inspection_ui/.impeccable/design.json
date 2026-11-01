@@ -8,6 +8,11 @@
         "name": "pointer-press",
         "value": "scale(.98), 100ms press / 140ms release, Cubic(.23,1,.32,1)",
         "purpose": "Pointer feedback only; disabled for Remove Animations."
+      },
+      {
+        "name": "inspection-feedback",
+        "value": "180ms eased viewpoint return and status-emblem settling; 2200ms processing scan cycle",
+        "purpose": "Direct drag uses immediate tracking. Continuous scan only during processing; reduced motion is static. Status text and motor findings remain immediate."
       }
     ],
     "breakpoints": [

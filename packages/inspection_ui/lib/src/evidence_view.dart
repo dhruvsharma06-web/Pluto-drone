@@ -5,6 +5,7 @@ import 'package:inspection_contract/inspection_contract.dart';
 
 import 'presentation.dart';
 import 'theme.dart';
+import 'drone_stage.dart';
 
 Rect containedImageRect(Size viewport, Size image) {
   if (image.width <= 0 ||
@@ -76,47 +77,58 @@ class EvidenceView extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (image != null)
-                    Image.memory(
-                      image.bytes,
-                      fit: BoxFit.contain,
-                      gaplessPlayback: false,
-                      semanticLabel: 'Current drone inspection image',
-                      errorBuilder: (_, error, trace) =>
-                          const _EmptyCanvas(invalidImage: true),
-                      frameBuilder: (context, child, frame, loaded) =>
-                          frame == null && !loaded
-                              ? const Center(
-                                  child: Text(
-                                    'Loading image',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                )
-                              : Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    child,
-                                    if (result != null &&
-                                        result!.inputId == image.id)
-                                      for (final motor in result!.motors)
-                                        if (motorBoxRect(motor['bbox'], rect)
-                                            case final Rect bounds)
-                                          _MotorTarget(
-                                            bounds: bounds,
-                                            motor: motor,
-                                            selected: selectedMotor ==
-                                                motor['motor_id'],
-                                            onSelected: onMotorSelected,
-                                          ),
-                                  ],
-                                ),
-                    )
+                    InteractiveViewer(
+                        key: ValueKey(image.id),
+                        minScale: 1,
+                        maxScale: 3,
+                        child: Image.memory(
+                          image.bytes,
+                          fit: BoxFit.contain,
+                          gaplessPlayback: false,
+                          semanticLabel: 'Current drone inspection image',
+                          errorBuilder: (_, error, trace) =>
+                              const _EmptyCanvas(invalidImage: true),
+                          frameBuilder: (context, child, frame, loaded) =>
+                              frame == null && !loaded
+                                  ? const Center(
+                                      child: Text(
+                                        'Loading image',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    )
+                                  : Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        child,
+                                        if (result != null &&
+                                            result!.inputId == image.id)
+                                          for (final motor in result!.motors)
+                                            if (motorBoxRect(
+                                                    motor['bbox'], rect)
+                                                case final Rect bounds)
+                                              _MotorTarget(
+                                                bounds: bounds,
+                                                motor: motor,
+                                                selected: selectedMotor ==
+                                                    motor['motor_id'],
+                                                onSelected: onMotorSelected,
+                                              ),
+                                      ],
+                                    ),
+                        ))
                   else if (cameraPreview != null)
                     cameraPreview!
                   else
-                    const _EmptyCanvas(),
+                    DroneStage(
+                        processing: state.phase == InspectionPhase.processing),
+                  if (state.phase == InspectionPhase.processing &&
+                      (image != null || cameraPreview != null))
+                    const Positioned.fill(
+                      child: IgnorePointer(child: ProcessingSweep()),
+                    ),
                   Positioned(
                     left: 12,
-                    bottom: 12,
+                    top: 12,
                     right: 12,
                     child: Align(
                       alignment: Alignment.centerLeft,

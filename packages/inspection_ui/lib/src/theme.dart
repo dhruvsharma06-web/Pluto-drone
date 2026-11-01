@@ -9,17 +9,17 @@ ThemeData inspectionTheme(Brightness brightness) {
     seedColor: inspectionBlue,
     brightness: brightness,
   ).copyWith(
-    primary: dark ? const Color(0xffa8c7ff) : inspectionBlue,
-    onPrimary: dark ? const Color(0xff002c72) : Colors.white,
-    surface: dark ? const Color(0xff17191b) : const Color(0xfff2f5f8),
+    primary: dark ? const Color(0xff70b8ff) : inspectionBlue,
+    onPrimary: dark ? const Color(0xff071c2b) : Colors.white,
+    surface: dark ? const Color(0xff0e1216) : const Color(0xfff2f5f8),
     onSurface: dark ? const Color(0xfff1f2f4) : const Color(0xff182026),
     onSurfaceVariant: dark ? const Color(0xffb9c0c8) : const Color(0xff53606d),
-    surfaceContainerLowest: dark ? const Color(0xff111315) : Colors.white,
+    surfaceContainerLowest: dark ? const Color(0xff141a20) : Colors.white,
     surfaceContainerLow:
-        dark ? const Color(0xff202326) : const Color(0xfff7f9fb),
-    surfaceContainer: dark ? const Color(0xff272b2f) : const Color(0xffe9eef4),
+        dark ? const Color(0xff1c252d) : const Color(0xfff7f9fb),
+    surfaceContainer: dark ? const Color(0xff23313b) : const Color(0xffe9eef4),
     surfaceContainerHighest:
-        dark ? const Color(0xff343a40) : const Color(0xffdde5ee),
+        dark ? const Color(0xff2d3c48) : const Color(0xffdde5ee),
     outlineVariant: dark ? const Color(0xff3b4148) : const Color(0xffdce3ea),
   );
   final base = ThemeData(useMaterial3: true, colorScheme: c);
@@ -35,7 +35,7 @@ ThemeData inspectionTheme(Brightness brightness) {
         .copyWith(
           headlineSmall: TextStyle(
             fontFamily: family,
-            fontSize: 24,
+            fontSize: 28,
             height: 1.18,
             fontWeight: FontWeight.w700,
             letterSpacing: -.4,
@@ -78,7 +78,7 @@ ThemeData inspectionTheme(Brightness brightness) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 54),
+        minimumSize: const Size(48, 56),
         elevation: 0,
         textStyle: const TextStyle(
           fontFamily: family,

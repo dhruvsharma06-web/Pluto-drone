@@ -14,7 +14,7 @@ colors:
 typography:
   headline:
     fontFamily: Roboto
-    fontSize: "24sp"
+    fontSize: "28sp"
     fontWeight: 700
     lineHeight: 1.18
     letterSpacing: "-0.4sp"
@@ -69,3 +69,5 @@ Primary action is 54dp high; standard minimum native targets are 48dp. Segmented
 - Do use the supplied reference's motor identities.
 - Don't fabricate model/dataset metrics, confidence or flight-clearance claims.
 - Don't replace Material Android controls with Cupertino controls.
+
+User-requested visual update: default dark graphite scheme; authored material shading is confined to the illustrative drone scene. A processing-only scan sweep, direct viewpoint manipulation and evidence zoom are supported. Continuous motion never indicates a classification result; reduced motion uses static feedback. Inspect/Review state text changes immediately.

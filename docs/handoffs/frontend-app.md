@@ -32,3 +32,5 @@ Original logo SVG + white variant, 1024 launcher, transparent foreground, densit
 No real camera, picker, ML inference, dataset evaluation or verified motor map is implemented here. Preview actions/scenarios are synthetic and visibly labelled. A device was initially visible to ADB but disconnected before native verification. Do not claim screenshots came from Android hardware or that the preview is the final APK.
 
 Next receiver: app owner. Merge only in the agreed final integration window, connect actual controller/core and test installed APK/device lifecycle. ML owner supplies real reference/engine outputs; no model/data choice was changed. Shared change proposals: none required; app owner may expand stable error codes for more specific permission/device failures.
+
+Visual redesign: interactive original framing scene, processing scan graphics, evidence pinch zoom, native preparation steps and status-change feedback. Contract v1 and detection separation unchanged. Validation updated in docs/frontend/REDESIGN.md.

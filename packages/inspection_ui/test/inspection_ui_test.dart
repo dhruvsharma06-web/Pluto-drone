@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inspection_contract/inspection_contract.dart';
 import 'package:inspection_ui/inspection_ui.dart';
 import '../example/lib/fixture_controller.dart';
+import 'package:inspection_ui/src/drone_stage.dart';
 
 late Uint8List photoBytes;
 
@@ -64,7 +65,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
     const privatePhoto = String.fromEnvironment('TEAM_PHOTO_PATH');
-    photoBytes = await File(privatePhoto.isEmpty ? 'example/assets/illustrative-drone.png' : privatePhoto).readAsBytes();
+    photoBytes = await File(privatePhoto.isEmpty
+            ? 'example/assets/illustrative-drone.png'
+            : privatePhoto)
+        .readAsBytes();
     final loader = FontLoader('packages/inspection_ui/InspectionSans');
     for (final name in ['Regular', 'Medium', 'Bold'])
       loader.addFont(File('assets/fonts/Roboto-$name.ttf')
@@ -272,6 +276,26 @@ void main() {
     });
   }
 
+  testWidgets('processing graphics honour reduced motion', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+        home: MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child:
+                SizedBox(width: 300, height: 250, child: ProcessingSweep()))));
+    await tester.pumpAndSettle();
+    expect(tester.binding.transientCallbackCount, 0);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('illustrative scene responds to drag and settles',
+      (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+        home: SizedBox(width: 390, height: 300, child: DroneStage())));
+    await tester.drag(find.byType(DroneStage), const Offset(35, -15));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(tester.binding.transientCallbackCount, 0);
+  });
+
   testWidgets('capture rendered UI evidence', (tester) async {
     final dest = const String.fromEnvironment('SCREENSHOT_DIR');
     if (dest.isEmpty) return;
@@ -280,7 +304,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     final key = GlobalKey();
     for (final (name, scenario, width, height, dark) in [
-      ('prepare-phone', 'prepare', 390.0, 844.0, false),
+      ('prepare-phone', 'prepare', 390.0, 844.0, true),
       ('reference-phone', 'reference', 390.0, 844.0, false),
       ('mismatch-tablet', 'incorrect', 1100.0, 1000.0, false),
       ('pass-dark', 'pass', 390.0, 844.0, true)

@@ -6,6 +6,7 @@ import 'presentation.dart';
 import 'support_views.dart';
 import 'theme.dart';
 import 'inspection_mark.dart';
+part 'inspection_steps.dart';
 
 /// Drop-in presentation. The caller owns and disposes [controller].
 class InspectionApp extends StatelessWidget {
@@ -13,7 +14,7 @@ class InspectionApp extends StatelessWidget {
       {super.key,
       required this.controller,
       this.cameraPreview,
-      this.themeMode = ThemeMode.system,
+      this.themeMode = ThemeMode.dark,
       this.demoMode = false,
       this.developmentControls});
   final InspectionController controller;
@@ -389,7 +390,7 @@ class _InspectionView extends StatelessWidget {
       const SizedBox(height: 8),
       Text(
           result == null
-              ? 'Check the installation before you fly.'
+              ? 'A clear view. A confident installation check.'
               : switch (result!.status) {
                   VerificationStatus.pass =>
                     'The visible installation matches the supplied reference.',
@@ -524,7 +525,14 @@ class _InspectionView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         heading,
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
+                        _InspectionSteps(
+                            stage: result != null
+                                ? 2
+                                : state.safetyConfirmed
+                                    ? 1
+                                    : 0),
+                        const SizedBox(height: 20),
                         if (wide)
                           Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -568,7 +576,7 @@ class _ReadyNote extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('What makes a useful image',
+      Text('Set up your inspection',
           style: Theme.of(context).textTheme.titleMedium),
       const SizedBox(height: 12),
       for (final text in [
@@ -632,7 +640,16 @@ class _ResultSummary extends StatelessWidget {
         child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(icon, color: ink, size: 23),
+              TweenAnimationBuilder<double>(
+                  key: ValueKey(result.status),
+                  tween: Tween(begin: .92, end: 1),
+                  duration: Duration(
+                      milliseconds:
+                          MediaQuery.disableAnimationsOf(context) ? 0 : 180),
+                  curve: const Cubic(.23, 1, .32, 1),
+                  builder: (context, value, child) =>
+                      Transform.scale(scale: value, child: child),
+                  child: Icon(icon, color: ink, size: 26)),
               const SizedBox(width: 12),
               Expanded(
                   child: Text(text,

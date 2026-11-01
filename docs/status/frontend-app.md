@@ -7,3 +7,5 @@ Implemented: native light/dark theme, inspection/guide/project views, safety-gat
 Checks: Final Flutter analysis: no issues. All 14 UI/geometry/layout/render checks passed on final logo-equipped code. See docs/frontend/VALIDATION.md. Native Android run blocked after initially connected device disconnected. No real detector/camera validation claimed.
 
 Inputs: user approved graphite/ice with blue action; user requested token-efficient execution and original logo/icon; team photo selected from newly supplied ZIP. Old unrelated ZIP excluded. Scope extension explicitly requested by user: production Android launcher resources only. No runtime, ML, contract, main or other-branch changes.
+
+Visual redesign: interactive original framing scene, processing scan graphics, evidence pinch zoom, native preparation steps and status-change feedback. Contract v1 and detection separation unchanged. Validation updated in docs/frontend/REDESIGN.md.

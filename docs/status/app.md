@@ -4,6 +4,8 @@ Branch: `app/runtime`
 
 State: MERGED CANDIDATE INSTALLED/LAUNCHED ON PHONE; FULL DEVICE ACCEPTANCE AND REAL DETECTOR PENDING.
 
+Current capture layout: `fe2e1dd8f624afea91bc30455db7f63f9386dff5`, dedicated large camera screen targeting ~65–70% portrait viewfinder after shutter space; full-width Take photo below, Close/Android Back return to inspection. 50 runtime + 17 UI + 1 mobile checks pass (68). App/UI analysis clean; rebuilt, signature-verified, installed/launched on Samsung. User explicitly chose finish without a preview screenshot; final native appearance/percentage remains unverified. See `docs/app/LARGE_CAPTURE_VIEW.md`. Prior milestone evidence follows.
+
 Latest fix: `ddc5f409a511e91e15595a3af8ef15561bdc8586`. Replaced 750-ms automatic still loop with steady preview and explicit Take photo; fixed permission-dialog cancellation and final UI session flag. 50 runtime + 15 UI + 1 mobile checks pass, all analysis clean. Rebuilt/installed on Samsung; user confirmed “Preview steady; photo captured.” Accessibility showed a frozen image and Start available again. No private photo committed. See `docs/app/CAMERA_FIX.md`; full permission/lifecycle/rotation and real detector checks remain pending. Subsequent entries are earlier milestone evidence.
 
 Latest physical smoke: USB debugging authorized; APK installed and launched successfully on Samsung SM-S731B, Android17/API37, arm64-v8a. Initial unchecked safety gate/disabled Start observed; no matching fatal errors in sampled app logs. User is trying gallery upload; captured upload screen has not yet shown selected photo/result. Camera and complete acquisition/lifecycle tests remain pending. See `docs/app/DEVICE_SMOKE.md`; no private photo committed.

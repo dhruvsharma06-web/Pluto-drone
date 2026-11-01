@@ -45,6 +45,8 @@ The index script records the current HEAD and dirty state; run it immediately af
 
 ## Camera fix and current phone evidence
 
+Current source `fe2e1dd` adds the requested [large capture screen](LARGE_CAPTURE_VIEW.md), installed on Samsung. It targets a 65–70% portrait viewfinder with a separate shutter and Close/Back exit. 68 checks pass; native enlarged appearance verification was skipped at the user's request.
+
 Latest source `ddc5f40` replaces automatic camera sampling with a stable preview and explicit Take photo shutter. It is installed on the Samsung phone; the user confirmed a steady preview and successful capture. All 66 Flutter tests/checks pass with clean analysis. Full report and current artifact identity: [camera fix](CAMERA_FIX.md). A physical camera smoke test does not validate the missing detector.
 
 ## Honest demo now

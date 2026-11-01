@@ -593,6 +593,20 @@ main {
   margin-top: 18px;
   font-size: clamp(1.15rem, 0.5vw + 1rem, 1.4rem);
 }
+.flight__hint {
+  font-size: 1rem !important;
+  color: var(--ink);
+  opacity: 0.8;
+}
+html[data-scene='flight'] {
+  cursor: crosshair;
+}
+.flight__note {
+  font-size: 0.85rem !important;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 .scene__copy--left {
   align-self: center;
   max-width: 34rem;

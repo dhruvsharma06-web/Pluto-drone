@@ -33,6 +33,8 @@ export interface DroneAsset {
   setExplodeStaged?(progress: number): void;
   /** Present only when the asset can play an assembly sequence. 0 = scattered, 1 = assembled. Returns groups that have landed. */
   setAssembly?(progress: number): PartKind[];
+  /** Flight illustration only: spin all propellers to this angle (radians) and show blur discs (0..1). */
+  setSpin?(radians: number, blur: number): void;
   /** Rotates one propeller to a resting angle (motors stopped; used to show that resting angle is not an error). */
   setRestingAngle?(index: number, radians: number): void;
   dispose(): void;

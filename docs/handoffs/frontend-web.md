@@ -8,7 +8,7 @@ Contract: v1.0.0 (read-only consumer of `contracts/verification-result.schema.js
 
 ## Completed
 
-Latest structure (supersedes the long-scroll description below where they differ): seven full-screen snap scenes over one persistent 3D stage (src/stage.ts), Apple-style dark theme with serif headlines, shader stage fog in deep purple, dip-to-black scene transitions. Content was cut to one screen per topic; the APK line was removed from the hero at the owner's request (resources still state that downloads will be linked when released).
+Latest structure (supersedes the long-scroll description below where they differ): seven full-screen snap scenes over one persistent 3D stage (src/stage.ts), Apple-style dark theme with serif headlines, shader stage fog in deep purple, dip-to-black scene transitions. Content was cut to one screen per topic. A separate "Made to fly." scene (owner request) shows the drone lifting off with spinning propellers and blur discs, steered by mouse or arrow keys, with rotor downwash swirling the fog. It is labelled "Flight shown for illustration only" and states that inspection happens disarmed with motors stopped; it is never part of the inspection story; the APK line was removed from the hero at the owner's request (resources still state that downloads will be linked when released).
 
 
 A responsive one-page overview in `apps/website/` (Vite 6 + TypeScript + three.js 0.170, no framework):

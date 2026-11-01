@@ -208,6 +208,18 @@ export function createSchematicDrone(): DroneAsset {
     return (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2) * 2.0;
   };
   const rest = [0, 0, 0, 0];
+  let spin = 0;
+  // Motion-blur discs for the flight illustration; kept out of the part groups.
+  const discMat = new THREE.MeshBasicMaterial({ color: 0xb8b2c8, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+  const discGeo = new THREE.RingGeometry(0.03, 0.272, 48);
+  discGeo.rotateX(-Math.PI / 2);
+  const discs = TIPS.map(([tx, tz]) => {
+    const d = new THREE.Mesh(discGeo, discMat);
+    d.position.set(tx, 0.272, tz);
+    d.visible = false;
+    root.add(d);
+    return d;
+  });
   const DELAY: Record<PartKind, number> = { body: 0, arm: 0.14, motor: 0.3, propeller: 0.46 };
   const SPAN = 0.52;
   const local = (k: PartKind) => Math.min(1, Math.max(0, (assembly - DELAY[k]) / SPAN));
@@ -219,7 +231,7 @@ export function createSchematicDrone(): DroneAsset {
       mv.obj.rotation.x = mv.tilt * away;
       mv.obj.visible = local(mv.kind) > 0 || assembly >= 1;
     }
-    props.forEach((p, i) => (p.rotation.y = REST[i] + rest[i]));
+    props.forEach((p, i) => (p.rotation.y = REST[i] + rest[i] + spin));
   };
 
   root.traverse((o) => {
@@ -249,6 +261,12 @@ export function createSchematicDrone(): DroneAsset {
       apply();
       return (Object.keys(DELAY) as PartKind[]).filter((k) => local(k) >= 1);
     },
+    setSpin(radians: number, blur: number) {
+      spin = radians;
+      discMat.opacity = 0.16 * blur;
+      discs.forEach((d) => (d.visible = blur > 0.01));
+      apply();
+    },
     setRestingAngle(index: number, radians: number) {
       rest[index] = radians;
       apply();
@@ -260,6 +278,7 @@ export function createSchematicDrone(): DroneAsset {
         if (me.isMesh) geos.add(me.geometry);
       });
       geos.forEach((g) => g.dispose());
+      discMat.dispose();
       Object.values(m).forEach((mat) => mat.dispose());
     },
   };

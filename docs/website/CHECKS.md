@@ -38,9 +38,12 @@ What the tests cover: exact result labels; no Pass with any missing evidence or 
 
 - Same commands re-run after the redesign: `npm run check` passes (tsc 0 errors, vitest 8/8, vite build).
 - Desktop 1440×900: all seven scenes visited. The intro assembles, then copy appears. Taken apart separates with labels. The propeller close-up shows the resting-angle label. Results and the demo render, Explore renders after the CSS fix, and Project renders. No console errors. With the fixed canvas and snap sections, page height is 7 viewports (≈6375 px at 900 px tall).
+- Fog: the shader compiled after fixing a variable-name clash (an earlier build drew no fog). It is drawn in the opaque pass before the drone, so the drone stays solid in front of it.
+- Flight scene: with real mouse hovers the drone moved left/up toward the cursor and back right, banking into turns; the propellers spin with blur discs and the fog swirls under the rotors. Arrow-key steering is coded but was not exercised in the browser.
 - Not re-checked after the redesign: mobile layout, keyboard pass through every scene, reduced motion.
 
 ## Screenshots (captured)
 
-- `screenshots/desktop-1440-hero-fog.jpg`: final intro with purple stage fog.
+- `screenshots/desktop-1440-hero-fog.jpg`: final intro with dark-purple stage fog.
+- `screenshots/desktop-1440-flight-steering.jpg`: the flight scene while steering with the mouse (bank angle was softened after this capture).
 - `screenshots/desktop-1440-taken-apart-earlier-lighting.jpg`, `...-propeller-earlier-lighting.jpg`, `...-results-earlier-lighting.jpg`: same scenes, captured before the lighting was darkened.

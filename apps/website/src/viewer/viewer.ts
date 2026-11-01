@@ -88,6 +88,14 @@ export class DroneViewer {
   private storyGroup = new THREE.Group();
   private userGroup = new THREE.Group();
   private holder = new THREE.Group();
+  /** Lifts and banks the drone for the flight illustration; the floor stays put. */
+  private flyGroup = new THREE.Group();
+  private floorGroup = new THREE.Group();
+  private shadowMat?: THREE.MeshBasicMaterial;
+  private flight = { cur: 0, goal: 0 };
+  /** Steering target for the flight illustration, -1..1 on each axis. */
+  private steer = { gx: 0, gy: 0, x: 0, y: 0, z: 0, lift: 0, prevLat: 0 };
+  private spinAngle = 0;
   private asset: DroneAsset | null = null;
   private pmrem?: THREE.PMREMGenerator;
   private envTex?: THREE.Texture;
@@ -169,7 +177,8 @@ export class DroneViewer {
     this.scene.add(this.key, this.rim, this.rim2, this.hemi);
     this.scene.add(this.storyGroup);
     this.storyGroup.add(this.userGroup);
-    this.userGroup.add(this.holder);
+    this.userGroup.add(this.flyGroup, this.floorGroup);
+    this.flyGroup.add(this.holder);
 
     const asset = await this.opts.createAsset();
     if (this.disposed) {
@@ -247,6 +256,8 @@ export class DroneViewer {
     const s = 1 / sphere.radius;
     this.holder.scale.setScalar(s);
     this.holder.position.set(-sphere.center.x * s, -sphere.center.y * s, -sphere.center.z * s);
+    this.floorGroup.position.copy(this.holder.position);
+    this.floorGroup.scale.copy(this.holder.scale);
     this.fitDistance = 1.08 / Math.sin(THREE.MathUtils.degToRad(FOV / 2));
   }
 
@@ -257,14 +268,12 @@ export class DroneViewer {
       [1, 'rgba(0,0,0,0)'],
     ]);
     this.textures.push(shadowTex);
-    const shadow = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.9, 1.8),
-      new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }),
-    );
+    this.shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false });
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.8), this.shadowMat);
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.y = 0.002;
     shadow.renderOrder = -1;
-    this.asset!.root.parent!.add(shadow);
+    this.floorGroup.add(shadow);
 
     if (this.opts.ground === 'dark') {
       const poolTex = radialTexture([
@@ -280,7 +289,7 @@ export class DroneViewer {
       pool.rotation.x = -Math.PI / 2;
       pool.position.y = 0.001;
       pool.renderOrder = -2;
-      this.asset!.root.parent!.add(pool);
+      this.floorGroup.add(pool);
 
       this.addFog();
 
@@ -310,7 +319,7 @@ export class DroneViewer {
       );
       beam.position.y = 2.25;
       beam.renderOrder = -3;
-      this.asset!.root.parent!.add(beam);
+      this.floorGroup.add(beam);
     }
   }
 
@@ -324,8 +333,10 @@ export class DroneViewer {
       uniforms: {
         uTime: { value: 0 },
         uColor: { value: new THREE.Color(0x2b0b55) },
-        uStrength: { value: 3.4 },
+        uStrength: { value: 2.6 },
         uAspect: { value: 1 },
+        uHole: { value: new THREE.Vector2(0.5, 0.4) },
+        uStir: { value: 0 },
       },
       vertexShader: /* glsl */ `
         varying vec2 vUv;
@@ -338,6 +349,8 @@ export class DroneViewer {
         uniform vec3 uColor;
         uniform float uStrength;
         uniform float uAspect;
+        uniform vec2 uHole;
+        uniform float uStir;
         varying vec2 vUv;
         float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float noise(vec2 p) {
@@ -352,18 +365,36 @@ export class DroneViewer {
           return v;
         }
         void main() {
-          vec2 p = vec2(vUv.x * uAspect, vUv.y) * 2.0;
-          float t = uTime * 0.065;
+          // Rotor wash: smoke near the drone is pushed outward and swirled.
+          vec2 dv = (vUv - uHole) * vec2(uAspect, 1.0);
+          float rd = length(dv);
+          float infl = 0.35 * uStir * exp(-rd * rd * 6.0);
+          float ang = infl * (1.6 + 0.5 * sin(uTime * 0.8));
+          mat2 rot = mat2(cos(ang), -sin(ang), sin(ang), cos(ang));
+          vec2 dw = rot * dv + normalize(dv + 1e-4) * infl * 0.12;
+          vec2 uv = dw / vec2(uAspect, 1.0) + uHole;
+          vec2 p = vec2(uv.x * uAspect, uv.y) * 2.0;
+          float t = uTime * 0.065 * (1.0 + infl * 2.0);
           vec2 q = vec2(fbm(p + vec2(0.0, -t)), fbm(p + vec2(5.2, 1.3) - t * 0.7));
           vec2 r = vec2(fbm(p + 3.0 * q + vec2(1.7, 9.2) + t * 0.5), fbm(p + 3.0 * q + vec2(8.3, 2.8) - t * 0.4));
           float f = fbm(p + 2.6 * r + vec2(t * 0.6, -t));
           // Thickest at the floor, but a thinner haze still reaches the top of the frame.
-          float floorMask = mix(0.55, 1.0, smoothstep(1.0, 0.0, vUv.y));
+          float floorMask = mix(0.2, 1.0, smoothstep(0.9, 0.0, vUv.y));
+          // Keep the middle of the frame clearer so smoke frames the content instead of covering it.
+          floorMask *= mix(0.55, 1.0, smoothstep(0.12, 0.5, abs(vUv.x - 0.5)) + smoothstep(0.45, 0.0, vUv.y));
           float d = pow(smoothstep(0.28, 0.95, f) * floorMask, 1.3);
-          vec3 col = uColor * d * uStrength + vec3(0.32, 0.2, 0.55) * pow(d, 3.0) * 0.12 * uStrength;
+          // Cigar-like strands: thin ridged filaments, stretched upward, curling in the same flow.
+          float wisp = fbm(vec2(p.x * 1.5, p.y * 0.75) + 2.4 * r + vec2(0.0, -t * 1.6));
+          float strand = pow(1.0 - abs(2.0 * wisp - 1.0), 10.0);
+          float wispMask = mix(0.35, 1.0, smoothstep(1.0, 0.0, vUv.y)) * smoothstep(0.38, 0.7, f);
+          d = d * 0.85 + strand * wispMask * 0.35;
+          // Downwash clears a hollow under the rotors with a brighter churned rim.
+          d *= 1.0 - 0.45 * uStir * exp(-rd * rd * 26.0);
+          d += uStir * 0.18 * f * exp(-pow((rd - 0.18) * 10.0, 2.0));
+          vec3 col = uColor * d * uStrength + vec3(0.36, 0.26, 0.58) * strand * wispMask * 0.1 * uStrength;
           gl_FragColor = vec4(col, 1.0);
         }`,
-      transparent: true,
+      transparent: false,
       depthWrite: false,
       depthTest: false,
       blending: THREE.AdditiveBlending,
@@ -460,6 +491,20 @@ export class DroneViewer {
       if (Math.abs(deg) < 360) this.yaw += angle;
     } else this.turn = { from: this.yaw, start: performance.now(), dur, angle };
     this.touch();
+  }
+
+  /** Flight illustration on/off: lift-off, hover, spinning propellers and rotor wash in the fog. */
+  setFlight(on: number) {
+    this.flight.goal = on;
+    if (this.opts.reducedMotion) this.flight.cur = on;
+    this.kick();
+  }
+
+  /** Steer the flying drone toward a screen direction (-1..1, +x right, +y up). */
+  setSteer(x: number, y: number) {
+    this.steer.gx = Math.max(-1, Math.min(1, x));
+    this.steer.gy = Math.max(-1, Math.min(1, y));
+    this.kick();
   }
 
   /** Move the model within the frame (fractions of width/height; +x right, +y up). */
@@ -671,10 +716,43 @@ export class DroneViewer {
     this.storyGroup.position.y = c.lift + Math.sin(t * 0.9) * 0.008 * this.idle;
     // Key light glides slowly so reflections sweep across the gloss.
     if (!rm) this.key.position.set(Math.cos(t * 0.18) * 4.5, 5, Math.sin(t * 0.18) * 4.5);
+    // Flight illustration: lift, hover, bank, spin, rotor wash.
+    const fl = this.flight;
+    fl.cur = rm ? fl.goal : damp(fl.cur, fl.goal, 1.3, dt);
+    const k = fl.cur;
+    // Steering: follow the target across the screen plane, bank into the turn.
+    const st = this.steer;
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
+    right.y = 0;
+    right.normalize();
+    const reach = 1.15 * k;
+    const sr = rm ? 1 : 1 - Math.exp(-dt * 2.2);
+    st.x += (right.x * st.gx * reach - st.x) * sr;
+    st.z += (right.z * st.gx * reach - st.z) * sr;
+    st.lift += (st.gy * 0.5 * k - st.lift) * sr;
+    const lat = st.x * right.x + st.z * right.z;
+    const vLat = (lat - st.prevLat) / dt;
+    st.prevLat = lat;
+    this.flyGroup.position.set(st.x, k * (0.42 + (rm ? 0 : Math.sin(t * 1.2) * 0.04)) + st.lift, st.z);
+    const bank = THREE.MathUtils.clamp(-vLat * 0.18, -0.3, 0.3);
+    this.flyGroup.rotation.z = rm ? 0 : k * (Math.sin(t * 0.6) * 0.05) + bank;
+    this.flyGroup.rotation.x = rm ? 0 : k * Math.sin(t * 0.8 + 1) * 0.05;
+    if (this.asset?.setSpin) {
+      if (!rm) this.spinAngle = (this.spinAngle + dt * 32 * k * k) % (Math.PI * 2);
+      this.asset.setSpin(this.spinAngle, rm ? 0 : k);
+    }
+    if (this.shadowMat) this.shadowMat.opacity = 1 - 0.55 * k;
+
     if (this.fog) {
       const u = this.fog.material.uniforms;
       if (!rm) u.uTime.value = t;
-      u.uStrength.value = 3.4 * (this.light.env / 0.6);
+      u.uStrength.value = 2.6 * (this.light.env / 0.6) * (1 + 0.15 * k);
+      u.uStir.value = k;
+      // Rotor wash centre: just below the drone, in screen space.
+      const below = new THREE.Vector3(0, -0.55, 0);
+      this.flyGroup.localToWorld(below);
+      below.project(this.camera);
+      u.uHole.value.set(below.x * 0.5 + 0.5, below.y * 0.5 + 0.5);
     }
 
     this.asset?.setExplode?.(c.explode);

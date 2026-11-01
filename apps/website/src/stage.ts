@@ -13,14 +13,17 @@ interface Shot {
   shift: [number, number];
   /** Staged explode target for this scene (0 assembled, 1 apart). */
   apart: number;
-  /** Propeller resting angle offset (radians); motors stopped throughout. */
+  /** Propeller resting angle offset (radians). */
   rest: number;
+  /** Flight illustration (1) — only in its own labelled scene, never during inspection. */
+  flight?: number;
 }
 
 const SHOTS: Record<string, Shot> = {
   hero: { pose: { az: 34, el: 20, dist: 0.8, target: null, explode: 0, focus: null }, shift: [0.17, 0.02], apart: 0, rest: 0 },
   apart: { pose: { az: 28, el: 30, dist: 1.45, target: null, explode: 0, focus: null }, shift: [0, 0.08], apart: 1, rest: 0 },
   propeller: { pose: { az: 46, el: 24, dist: 0.36, target: 'prop0', explode: 0, focus: 'propeller' }, shift: [0.2, 0], apart: 0, rest: 1.25 },
+  flight: { pose: { az: 22, el: 12, dist: 1.25, target: null, explode: 0, focus: null }, shift: [0, -0.04], apart: 0, rest: 0, flight: 1 },
   how: { pose: { az: 120, el: 14, dist: 1.5, target: null, explode: 0, focus: null }, shift: [0.1, 0.26], apart: 0, rest: 0 },
   results: { pose: { az: 0, el: 88, dist: 1.05, target: null, explode: 0, focus: null }, shift: [0, 0], apart: 0, rest: 0 },
   explore: { pose: { az: 32, el: 26, dist: 0.8, target: null, explode: 0, focus: null }, shift: [0, 0], apart: 0, rest: 0 },
@@ -92,6 +95,8 @@ export function mountStage(reducedMotion: boolean) {
     viewer.applyPose(shot.pose);
     viewer.setShift(window.innerWidth < 960 ? 0 : shot.shift[0], shot.shift[1]);
     viewer.setRestingAngle(0, shot.rest);
+    viewer.setFlight(shot.flight ?? 0);
+    if (!shot.flight) viewer.setSteer(0, 0);
     tweenApart(shot.apart);
     updateTags();
   };
@@ -122,6 +127,27 @@ export function mountStage(reducedMotion: boolean) {
   activate('hero');
 
   window.addEventListener('resize', shoot);
+
+  // Flight scene: steer the drone with the mouse, or with the arrow keys.
+  let kx = 0;
+  let ky = 0;
+  window.addEventListener('pointermove', (e) => {
+    if (active !== 'flight' || !viewer || e.pointerType === 'touch') return;
+    viewer.setSteer((e.clientX / window.innerWidth) * 2 - 1, 1 - (e.clientY / window.innerHeight) * 2 - 0.2);
+  });
+  window.addEventListener('keydown', (e) => {
+    if (active !== 'flight' || !viewer) return;
+    const step = 0.25;
+    if (e.key === 'ArrowLeft') kx -= step;
+    else if (e.key === 'ArrowRight') kx += step;
+    else if (e.key === 'ArrowUp' && e.shiftKey) ky += step;
+    else if (e.key === 'ArrowDown' && e.shiftKey) ky -= step;
+    else return;
+    e.preventDefault();
+    kx = Math.max(-1, Math.min(1, kx));
+    ky = Math.max(-1, Math.min(1, ky));
+    viewer.setSteer(kx, ky);
+  });
 
   mountViewer(stage, {
     interactive: false,

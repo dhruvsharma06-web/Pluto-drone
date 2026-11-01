@@ -7,6 +7,8 @@ import 'package:inspection_contract/inspection_contract.dart';
 import 'package:inspection_runtime/inspection_runtime.dart';
 import 'package:inspection_ui/inspection_ui.dart';
 
+import 'assistant.dart';
+
 /// Platform composition/lifecycle only. Presentation belongs to inspection_ui.
 class RuntimeApplication extends StatefulWidget {
   const RuntimeApplication({super.key});
@@ -57,10 +59,12 @@ class _RuntimeApplicationState extends State<RuntimeApplication>
   }
 
   @override
-  Widget build(BuildContext context) => InspectionApp(
+  Widget build(BuildContext context) => AssistantLayer(
       controller: controller,
-      cameraPreview: RuntimeCameraPreview(
-          acquisition: acquisition, controller: controller));
+      child: InspectionApp(
+          controller: controller,
+          cameraPreview: RuntimeCameraPreview(
+              acquisition: acquisition, controller: controller)));
 
   @override
   void dispose() {

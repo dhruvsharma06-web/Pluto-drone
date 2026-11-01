@@ -7,6 +7,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  camera: ^0.12.2
   inspection_ui:
     path: ../../packages/inspection_ui
   inspection_runtime:
@@ -16,3 +17,5 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
+  assets:
+    - assets/reference.json

@@ -1,6 +1,7 @@
 # Android Flutter shell
 
-App owner workspace. `flutter pub get`, `flutter analyze`, `flutter test`, `flutter run`.
-Flutter shell delegates UI to inspection_ui and controller to inspection_runtime. Baseline camera/image service buttons intentionally return Unable to Verify; they do not acquire images. No model/data/reference is bundled. Android wrapper generated with local Flutter 3.47.1; verify team tooling compatibility. Release config is template debug signing, suitable only if explicitly chosen/documented for hackathon sideload; not store-ready.
+App owner workspace. The shell injects the runtime controller and camera preview into `inspection_ui`. Gallery acquisition, sampled rear-camera stills, EXIF normalization, lifecycle cancellation and guarded engine output are implemented. The bundled reference is pending and the native engine is explicitly unavailable; this is not a working detector. Frontend baseline labels still say pending.
 
-If Gradle launcher files are absent from Git, regenerate wrappers with `flutter create --platforms=android --project-name pluto_inspector --org org.plutoinspection .` only after backing up and preserving existing source/config; inspect changes carefully. The launcher JAR is a generated binary; no SDK paths or signing material are committed. See root README and app prompt.
+Tested toolchain: Flutter 3.47.9 / Dart 3.13.7. Release mode intentionally uses debug signing for hackathon sideload only, not store distribution. See [runtime build guide](../../docs/app/README.md), [adapter boundary](../../docs/app/ENGINE_ADAPTER.md) and [physical-device checklist](../../docs/app/DEVICE_CHECKLIST.md).
+
+Gradle launchers are ignored generated files; Flutter's build generates them. If needed, copy only the cached launchers as described in the build guide. Preserve existing source/config rather than regenerating the project. No SDK paths or signing material are committed.

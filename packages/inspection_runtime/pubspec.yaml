@@ -1,9 +1,17 @@
 name: inspection_runtime
-description: Acquisition and runtime adapter workspace; safe pending implementation.
+description: Local acquisition, normalization and fail-closed verification runtime.
 version: 0.1.0
 publish_to: none
 environment:
   sdk: '>=3.4.0 <4.0.0'
 dependencies:
+  flutter:
+    sdk: flutter
+  camera: ^0.12.2
+  image_picker: ^1.2.4
+  image: ^4.9.0
   inspection_contract:
     path: ../inspection_contract
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

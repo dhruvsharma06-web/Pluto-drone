@@ -43,6 +43,9 @@ def main():
     for path in (ROOT / "contracts/fixtures").glob("*.json"):
         validate_result(json.loads(path.read_text(encoding="utf-8")))
     validate_reference(read("reference/config/pending.json"))
+    bundled_reference = ROOT / "apps/mobile/assets/reference.json"
+    if bundled_reference.exists():
+        validate_reference(read("apps/mobile/assets/reference.json"))
     base=read("contracts/fixtures/pass.json")
     mutations=[]
     for field,value in [("reference_version",None),("all_required_checks_observable",False),("reasons",["BLUR"]),("motors",[])]:

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:inspection_runtime/inspection_runtime.dart';
-import 'package:inspection_ui/inspection_ui.dart';
+import 'runtime_application.dart';
 
-void main() => runApp(InspectionApp(controller: PendingInspectionController()));
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const RuntimeApplication());
+}

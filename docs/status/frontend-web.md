@@ -1,3 +1,5 @@
+Implementation commit: `f85212ce9ebc8b18138a07e59a1f4b91e73dfe38`. Final production build passed.
+
 ## Centered pill navigation and cleanup — 1 November 2026
 
 User-authorized scoped refinement on frontend/website: centered transparent header with active-dot pills, original drone mark, purple Source CTA; rounded unnumbered Explore tabs/cards/tools; removed projected model text; simplified Project and footer. The 3D stage/viewer/cursor source files and scroll/animation timing remain unchanged. No React dependency or other-branch merge.

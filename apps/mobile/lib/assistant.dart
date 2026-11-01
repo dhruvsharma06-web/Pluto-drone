@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
@@ -226,6 +227,13 @@ class _AssistantLayerState extends State<AssistantLayer> {
                             setState(() => _voice = !_voice);
                             if (!_voice) unawaited(_tts.stop());
                           }),
+                      const SizedBox(width: 8),
+                    ],
+                    if (firebaseReady && _explanation == null) ...[
+                      _Round(
+                          icon: Icons.logout_rounded,
+                          tooltip: 'Sign out',
+                          onTap: () => FirebaseAuth.instance.signOut()),
                       const SizedBox(width: 8),
                     ],
                     _Round(

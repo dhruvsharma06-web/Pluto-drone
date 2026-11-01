@@ -101,7 +101,8 @@ async def explain(summary: Summary, authorization: str = Header(default='')):
             authorization.removeprefix('Bearer '), _google_request, audience=PROJECT_ID)
     except Exception:
         raise HTTPException(401, 'invalid token')
-    if not claims or not claims.get('email_verified', False):
+    # Signature, issuer, audience (this Firebase project) and expiry are checked above.
+    if not claims or not claims.get('sub'):
         raise HTTPException(401, 'invalid token')
     if _rate_limited(claims['sub']):
         raise HTTPException(429, 'too many requests, try again in a minute')

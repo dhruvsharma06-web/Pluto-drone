@@ -1,3 +1,9 @@
+## Calmer typography — 1 November 2026
+
+User found the text overwhelming. Switched current headings to Inter, reduced headline 34→28sp, body/controls 17→16sp, softened title/safety weights, and simplified the start heading to “Inspect your drone.” Shortened only the illustration helper disclosure. Palette, rounded controls, safety meaning, result labels, camera and runtime logic unchanged. Impeccable/Emil guidance applied to hierarchy and readability.
+
+UI analysis clean; all 25 UI tests pass, including four widths and 1.0x/1.5x text. Local 390px normal and 320px enlarged-text renders inspected. Device connected; updated APK installation recorded in the artifact follow-up.
+
 Source: 67275ac59d4f31734111f8bfff55776ab6f18e66. Updated APK built and signature verified; see docs/app/apk.json.
 
 ## Minimal rounded refinement — 1 November 2026

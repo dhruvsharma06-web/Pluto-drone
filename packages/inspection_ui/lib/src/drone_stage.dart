@@ -80,7 +80,7 @@ class _DroneStageState extends State<DroneStage>
             ),
           )),
         ),
-        const Text("Illustrative drone, not the supplied drone's geometry.",
+        const Text("Illustration only · not a reference model",
             textAlign: TextAlign.center,
             style:
                 TextStyle(color: inspectionMuted, fontSize: 14, height: 1.4)),

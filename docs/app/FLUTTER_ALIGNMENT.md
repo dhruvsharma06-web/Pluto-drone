@@ -38,3 +38,9 @@ Visual-only refinement: separate pill-shaped input choices, shorter repeated hel
 UI analysis clean; all 25 tests passed, plus the extended sheet reopening check. Responsive checks cover 320/390/768/1440px at 1.0x/1.5x. Updated local phone start/result renders inspected. ADB lists no connected device, so updated hardware testing/installation is pending. Impeccable and Emil guided hierarchy, touch targets and restrained feedback. APK/source provenance is recorded in docs/app/FLUTTER_ALIGNMENT.md.
 
 Final APK built from clean source 67275ac59d4f31734111f8bfff55776ab6f18e66: 18427797 bytes; SHA256 f8e7adbbdefbeb4ac9a41890f78861cd833057f5f5b60576198bee76123c10d0. Android signature verified. APK path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk. App-level fail-closed test passed (1/1). Phone disconnected; installation remains pending.
+
+## Calmer typography — 1 November 2026
+
+User found the text overwhelming. Switched current headings to Inter, reduced headline 34→28sp, body/controls 17→16sp, softened title/safety weights, and simplified the start heading to “Inspect your drone.” Shortened only the illustration helper disclosure. Palette, rounded controls, safety meaning, result labels, camera and runtime logic unchanged. Impeccable/Emil guidance applied to hierarchy and readability.
+
+UI analysis clean; all 25 UI tests pass, including four widths and 1.0x/1.5x text. Local 390px normal and 320px enlarged-text renders inspected. Device connected; updated APK installation recorded in the artifact follow-up.

@@ -311,8 +311,8 @@ class _InspectionShellState extends State<_InspectionShell>
               const Flexible(
                   child: Text('Pluto Inspector',
                       style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
                           letterSpacing: -.3))),
             ])),
         bottomNavigationBar: expanded
@@ -450,27 +450,14 @@ class _InspectionView extends StatelessWidget {
     final c = Theme.of(context).colorScheme;
     final processing =
         error == null && (state.phase == InspectionPhase.processing || busy);
-    final title = result == null
-        ? 'Every propeller, verified.'
-        : resultLabel(result!.status);
+    final title =
+        result == null ? 'Inspect your drone' : resultLabel(result!.status);
     final heading =
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Semantics(
           header: true,
           liveRegion: result != null,
-          child: Text.rich(
-              TextSpan(
-                  children: result == null
-                      ? [
-                          const TextSpan(text: 'Every '),
-                          const TextSpan(
-                              text: 'propeller,',
-                              style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  color: inspectionTextAccent)),
-                          const TextSpan(text: ' verified.'),
-                        ]
-                      : [TextSpan(text: title)]),
+          child: Text(title,
               key: const ValueKey('inspection-heading'),
               style: Theme.of(context).textTheme.headlineSmall)),
       if (result == null) ...[
@@ -521,7 +508,7 @@ class _InspectionView extends StatelessWidget {
             contentPadding: const EdgeInsets.only(left: 16, right: 6),
             title: Text(
                 'I confirm the drone is disarmed and every motor is stopped.',
-                style: Theme.of(context).textTheme.titleSmall),
+                style: Theme.of(context).textTheme.bodyMedium),
           ))),
       const SizedBox(height: 12),
       _PressButton(
@@ -631,7 +618,7 @@ class _ResultSummary extends StatelessWidget {
               Expanded(
                   child: Text(text,
                       style: TextStyle(
-                          color: c.onSurface, height: 1.5, fontSize: 17))),
+                          color: c.onSurface, height: 1.5, fontSize: 16))),
             ])));
   }
 }
@@ -702,8 +689,8 @@ class _MotorFindings extends StatelessWidget {
                                     onTap: () => onSelect(id),
                                     title: Text(id,
                                         style: const TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w600)),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500)),
                                     subtitle: Text(switch (motor['finding']) {
                                       'match' => 'Matches reference',
                                       'mismatch' => 'Installation mismatch',

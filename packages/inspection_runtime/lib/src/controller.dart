@@ -218,13 +218,8 @@ class RuntimeInspectionController implements InspectionController {
       if (result.inputId != image.id || result.evidenceSource != 'real') {
         result = unable(image.id, const ['ENGINE_ERROR']);
       }
-      // A sampled still cannot establish that a moving preview remains tracked.
-      // Fail closed until ML supplies a tracking/observability protocol.
-      if (source == 'live' &&
-          result.status != VerificationStatus.unableToVerify) {
-        result = unable(image.id, const ['LIVE_TRACKING_UNAVAILABLE'],
-            referenceVersion: result.referenceVersion);
-      }
+      // Live input is a single frozen still from the app-owned shutter, so it
+      // gets the same engine checks (quality, completeness, view) as an upload.
       stopwatch.stop();
       result = VerificationResult(
           inputId: result.inputId,

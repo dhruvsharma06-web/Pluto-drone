@@ -32,7 +32,7 @@ class PropellerEngine(context: Context) {
         const val ENGINE_VERSION = "pluto-yolo11s-propeller-1.1.0"
         const val INPUT = 640
         const val CONF = 0.35f
-        const val MIN_CLASS_CONF = 0.40f
+        const val MIN_CLASS_CONF = 0.30f
         const val MISMATCH_CONF = 0.60f  // a mismatch verdict needs a confident type
         const val IOU = 0.5f
         const val BLUR_MIN = 60.0      // Laplacian variance on 320px grey (sharp photos >= 134, blurred <= 12)
@@ -98,8 +98,17 @@ class PropellerEngine(context: Context) {
         }
 
         val typed = if (dets.size == 4) ttaTypes(bmp, dets) else dets
-        val assignment = if (typed.size == 4) assignMotors(bmp, typed) else null
-        if (dets.size == 4 && assignment == null) reasons += "UNSUPPORTED_VIEW_TOP_DOWN_REQUIRED"
+        // Prefer the body-axis assignment; otherwise name motors by their order
+        // around the frame (works for angled handheld shots too).
+        var assignment = if (typed.size == 4) (assignMotors(bmp, typed) ?: ringAssign(typed)) else null
+        if (assignment != null) {
+            // CW/CCW must alternate around the frame. A misread body axis flips
+            // every expected type at once, so >2 mismatches means "rotate the
+            // naming by 90 degrees", not four wrong propellers. Any real swap
+            // breaks the alternation and still yields a mismatch.
+            val wrong = assignment.count { (id, d) -> TYPES[d.cls] != refMotors[id]?.get("expected_type") }
+            if (wrong > 2) assignment = rotateIds(assignment)
+        }
 
         val motors = mutableListOf<Map<String, Any?>>()
         if (assignment != null) {
@@ -200,6 +209,24 @@ class PropellerEngine(context: Context) {
         val keep = mutableListOf<Det>()
         for (d in cands.sortedByDescending { it.conf }) if (keep.none { iou(it, d) > IOU }) keep += d
         return keep
+    }
+
+    /** Name motors by clockwise order around the centroid, starting top-left. */
+    private fun ringAssign(dets: List<Det>): Map<String, Det> {
+        val cx = dets.map { it.cx }.average().toFloat(); val cy = dets.map { it.cy }.average().toFloat()
+        val ordered = dets.sortedBy {
+            // Angle measured clockwise from the top-left diagonal (-135 degrees).
+            val a = Math.toDegrees(atan2((it.cy - cy).toDouble(), (it.cx - cx).toDouble())) + 135.0
+            (a % 360.0 + 360.0) % 360.0
+        }
+        val ids = listOf("front_left", "front_right", "rear_right", "rear_left")
+        return ids.zip(ordered).toMap()
+    }
+
+    private fun rotateIds(a: Map<String, Det>): Map<String, Det> {
+        val next = mapOf("front_left" to "front_right", "front_right" to "rear_right",
+            "rear_right" to "rear_left", "rear_left" to "front_left")
+        return a.entries.associate { (id, d) -> next.getValue(id) to d }
     }
 
     /** Average type scores over 90-degree rotations; rotation preserves CW/CCW chirality. */

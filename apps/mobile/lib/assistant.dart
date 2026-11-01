@@ -139,7 +139,21 @@ class _AssistantLayerState extends State<AssistantLayer> {
   final _tts = FlutterTts();
   StreamSubscription<InspectionState>? _sub;
   VerificationResult? _result;
-  bool _voice = true, _loading = false;
+  bool _voice = true, _loading = false, _confirmSignOut = false;
+  Timer? _signOutTimer;
+
+  /// Two taps within 3 s sign out, so a stray tap next to Explain does nothing.
+  void _signOutTapped() {
+    if (_confirmSignOut) {
+      _signOutTimer?.cancel();
+      unawaited(FirebaseAuth.instance.signOut());
+      return;
+    }
+    setState(() => _confirmSignOut = true);
+    _signOutTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _confirmSignOut = false);
+    });
+  }
   String? _explanation;
 
   @override
@@ -184,6 +198,7 @@ class _AssistantLayerState extends State<AssistantLayer> {
   @override
   void dispose() {
     _sub?.cancel();
+    _signOutTimer?.cancel();
     unawaited(_tts.stop());
     super.dispose();
   }
@@ -197,6 +212,42 @@ class _AssistantLayerState extends State<AssistantLayer> {
       textDirection: TextDirection.ltr,
       child: Stack(children: [
         widget.child,
+        if (firebaseReady)
+          Positioned(
+            top: 0,
+            right: 6,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Tooltip(
+                    message: _confirmSignOut ? 'Tap again to sign out' : 'Sign out',
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: _signOutTapped,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 150),
+                          child: _confirmSignOut
+                              ? const Text('Sign out?',
+                                  key: ValueKey('confirm'),
+                                  style: TextStyle(
+                                      color: Color(0xFFFF8A8A),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'InspectionSans'))
+                              : const Icon(Icons.logout_rounded,
+                                  key: ValueKey('icon'), size: 22, color: Colors.white70),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         if (r != null)
           Positioned(
             right: 14,
@@ -227,13 +278,6 @@ class _AssistantLayerState extends State<AssistantLayer> {
                             setState(() => _voice = !_voice);
                             if (!_voice) unawaited(_tts.stop());
                           }),
-                      const SizedBox(width: 8),
-                    ],
-                    if (firebaseReady && _explanation == null) ...[
-                      _Round(
-                          icon: Icons.logout_rounded,
-                          tooltip: 'Sign out',
-                          onTap: () => FirebaseAuth.instance.signOut()),
                       const SizedBox(width: 8),
                     ],
                     _Round(

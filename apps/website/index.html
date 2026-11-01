@@ -191,44 +191,26 @@
           </div>
         </dl>
 
-        <div class="demo" id="demo" data-in>
-          <form class="demo__controls" data-demo-form aria-label="Fixture demo inputs">
-            <p class="demo__flag"><b>Try an example</b></p>
-            <div class="preset-row" role="group" aria-label="Choose a simulated example">
-              <button type="button" class="chip" data-preset="pass">Pass</button>
-              <button type="button" class="chip" data-preset="incorrect">Incorrect</button>
-              <button type="button" class="chip" data-preset="unclear">Unclear image</button>
-              <button type="button" class="chip" data-preset="pending">No reference</button>
-            </div>
-            <details class="demo__advanced">
-              <summary>Adjust the example</summary>
-            <fieldset class="switches">
-              <legend class="visually-hidden">Evidence in the image</legend>
-              <label class="switch"><input type="checkbox" name="referenceLoaded" checked /><span>Reference</span></label>
-              <label class="switch"><input type="checkbox" name="wholeDrone" checked /><span>Whole drone</span></label>
-              <label class="switch"><input type="checkbox" name="inFocus" checked /><span>In focus</span></label>
-              <label class="switch"><input type="checkbox" name="usableLight" checked /><span>Good light</span></label>
-              <label class="switch"><input type="checkbox" name="allClassified" checked /><span>All classified</span></label>
-            </fieldset>
-            <fieldset class="faults">
-              <legend class="visually-hidden">Installation</legend>
-              <label class="radio"><input type="radio" name="fault" value="none" checked /><span>As referenced</span></label>
-              <label class="radio"><input type="radio" name="fault" value="type" /><span>Wrong type</span></label>
-              <label class="radio"><input type="radio" name="fault" value="orientation" /><span>Upside down</span></label>
-              <label class="select"><span class="visually-hidden">At position</span>
-                <select name="faultMotor">
-                  <option>FIXTURE_1</option>
-                  <option>FIXTURE_2</option>
-                  <option>FIXTURE_3</option>
-                  <option>FIXTURE_4</option>
-                </select>
-              </label>
-            </fieldset>
-            </details>
-          </form>
-          <div class="demo__out" data-demo-out aria-live="polite" aria-atomic="true">
-            <noscript><p>The fixture demo needs JavaScript.</p></noscript>
-          </div>
+        <div class="shots" id="demo" data-in>
+          <p class="shots__flag">Real screens from the Android app, running the on-device model.</p>
+          <ol class="shots__row">
+            <li class="shot">
+              <div class="shot__phone"><img src="./app/signin.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Pluto Inspector sign-in screen with email and password fields" /></div>
+              <p class="shot__cap"><b>Sign in</b> Email and password, per inspector.</p>
+            </li>
+            <li class="shot">
+              <div class="shot__phone"><img src="./app/inspect.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Inspect screen with live camera, upload and the disarmed-motors confirmation" /></div>
+              <p class="shot__cap"><b>Inspect</b> Live camera or an uploaded photo, after confirming the motors are stopped.</p>
+            </li>
+            <li class="shot shot--pass">
+              <div class="shot__phone"><img src="./app/pass.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Pass result with all four propellers boxed and matching the reference" /></div>
+              <p class="shot__cap"><b>Pass</b> All four propellers found and matched to the reference.</p>
+            </li>
+            <li class="shot shot--unable">
+              <div class="shot__phone"><img src="./app/unable.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Unable to Verify result asking for a clearer top-down photo" /></div>
+              <p class="shot__cap"><b>Unable to Verify</b> Partial or unclear photos are refused, with spoken retake guidance.</p>
+            </li>
+          </ol>
         </div>
       </section>
 

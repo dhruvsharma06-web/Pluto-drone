@@ -194,7 +194,7 @@ void main() {
     expect(acquisition.captures, 1);
     response.complete(syntheticPass(image));
     await capture;
-    expect(controller.current.result!.reasons, ['LIVE_TRACKING_UNAVAILABLE']);
+    expect(controller.current.result!.status, VerificationStatus.pass);
     expect(controller.current.image!.source, 'live');
     expect(acquisition.opens, 1);
     expect(acquisition.captures, 1);

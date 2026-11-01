@@ -1,0 +1,767 @@
+{
+  "status": "AI-proposed, not human approved",
+  "classes": [
+    "propeller_cw",
+    "propeller_ccw"
+  ],
+  "objects": [
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33 (1).jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img00_obj0",
+      "bbox_px_xyxy": [
+        283,
+        400,
+        500,
+        452
+      ],
+      "bbox_norm_xywh": [
+        0.305859,
+        0.44375,
+        0.169531,
+        0.054167
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "frame_geometry: diagonal motors share type, adjacent differ; anchored to a mount-identified motor in same photo",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "rear-left in view; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33 (1).jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img00_obj1",
+      "bbox_px_xyxy": [
+        705,
+        385,
+        932,
+        430
+      ],
+      "bbox_norm_xywh": [
+        0.639453,
+        0.424479,
+        0.177344,
+        0.046875
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "frame_geometry: diagonal motors share type, adjacent differ; anchored to a mount-identified motor in same photo",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "rear-right in view; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33 (1).jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img00_obj2",
+      "bbox_px_xyxy": [
+        215,
+        535,
+        352,
+        700
+      ],
+      "bbox_norm_xywh": [
+        0.221484,
+        0.643229,
+        0.107031,
+        0.171875
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "front-left in view; blade near-vertical; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33 (1).jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img00_obj3",
+      "bbox_px_xyxy": [
+        865,
+        522,
+        1018,
+        700
+      ],
+      "bbox_norm_xywh": [
+        0.735547,
+        0.636458,
+        0.119531,
+        0.185417
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "front-right in view; blade near-vertical; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img01_obj0",
+      "bbox_px_xyxy": [
+        160,
+        378,
+        357,
+        532
+      ],
+      "bbox_norm_xywh": [
+        0.269271,
+        0.355469,
+        0.205208,
+        0.120313
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "guide_match: same top view, body/mount features match guide rotated 180 deg",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "top view upper-left; box hand-estimated from 100px grid, approx +/-10-20px; type assigned by guide-view matching, motor_id still null"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img01_obj1",
+      "bbox_px_xyxy": [
+        573,
+        390,
+        767,
+        553
+      ],
+      "bbox_norm_xywh": [
+        0.697917,
+        0.368359,
+        0.202083,
+        0.127344
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "guide_match: same top view, body/mount features match guide rotated 180 deg",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "top view upper-right; box hand-estimated from 100px grid, approx +/-10-20px; type assigned by guide-view matching, motor_id still null"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img01_obj2",
+      "bbox_px_xyxy": [
+        200,
+        740,
+        285,
+        990
+      ],
+      "bbox_norm_xywh": [
+        0.252604,
+        0.675781,
+        0.088542,
+        0.195312
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "guide_match: same top view, body/mount features match guide rotated 180 deg",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "top view lower-left; box hand-estimated from 100px grid, approx +/-10-20px; type assigned by guide-view matching, motor_id still null"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.33.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img01_obj3",
+      "bbox_px_xyxy": [
+        570,
+        778,
+        742,
+        970
+      ],
+      "bbox_norm_xywh": [
+        0.683333,
+        0.682813,
+        0.179167,
+        0.15
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "guide_match: same top view, body/mount features match guide rotated 180 deg",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "top view lower-right; box hand-estimated from 100px grid, approx +/-10-20px; type assigned by guide-view matching, motor_id still null"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.34.jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img02_obj0",
+      "bbox_px_xyxy": [
+        108,
+        455,
+        520,
+        522
+      ],
+      "bbox_norm_xywh": [
+        0.245312,
+        0.508854,
+        0.321875,
+        0.069792
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "near-left; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.34.jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img02_obj1",
+      "bbox_px_xyxy": [
+        955,
+        343,
+        1028,
+        500
+      ],
+      "bbox_norm_xywh": [
+        0.774609,
+        0.439063,
+        0.057031,
+        0.163542
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": true,
+      "review_status": "needs_review",
+      "notes": "right; blade edge-on, partly self-occluded; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.34.jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img02_obj2",
+      "bbox_px_xyxy": [
+        168,
+        272,
+        310,
+        322
+      ],
+      "bbox_norm_xywh": [
+        0.186719,
+        0.309375,
+        0.110937,
+        0.052083
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "frame_geometry: diagonal motors share type, adjacent differ; anchored to a mount-identified motor in same photo",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": true,
+      "review_status": "needs_review",
+      "notes": "behind body; only blade tip and hub visible; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.35 (1).jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img03_obj0",
+      "bbox_px_xyxy": [
+        238,
+        285,
+        712,
+        500
+      ],
+      "bbox_norm_xywh": [
+        0.371094,
+        0.408854,
+        0.370312,
+        0.223958
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "weak_inference: anchor mount blurred or fragment position only; check first",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "near, sharp; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.35 (1).jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img03_obj1",
+      "bbox_px_xyxy": [
+        232,
+        105,
+        835,
+        215
+      ],
+      "bbox_norm_xywh": [
+        0.416797,
+        0.166667,
+        0.471094,
+        0.114583
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "weak_inference: anchor mount blurred or fragment position only; check first",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "background, defocused; box widened to full blade span"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.35.jpeg",
+      "working_path": null,
+      "image_width": 1280,
+      "image_height": 960,
+      "object_id": "img04_obj0",
+      "bbox_px_xyxy": [
+        283,
+        207,
+        892,
+        535
+      ],
+      "bbox_norm_xywh": [
+        0.458984,
+        0.386458,
+        0.475781,
+        0.341667
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "near, sharp; background motor at top edge has propeller out of frame (not boxed); box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.37.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img05_obj0",
+      "bbox_px_xyxy": [
+        200,
+        375,
+        392,
+        415
+      ],
+      "bbox_norm_xywh": [
+        0.308333,
+        0.308594,
+        0.2,
+        0.03125
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "frame_geometry: diagonal motors share type, adjacent differ; anchored to a mount-identified motor in same photo",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "rear-left in view; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.37.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img05_obj1",
+      "bbox_px_xyxy": [
+        597,
+        360,
+        798,
+        422
+      ],
+      "bbox_norm_xywh": [
+        0.726562,
+        0.305469,
+        0.209375,
+        0.048438
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "frame_geometry: diagonal motors share type, adjacent differ; anchored to a mount-identified motor in same photo",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "rear-right in view; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.37.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img05_obj2",
+      "bbox_px_xyxy": [
+        55,
+        482,
+        352,
+        560
+      ],
+      "bbox_norm_xywh": [
+        0.211979,
+        0.407031,
+        0.309375,
+        0.060937
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "front-left in view; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.37.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img05_obj3",
+      "bbox_px_xyxy": [
+        728,
+        490,
+        848,
+        640
+      ],
+      "bbox_norm_xywh": [
+        0.820833,
+        0.441406,
+        0.125,
+        0.117188
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "front-right in view; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.38.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img06_obj0",
+      "bbox_px_xyxy": [
+        0,
+        85,
+        175,
+        325
+      ],
+      "bbox_norm_xywh": [
+        0.091146,
+        0.160156,
+        0.182292,
+        0.1875
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "frame_geometry: diagonal motors share type, adjacent differ; anchored to a mount-identified motor in same photo",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": true,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "cut by left image edge; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.38.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img06_obj1",
+      "bbox_px_xyxy": [
+        643,
+        185,
+        855,
+        500
+      ],
+      "bbox_norm_xywh": [
+        0.780208,
+        0.267578,
+        0.220833,
+        0.246094
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "frame_geometry: diagonal motors share type, adjacent differ; anchored to a mount-identified motor in same photo",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "upper-right; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.38.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img06_obj2",
+      "bbox_px_xyxy": [
+        340,
+        825,
+        778,
+        1112
+      ],
+      "bbox_norm_xywh": [
+        0.582292,
+        0.756641,
+        0.45625,
+        0.224219
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "lower; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.39.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img07_obj0",
+      "bbox_px_xyxy": [
+        68,
+        340,
+        740,
+        825
+      ],
+      "bbox_norm_xywh": [
+        0.420833,
+        0.455078,
+        0.7,
+        0.378906
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "single close-up propeller; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.40.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img08_obj0",
+      "bbox_px_xyxy": [
+        88,
+        475,
+        737,
+        565
+      ],
+      "bbox_norm_xywh": [
+        0.429688,
+        0.40625,
+        0.676042,
+        0.070312
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "near; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.40.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img08_obj1",
+      "bbox_px_xyxy": [
+        447,
+        120,
+        928,
+        190
+      ],
+      "bbox_norm_xywh": [
+        0.716146,
+        0.121094,
+        0.501042,
+        0.054688
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "background; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.42.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img09_obj0",
+      "bbox_px_xyxy": [
+        462,
+        150,
+        782,
+        330
+      ],
+      "bbox_norm_xywh": [
+        0.647917,
+        0.1875,
+        0.333333,
+        0.140625
+      ],
+      "class_id": 1,
+      "class_name": "propeller_ccw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "background; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.42.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img09_obj1",
+      "bbox_px_xyxy": [
+        285,
+        532,
+        690,
+        803
+      ],
+      "bbox_norm_xywh": [
+        0.507812,
+        0.521484,
+        0.421875,
+        0.211719
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "arm_mount_visible: screw-mount arm=CW, hook-mount arm=CCW (rule derived from guide + top view)",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": false,
+      "occluded": false,
+      "review_status": "needs_review",
+      "notes": "near; box hand-estimated from 100px grid, approx +/-10-20px"
+    },
+    {
+      "original_filename": "WhatsApp Image 2026-11-01 at 12.42.42.jpeg",
+      "working_path": null,
+      "image_width": 960,
+      "image_height": 1280,
+      "object_id": "img09_obj2",
+      "bbox_px_xyxy": [
+        0,
+        175,
+        80,
+        195
+      ],
+      "bbox_norm_xywh": [
+        0.041667,
+        0.144531,
+        0.083333,
+        0.015625
+      ],
+      "class_id": 0,
+      "class_name": "propeller_cw",
+      "motor_id": null,
+      "type_label_source": "weak_inference: anchor mount blurred or fragment position only; check first",
+      "type_features_visually_distinguishable": "not assessed as ground truth; blade pitch direction not confirmed",
+      "truncated": true,
+      "occluded": true,
+      "review_status": "needs_review",
+      "notes": "blade fragment at left edge; hub not visible; box hand-estimated from 100px grid, approx +/-10-20px"
+    }
+  ],
+  "reference_guide": "user-supplied annotated top view (1.webp); excluded from training and from the 10",
+  "labeling_note": "Guide labels not independently verified; all types are AI-inferred proposals"
+}

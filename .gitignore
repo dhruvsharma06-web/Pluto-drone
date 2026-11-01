@@ -31,3 +31,11 @@ models/weights/
 .idea/
 .DS_Store
 Thumbs.db
+
+# ML: raw photos, runs and weights are distributed outside git
+datasets/**/*.jpg
+datasets/**/*.jpeg
+datasets/**/*.heic
+runs/
+*.pt
+*.onnx

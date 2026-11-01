@@ -18,9 +18,9 @@
   --accent-hi: #a983e6;
   --accent-glow: 138, 92, 214;
   --on-accent: #050505;
-  --pass: #ffffff;
-  --fail: #8a5cd6;
-  --unable: #8c84a0;
+  --pass: #76d69b;
+  --fail: #ff8c90;
+  --unable: #f1cc70;
   --bench-2: #110c19;
   --paper: #050505;
   --serif: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
@@ -779,12 +779,21 @@ html[data-scene='flight'] .reticle.is-live {
   font-weight: 800;
   color: var(--black);
 }
-.verdict--pass .glyph,
-.out--pass .glyph { background: var(--pass); border-radius: 50%; box-shadow: 0 0 18px rgba(255, 255, 255, 0.25); }
-.verdict--fail .glyph,
-.out--fail .glyph { background: var(--fail); box-shadow: 0 0 18px rgba(138, 92, 214, 0.5); }
-.verdict--unable .glyph,
-.out--unable .glyph { background: transparent; color: var(--unable); box-shadow: inset 0 0 0 2px var(--unable); border-radius: 50%; }
+.verdict--pass, .out--pass { --result-tone: var(--pass); }
+.verdict--fail, .out--fail { --result-tone: var(--fail); }
+.verdict--unable, .out--unable { --result-tone: var(--unable); }
+.verdict dt, .out__verdict { color: var(--result-tone); }
+.verdict .glyph, .out .glyph {
+  background: transparent;
+  color: var(--result-tone);
+  border: 2px solid currentColor;
+  box-shadow: none;
+}
+.verdict--pass .glyph, .out--pass .glyph { border-radius: 50%; }
+.verdict--fail .glyph, .out--fail .glyph { border-radius: 4px; }
+.verdict--unable .glyph, .out--unable .glyph {
+  border-radius: 50%; border-style: dashed;
+}
 .demo {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);

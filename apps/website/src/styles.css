@@ -1763,15 +1763,15 @@ html[data-scene='flight'] .reticle.is-live {
 }
 
 /* Three results: phone showcase, hovered phone in focus */
-.stage3-wrap { margin-top: clamp(28px, 4vw, 52px); }
+.stage3-wrap { margin-top: clamp(8px, 2vh, 24px); }
 .cases__lead { color: var(--muted); font-size: 0.95rem; margin: 0 0 clamp(16px, 2vw, 24px); text-align: center; }
 .stage3 {
   display: flex; justify-content: center; align-items: center; gap: clamp(8px, 2vw, 28px);
-  padding: clamp(24px, 4vw, 48px) 0;
+  padding: clamp(10px, 2.5vh, 28px) 0;
   background: radial-gradient(60% 70% at 50% 50%, rgba(var(--accent-glow), 0.14), transparent 70%);
 }
 .phone3 {
-  position: relative; flex: 0 0 auto; width: clamp(170px, 21vw, 280px); aspect-ratio: 560 / 1182;
+  position: relative; flex: 0 0 auto; width: clamp(130px, min(19vw, 25vh), 250px); aspect-ratio: 560 / 1182;
   padding: 0; border: 7px solid #1c1a21; border-radius: clamp(28px, 3.4vw, 44px); overflow: hidden;
   background: #000; cursor: pointer;
   box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px -30px rgba(0,0,0,0.9);
@@ -1785,16 +1785,16 @@ html[data-scene='flight'] .reticle.is-live {
 .phone3--fail.is-active { box-shadow: 0 0 0 1px rgba(255,140,144,0.35), 0 40px 90px -30px rgba(255,140,144,0.45); }
 .phone3--unable.is-active { box-shadow: 0 0 0 1px rgba(241,204,112,0.35), 0 40px 90px -30px rgba(241,204,112,0.4); }
 .phone3:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 6px; }
-.stage3__panel { max-width: 640px; margin: 4px auto 0; text-align: center; min-height: 190px; }
+.stage3__panel { max-width: 640px; margin: 0 auto; text-align: center; min-height: 150px; }
 .stage3__info h3 { margin: 0 0 6px; font-family: var(--serif); font-weight: 500; font-size: clamp(1.5rem, 2.4vw, 2rem); }
 .stage3__info--pass h3 { color: var(--pass); }
 .stage3__info--fail h3 { color: var(--fail); }
 .stage3__info--unable h3 { color: var(--unable); }
-.stage3__line { margin: 0 0 14px; color: var(--ink); }
-.stage3__info blockquote { margin: 0; color: var(--muted); font-size: 0.93rem; line-height: 1.65; }
+.stage3__line { margin: 0 0 10px; color: var(--ink); }
+.stage3__info blockquote { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
 .stage3__note { margin: 10px 0 0; color: var(--muted); font-size: 0.8rem; opacity: 0.8; }
 @media (max-width: 700px) {
   .stage3 { justify-content: flex-start; overflow-x: auto; scroll-snap-type: x mandatory; padding-inline: 16px; }
-  .phone3 { width: 62vw; scroll-snap-align: center; }
+  .phone3 { width: min(62vw, 34vh); scroll-snap-align: center; }
 }
 @media (prefers-reduced-motion: reduce) { .phone3 { transition: none; } }

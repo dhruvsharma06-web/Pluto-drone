@@ -116,12 +116,19 @@ export function mountStage(reducedMotion: boolean) {
     shoot();
   };
 
-  // A scene is active once most of it fills the viewport.
+  // The active scene is the one covering most of the viewport. Measuring
+  // viewport coverage (not the scene's own visible share) keeps scenes taller
+  // than the screen from never activating.
+  const cover = new Map<Element, number>();
   const io = new IntersectionObserver(
     (entries) => {
-      for (const e of entries) if (e.isIntersecting) activate((e.target as HTMLElement).dataset.scene!);
+      for (const e of entries) cover.set(e.target, e.intersectionRect.height);
+      let best: Element | null = null;
+      let most = 0;
+      cover.forEach((h, el) => { if (h > most) { most = h; best = el; } });
+      if (best && most > window.innerHeight * 0.4) activate((best as HTMLElement).dataset.scene!);
     },
-    { threshold: 0.55 },
+    { threshold: Array.from({ length: 21 }, (_, i) => i / 20) },
   );
   scenes.forEach((s) => io.observe(s));
   activate('hero');

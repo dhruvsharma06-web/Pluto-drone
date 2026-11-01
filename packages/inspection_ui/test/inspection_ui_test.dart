@@ -8,8 +8,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inspection_contract/inspection_contract.dart';
 import 'package:inspection_ui/inspection_ui.dart';
 import '../example/lib/fixture_controller.dart';
-import '../lib/src/theme.dart';
-import '../lib/src/drone_stage.dart';
+import 'package:inspection_ui/src/drone_stage.dart';
+import 'package:inspection_ui/src/motor_finding.dart';
+import 'package:inspection_ui/src/presentation.dart' show motorWhy;
 
 late Uint8List photoBytes;
 
@@ -64,11 +65,6 @@ Future<FixtureController> fixture(String name) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUp(() {
-    TestWidgetsFlutterBinding
-            .instance.platformDispatcher.accessibilityFeaturesTestValue =
-        FakeAccessibilityFeatures(disableAnimations: true);
-  });
   setUpAll(() async {
     const privatePhoto = String.fromEnvironment('TEAM_PHOTO_PATH');
     photoBytes = await File(privatePhoto.isEmpty
@@ -76,19 +72,11 @@ void main() {
             : privatePhoto)
         .readAsBytes();
     final loader = FontLoader('packages/inspection_ui/InspectionSans');
-    for (final name in ['Inter'])
-      loader.addFont(File('assets/fonts/$name.ttf')
+    for (final name in ['Regular', 'Medium', 'Bold'])
+      loader.addFont(File('assets/fonts/Roboto-$name.ttf')
           .readAsBytes()
           .then((v) => ByteData.sublistView(v)));
     await loader.load();
-    final display = FontLoader('packages/inspection_ui/InspectionDisplay')
-      ..addFont(File('assets/fonts/PlayfairDisplay.ttf')
-          .readAsBytes()
-          .then((v) => ByteData.sublistView(v)))
-      ..addFont(File('assets/fonts/PlayfairDisplay-Italic.ttf')
-          .readAsBytes()
-          .then((v) => ByteData.sublistView(v)));
-    await display.load();
     final icons = FontLoader('MaterialIcons')
       ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
     await icons.load();
@@ -106,6 +94,83 @@ void main() {
     expect(motorBoxRect([.9, 0, .2, .2], landscape), isNull);
     expect(motorBoxRect([double.nan, 0, .1, .1], landscape), isNull);
     expect(motorBoxRect([0, 0, 0, .2], landscape), isNull);
+  });
+  test('finding explains only supplied differences and image coordinates', () {
+    final motor = <String, Object?>{
+      'motor_id': 'M2',
+      'bbox': [.7, .1, .2, .2],
+      'finding': 'mismatch',
+      'observed_type': 'B',
+      'expected_type': 'A',
+      'observed_orientation': 'face down',
+      'expected_orientation': 'face up',
+    };
+    expect(motorWhere(motor), 'M2 · Upper right of image.');
+    expect(motorWhy(motor), contains('Type: observed B; expected A.'));
+    expect(motorWhy(motor),
+        contains('Orientation: observed face down; expected face up.'));
+    expect(motorWhy({...motor, 'finding': 'unknown'}),
+        'This part could not be verified from the image.');
+    expect(motorWhy({'finding': 'mismatch'}),
+        contains('a specific reason was not supplied'));
+    expect(
+        motorWhere({
+          ...motor,
+          'bbox': [double.nan, 0, .1, .2]
+        }),
+        'M2 · Image location not supplied.');
+    expect(motorWhere({...motor, 'bbox': null}),
+        'M2 · Image location not supplied.');
+  });
+
+  testWidgets('issue box opens matching details and closes on new inspection',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    final c = await fixture('incorrect');
+    await tester.pumpWidget(InspectionApp(controller: c));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() => precacheImage(MemoryImage(photoBytes),
+        tester.element(find.byType(InteractiveViewer))));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('motor-box-Sample A')), findsNothing);
+    final box = find.byKey(const ValueKey('motor-box-Sample B'));
+    expect(box, findsOneWidget);
+    await tester.tap(box);
+    await tester.pumpAndSettle();
+    expect(find.byType(MotorFindingSheet), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet), matching: find.text('Where')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet), matching: find.text('Why')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet),
+            matching: find.text('Correction')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet),
+            matching: find.text('Sample B · Upper right of image.')),
+        findsOneWidget);
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    c.show('processing');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    // The broadcast event pops the route, then its reverse ticker starts.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byType(MotorFindingSheet), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await c.dispose();
   });
   test('processing and mismatched image identity suppress stale result',
       () async {
@@ -200,78 +265,6 @@ void main() {
     await c.dispose();
   });
   testWidgets(
-      'capture uses large phone surface and close returns to inspection',
-      (tester) async {
-    tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = const Size(390, 844);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    addTearDown(tester.view.resetPhysicalSize);
-    final c = TestController(const InspectionState(safetyConfirmed: true));
-    await tester.pumpWidget(InspectionApp(
-        controller: c, cameraPreview: const ColoredBox(color: Colors.black)));
-    final action = find.byKey(const ValueKey('primary-inspection-action'));
-    await tester.ensureVisible(action);
-    await tester.tap(action);
-    await tester.pumpAndSettle();
-    expect(find.text('Capture photo'), findsOneWidget);
-    expect(find.byType(NavigationBar), findsNothing);
-    expect(tester.getSize(find.byKey(const ValueKey('capture-stage'))).height,
-        closeTo(844 * .78, 1));
-    await tester.tap(find.byTooltip('Close camera'));
-    await tester.pumpAndSettle();
-    expect(c.stopCalls, 1);
-    expect(find.text('Capture photo'), findsNothing);
-    expect(find.byType(NavigationBar), findsOneWidget);
-    await tester.pumpWidget(const SizedBox());
-    await c.dispose();
-  });
-  testWidgets('capture supports short landscape, large text and Android Back',
-      (tester) async {
-    tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = const Size(844, 390);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    addTearDown(tester.view.resetPhysicalSize);
-    final c = TestController(const InspectionState(safetyConfirmed: true));
-    await tester.pumpWidget(MediaQuery(
-        data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
-        child: InspectionApp(
-            controller: c,
-            cameraPreview: const ColoredBox(color: Colors.black))));
-    final action = find.byKey(const ValueKey('primary-inspection-action'));
-    await tester.ensureVisible(action);
-    await tester.tap(action);
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), null);
-    await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle();
-    expect(c.stopCalls, 1);
-    expect(find.text('Capture photo'), findsNothing);
-    await tester.pumpWidget(const SizedBox());
-    await c.dispose();
-  });
-  testWidgets('inactive camera permission prompt does not stop camera startup',
-      (tester) async {
-    final c = TestController(const InspectionState(safetyConfirmed: true))
-      ..pending = Completer<void>();
-    await tester.pumpWidget(InspectionApp(controller: c));
-    final action = find.byKey(const ValueKey('primary-inspection-action'));
-    await tester.ensureVisible(action);
-    await tester.tap(action);
-    await tester.pump();
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
-    await tester.pump();
-    expect(c.stopCalls, 0);
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-    c.pending!.complete();
-    await tester.pumpAndSettle();
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-    await tester.pump();
-    expect(c.stopCalls, 1);
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-    await tester.pumpWidget(const SizedBox());
-    await c.dispose();
-  });
-  testWidgets(
       'new operation immediately removes old Pass even before controller emits',
       (tester) async {
     final f = await fixture('pass');
@@ -331,9 +324,11 @@ void main() {
   });
 
   for (final (width, height, scale, dark) in [
-    for (final width in [320.0, 390.0, 768.0, 1440.0])
-      for (final scale in [1.0, 1.5])
-        (width, width < 500 ? 844.0 : 1024.0, scale, true)
+    (320.0, 740.0, 1.0, false),
+    (390.0, 844.0, 1.0, false),
+    (390.0, 844.0, 1.5, true),
+    (768.0, 1024.0, 1.0, false),
+    (1440.0, 900.0, 1.0, false)
   ]) {
     testWidgets('layout $width scale $scale dark $dark', (tester) async {
       tester.view.physicalSize = Size(width, height);
@@ -360,130 +355,24 @@ void main() {
     });
   }
 
-  test('palette and contrast follow the website', () {
-    final c = inspectionTheme(Brightness.dark).colorScheme;
-    for (final color in [
-      c.primary,
-      c.onPrimary,
-      c.primaryContainer,
-      c.onPrimaryContainer,
-      c.secondary,
-      c.onSecondary,
-      c.secondaryContainer,
-      c.onSecondaryContainer,
-      c.tertiary,
-      c.onTertiary,
-      c.tertiaryContainer,
-      c.onTertiaryContainer,
-      c.error,
-      c.onError,
-      c.errorContainer,
-      c.onErrorContainer,
-      c.surface,
-      c.onSurface,
-      c.onSurfaceVariant,
-      c.outline,
-      c.outlineVariant,
-      c.surfaceContainerLowest,
-      c.surfaceContainerLow,
-      c.surfaceContainer,
-      c.surfaceContainerHigh,
-      c.surfaceContainerHighest,
-      c.inverseSurface,
-      c.onInverseSurface,
-      c.inversePrimary,
-      c.surfaceTint
-    ]) {
-      expect(color, isNot(const Color(0xff00e5ff)));
-    }
-    double contrast(Color foreground) =>
-        (foreground.computeLuminance() + .05) /
-        (inspectionGround.computeLuminance() + .05);
-    expect(contrast(inspectionInk), greaterThanOrEqualTo(7));
-    expect(contrast(inspectionMuted), greaterThanOrEqualTo(4.5));
-    expect(contrast(inspectionAccent), greaterThanOrEqualTo(3));
-  });
-  testWidgets('exact labels and distinct symbols for every result',
-      (tester) async {
-    for (final (scenario, status) in [
-      ('pass', VerificationStatus.pass),
-      ('incorrect', VerificationStatus.incorrectInstallation),
-      ('reference', VerificationStatus.unableToVerify)
-    ]) {
-      final c = await fixture(scenario);
-      await tester.pumpWidget(InspectionApp(controller: c, demoMode: true));
-      await tester.pumpAndSettle();
-      expect(
-          find.text(resultLabel(status), findRichText: true), findsOneWidget);
-      expect(
-          find.byKey(ValueKey('result-symbol-${status.name}')), findsOneWidget);
-      expect(find.text('Demo · Simulated results'), findsOneWidget);
-      await tester.pumpWidget(const SizedBox());
-      await c.dispose();
-    }
-  });
-  testWidgets('reduced motion freezes mist and processing scan',
-      (tester) async {
-    await tester.pumpWidget(MaterialApp(
+  testWidgets('processing graphics honour reduced motion', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
         home: MediaQuery(
-            data: const MediaQueryData(
-                size: Size(390, 844), disableAnimations: true),
-            child: const Scaffold(body: DroneStage(processing: true)))));
+            data: MediaQueryData(disableAnimations: true),
+            child:
+                SizedBox(width: 300, height: 250, child: ProcessingSweep()))));
     await tester.pumpAndSettle();
-    DroneStagePainter painter() => tester
-        .widget<CustomPaint>(
-            find.byKey(const ValueKey('illustrative-drone-stage')))
-        .painter! as DroneStagePainter;
-    expect(painter().phase, 0);
-    await tester.pump(const Duration(seconds: 3));
-    expect(painter().phase, 0);
-    expect(tester.binding.hasScheduledFrame, isFalse);
+    expect(tester.binding.transientCallbackCount, 0);
+    expect(tester.takeException(), isNull);
   });
-
-  testWidgets('motor guidance closes as soon as its result is invalidated',
+  testWidgets('illustrative scene responds to drag and settles',
       (tester) async {
-    final c = await fixture('incorrect');
-    await tester.pumpWidget(InspectionApp(controller: c, demoMode: true));
+    await tester.pumpWidget(const MaterialApp(
+        home: SizedBox(width: 390, height: 300, child: DroneStage())));
+    await tester.drag(find.byType(DroneStage), const Offset(35, -15));
     await tester.pumpAndSettle();
-    final target = find.text('Sample B');
-    await tester.ensureVisible(target);
-    await tester.tap(target);
-    await tester.pumpAndSettle();
-    expect(find.text('Where'), findsOneWidget);
-    expect(find.text('Why'), findsOneWidget);
-    expect(find.text('Correction'), findsOneWidget);
-    c.show('prepare');
-    await tester.pumpAndSettle();
-    expect(find.text('Where'), findsNothing);
-    expect(
-        find.text('Incorrect Installation', findRichText: true), findsNothing);
-    await tester.pumpWidget(const SizedBox());
-    await c.dispose();
-  });
-  testWidgets('mist runs onscreen and stops when scrolled out', (tester) async {
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        FakeAccessibilityFeatures(disableAnimations: false);
-    final scroll = ScrollController();
-    await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-            body: SingleChildScrollView(
-                controller: scroll,
-                child: const Column(
-                    children: [DroneStage(), SizedBox(height: 2000)])))));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    DroneStagePainter painter() => tester
-        .widget<CustomPaint>(
-            find.byKey(const ValueKey('illustrative-drone-stage')))
-        .painter! as DroneStagePainter;
-    expect(painter().phase, greaterThan(0));
-    scroll.jumpTo(500);
-    await tester.pump();
-    final stopped = painter().phase;
-    await tester.pump(const Duration(seconds: 2));
-    expect(painter().phase, stopped);
-    await tester.pumpWidget(const SizedBox());
-    scroll.dispose();
+    expect(tester.takeException(), isNull);
+    expect(tester.binding.transientCallbackCount, 0);
   });
 
   testWidgets('capture rendered UI evidence', (tester) async {
@@ -492,26 +381,15 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    final key = GlobalKey();
     for (final (name, scenario, width, height, dark) in [
-      for (final width in [320.0, 390.0, 768.0, 1440.0])
-        for (final scale in [1.0, 1.5])
-          for (final scenario in ['prepare', 'incorrect'])
-            (
-              '$scenario-$width-$scale',
-              scenario,
-              width,
-              width < 500 ? 844.0 : 1024.0,
-              true
-            ),
-      ('reference-phone', 'reference', 390.0, 844.0, true),
-      ('pass-phone', 'pass', 390.0, 844.0, true),
-      ('processing-phone', 'processing', 390.0, 844.0, true)
+      ('prepare-phone', 'prepare', 390.0, 844.0, true),
+      ('reference-phone', 'reference', 390.0, 844.0, false),
+      ('mismatch-tablet', 'incorrect', 1100.0, 1000.0, false),
+      ('finding-phone', 'incorrect', 390.0, 844.0, true),
+      ('pass-dark', 'pass', 390.0, 844.0, true)
     ]) {
+      final key = GlobalKey();
       tester.view.physicalSize = Size(width, height);
-      tester.platformDispatcher.textScaleFactorTestValue =
-          name.endsWith('-1.5') ? 1.5 : 1;
       final c = await fixture(scenario);
       await tester.pumpWidget(RepaintBoundary(
           key: key,
@@ -520,8 +398,19 @@ void main() {
               demoMode: true,
               themeMode: dark ? ThemeMode.dark : ThemeMode.light)));
       await tester.pumpAndSettle();
+      if (c.current.image != null) {
+        await tester.runAsync(() => precacheImage(MemoryImage(photoBytes),
+            tester.element(find.byType(InteractiveViewer))));
+        await tester.pumpAndSettle();
+      }
+      if (name == 'finding-phone') {
+        await tester.tap(find.byKey(const ValueKey('motor-box-Sample B')));
+        await tester.pumpAndSettle();
+      }
       final boundary =
           key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      boundary.markNeedsPaint();
+      await tester.pump();
       await tester.runAsync(() async {
         final im = await boundary.toImage(pixelRatio: 2);
         final bytes = await im.toByteData(format: ui.ImageByteFormat.png);

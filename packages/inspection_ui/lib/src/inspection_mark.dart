@@ -9,7 +9,7 @@ class InspectionMark extends StatelessWidget {
   final Color? color;
   @override
   Widget build(BuildContext context) => Semantics(
-      label: 'Pluto Inspector logo',
+      label: 'Pluto Inspection logo',
       image: true,
       child: SizedBox.square(
           dimension: size,

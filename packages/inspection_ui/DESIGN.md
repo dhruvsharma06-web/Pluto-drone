@@ -1,37 +1,53 @@
-# Pluto Inspector — Flutter design
+---
+name: Pluto Inspection
+colors:
+  ink-dark: "#ffffff"
+  ground-dark: "#050505"
+  amethyst: "#3b0a6b"
+  cyan: "#00e5ff"
+  ink-light: "#000000"
+  ground-light: "#ffffff"
+typography:
+  headline:
+    fontFamily: Roboto
+    fontSize: "32sp"
+    fontWeight: 700
+    lineHeight: 1.12
+  title:
+    fontFamily: Roboto
+    fontSize: "24sp"
+    fontWeight: 700
+  body:
+    fontFamily: Roboto
+    fontSize: "18sp"
+    fontWeight: 400
+rounded:
+  controls: "8dp"
+  evidence: "16dp"
+spacing:
+  group: "16dp"
+  section: "24dp"
+---
+# Design System: Pluto Inspection
+## Overview
+User-supplied palette reference: jet black #050505, royal amethyst #3B0A6B and electric cyan #00E5FF. Large readable text and minimal working copy remain. This supersedes the monochrome-only direction.
+## Colors
+Jet-black canvas, amethyst selected controls and primary actions, restrained cyan interaction accents. Directional amethyst/cyan studio light belongs to the illustrative framing stage; a faint amethyst wash grounds the page. Outcome names/icons retain white/black contrast. Preserve original camera/photo evidence without filtering it; photographic cues may be needed for detection.
+## Typography
+Self-hosted Roboto. Headings 32sp; product title 24sp; body/control text 18sp. Native text scaling remains enabled. No small decorative labels.
+## Layout
+One clear inspection heading, camera/photo selection, evidence, explicit safety confirmation and primary action. No tagline, progress strip, repeated tip list or duplicate disclaimer. Detailed setup guidance and project metadata live in their dedicated views. Compact views stack; expanded results show evidence and motor findings side by side.
+## Elevation & Depth
+Flat native controls, directional lighting in the illustrative stage and a restrained background wash. No blur layers or added continuous animation.
+## Shapes
+8dp controls, 16dp evidence frame. Avoid extra containers when spacing is sufficient.
+## Components
+Result status is conveyed by its exact name and distinct icon, never colour. Pointer feedback, direct viewpoint manipulation, processing scan and image zoom remain restrained. No propeller spinning. Reduced motion uses static feedback.
+## Do's and Don'ts
+- Do keep safety confirmation and actionable correction guidance.
+- Do keep fixtures visibly labelled as simulated.
+- Do preserve the reusable UI/controller/core boundary.
+- Don't add tiny filler, taglines, fake metrics or effects over photographic evidence.
 
-Website alignment, 1 November 2026. Operate mode: choose an input, confirm disarmed/stopped, capture unfiltered evidence and review supported findings. User explicitly selected app/runtime to preserve integrated camera fixes. This replaces the former graphite/blue identity.
-
-## Colour
-
-| Role | Value |
-| --- | --- |
-| Ground | #050505 |
-| Ink | #F3F0F7 |
-| Muted | #A49CB2 |
-| Hairline | #F3F0F7 at 14% |
-| Accent / focus / mismatch | #8A5CD6 |
-| Large italic headline accent | #7A4FC4 |
-| Press feedback / error text | #B79CF0 |
-| Stage mist | #2B0B55 |
-| Deep purple role | #3B0A6B |
-
-Flat dark surfaces under both OS themes. Violet light is confined to the explicitly illustrative stage. No cyan UI or photo filters. Pass: white filled circle/check. Incorrect Installation: purple square/cross. Unable to Verify: grey dashed ring/question mark. Exact labels accompany symbols; loading/errors are separate states.
-
-## Typography and layout
-
-Self-hosted Inter UI/body and Playfair Display 500 large headings, at most one italic purple word. OFL notices accompany fonts and are bundled as assets. Headings 34sp, section titles 22–24sp, body/controls 17–18sp, secondary 15sp, minimum 14sp. Native scaling retained; narrow screens scroll at 1.5x rather than clipping or shrinking text.
-
-Equal 16dp gutters below 360dp, 24dp otherwise; max width 1120dp. Two columns from 760dp; rail from 900dp. Compact screens place the action before the stage. Safety confirmation is mandatory. The focused camera retains its .78-screen capture stage and runtime shutter, targeting approximately 60–70% portrait viewfinder area, device/text-scale dependent.
-
-## Components and motion
-
-White primary pill, minimum 52dp, black label; .97 pointer press over 100–140ms. Segments select white. Guide/motor findings use hairline rows. Scrollable Where/Why/Correction sheets dismiss immediately on invalidation, new input, failure or backgrounding. Fixture sheets retain their demo label.
-
-Purple focus borders on buttons; grouped controls/motor rows outline descendant keyboard focus. Native navigation retains Material ripple/focus. Evidence pinch zoom transforms image and boxes together. Black outer box stroke supports white matches, purple mismatches and dashed white unknowns over arbitrary unfiltered photos.
-
-Entrances fade/rise 20dp over 300ms; motor rows stagger 50ms (capped). Sheets exit in 180ms. Outgoing results disappear immediately, never retained for an exit animation. Mist uses three bounded radial fields over 14 seconds, pauses offscreen/background, and stays static with reduced motion. No propeller rotation. Reduced motion removes travel, press scaling and scan sweep.
-
-## Safety and honesty
-
-No shared controller/engine contract changes. Missing reference/engine fails closed. No invented motor identities, boxes, accuracy or predictions. Demo labels remain visible on all pages/sheets. Launcher text is Pluto Inspector; existing launcher artwork remains unchanged.
+## Findings
+Mismatch and unknown boxes use dual black/white outlines. Tap for a native scrollable Where/Why/Correction sheet; list uses the same content. Positions are relative to the analyzed image. No guessed boxes or causes. Detail sheets dismiss on inspection invalidation.

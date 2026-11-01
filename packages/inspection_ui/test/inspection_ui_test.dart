@@ -184,6 +184,56 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await c.dispose();
   });
+  testWidgets(
+      'capture uses large phone surface and close returns to inspection',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    final c = TestController(const InspectionState(safetyConfirmed: true));
+    await tester.pumpWidget(InspectionApp(
+        controller: c, cameraPreview: const ColoredBox(color: Colors.black)));
+    final action = find.byKey(const ValueKey('primary-inspection-action'));
+    await tester.ensureVisible(action);
+    await tester.tap(action);
+    await tester.pumpAndSettle();
+    expect(find.text('Capture photo'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(tester.getSize(find.byKey(const ValueKey('capture-stage'))).height,
+        closeTo(844 * .78, 1));
+    await tester.tap(find.byTooltip('Close camera'));
+    await tester.pumpAndSettle();
+    expect(c.stopCalls, 1);
+    expect(find.text('Capture photo'), findsNothing);
+    expect(find.byType(NavigationBar), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await c.dispose();
+  });
+  testWidgets('capture supports short landscape, large text and Android Back',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(844, 390);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    final c = TestController(const InspectionState(safetyConfirmed: true));
+    await tester.pumpWidget(MediaQuery(
+        data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
+        child: InspectionApp(
+            controller: c,
+            cameraPreview: const ColoredBox(color: Colors.black))));
+    final action = find.byKey(const ValueKey('primary-inspection-action'));
+    await tester.ensureVisible(action);
+    await tester.tap(action);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), null);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(c.stopCalls, 1);
+    expect(find.text('Capture photo'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await c.dispose();
+  });
   testWidgets('inactive camera permission prompt does not stop camera startup',
       (tester) async {
     final c = TestController(const InspectionState(safetyConfirmed: true))

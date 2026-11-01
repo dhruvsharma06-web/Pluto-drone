@@ -89,21 +89,24 @@ class RuntimeCameraPreview extends StatelessWidget {
             initialData: controller.current,
             builder: (context, snapshot) {
               final busy = snapshot.data!.phase == InspectionPhase.processing;
-              return Stack(fit: StackFit.expand, children: [
-                Center(child: CameraPreview(camera)),
-                Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 56,
-                    child: Center(
+              return Column(children: [
+                Expanded(
+                    key: const ValueKey('camera-viewfinder'),
+                    child:
+                        ClipRect(child: Center(child: CameraPreview(camera)))),
+                Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    child: SizedBox(
+                        width: double.infinity,
                         child: FilledButton.icon(
-                      key: const ValueKey('take-photo'),
-                      style: FilledButton.styleFrom(
-                          minimumSize: const Size(144, 48)),
-                      onPressed: busy ? null : controller.captureLiveImage,
-                      icon: const Icon(Icons.camera_alt_outlined),
-                      label: Text(busy ? 'Taking photo...' : 'Take photo'),
-                    ))),
+                          key: const ValueKey('take-photo'),
+                          style: FilledButton.styleFrom(
+                              minimumSize: const Size(144, 48)),
+                          onPressed: busy ? null : controller.captureLiveImage,
+                          icon: const Icon(Icons.camera_alt_outlined),
+                          label: Text(busy ? 'Taking photo...' : 'Take photo'),
+                        ))),
               ]);
             },
           );

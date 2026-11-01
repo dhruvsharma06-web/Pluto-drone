@@ -6,6 +6,7 @@ import 'presentation.dart';
 import 'support_views.dart';
 import 'theme.dart';
 import 'inspection_mark.dart';
+import 'capture_view.dart';
 
 /// Drop-in presentation. The caller owns and disposes [controller].
 class InspectionApp extends StatelessWidget {
@@ -211,6 +212,20 @@ class _InspectionShellState extends State<_InspectionShell>
     final colors = Theme.of(context).colorScheme;
     final result = _result;
     final demo = widget.demoMode || _fixtureSession;
+    if (_destination == 0 &&
+        _mode == _InputMode.live &&
+        _liveRequested &&
+        _state.safetyConfirmed &&
+        _state.image == null) {
+      return CaptureView(
+          preview: widget.cameraPreview,
+          busy: _operation || _state.phase == InspectionPhase.processing,
+          notice: demo
+              ? _DemoNotice(
+                  controls: widget.demoMode ? widget.developmentControls : null)
+              : null,
+          onClose: () => _run(widget.controller.stopLive, stopping: true));
+    }
     return LayoutBuilder(builder: (context, constraints) {
       final expanded = constraints.maxWidth >= 900;
       final page = switch (_destination) {

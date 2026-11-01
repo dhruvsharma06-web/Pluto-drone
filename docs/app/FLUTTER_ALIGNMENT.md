@@ -30,3 +30,10 @@ Downloaded 1 November 2026 from official Google Fonts:
 - https://github.com/google/fonts/tree/main/ofl/playfairdisplay — PlayfairDisplay[wght].ttf, PlayfairDisplay-Italic[wght].ttf and OFL.txt.
 
 Filenames simplified; font bytes unmodified. OFL notices accompany fonts and are bundled. No new runtime dependency. Impeccable guided native hierarchy/accessibility; Emil guided limited motion/feedback; Taste informed app composition, with the supplied palette/type/hairlines taking precedence. Browser-only inspectors were not used to claim native validation.
+
+## Minimal rounded refinement — 1 November 2026
+
+Visual-only refinement: separate pill-shaped input choices, shorter repeated helper copy, softer result/sheet corners, and motor details in the existing Where/Why/Correction sheet. Safety confirmation, exact result labels, fixture disclosures, error guidance and runtime logic are preserved. Existing colours/fonts/brand retained; no reference colours or business content copied. Motor sheets reopen on repeated taps and still close immediately when invalidated.
+
+UI analysis clean; all 25 tests passed, plus the extended sheet reopening check. Responsive checks cover 320/390/768/1440px at 1.0x/1.5x. Updated local phone start/result renders inspected. ADB lists no connected device, so updated hardware testing/installation is pending. Impeccable and Emil guided hierarchy, touch targets and restrained feedback. APK/source provenance is recorded in docs/app/FLUTTER_ALIGNMENT.md.
+

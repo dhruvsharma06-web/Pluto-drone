@@ -12,6 +12,7 @@ import 'result_symbol.dart';
 import 'reveal.dart';
 import 'motor_detail.dart';
 import 'control_feedback.dart';
+import 'input_choices.dart';
 
 /// Drop-in presentation. The caller owns and disposes [controller].
 class InspectionApp extends StatelessWidget {
@@ -472,19 +473,11 @@ class _InspectionView extends StatelessWidget {
                       : [TextSpan(text: title)]),
               key: const ValueKey('inspection-heading'),
               style: Theme.of(context).textTheme.headlineSmall)),
-      const SizedBox(height: 8),
-      Text(
-          result == null
-              ? 'Point the app at a disarmed drone. It checks every propeller against the verified reference.'
-              : switch (result!.status) {
-                  VerificationStatus.pass =>
-                    'The visible installation matches the supplied reference.',
-                  VerificationStatus.incorrectInstallation =>
-                    'Correct the highlighted motor before inspecting again.',
-                  VerificationStatus.unableToVerify =>
-                    'This image has not been approved.',
-                },
-          style: TextStyle(color: c.onSurfaceVariant, height: 1.45)),
+      if (result == null) ...[
+        const SizedBox(height: 12),
+        Text('Use the live camera or upload a photo.',
+            style: TextStyle(color: c.onSurfaceVariant, height: 1.45)),
+      ],
     ]);
     final resultPanel = result != null
         ? _ResultPanel(
@@ -502,21 +495,10 @@ class _InspectionView extends StatelessWidget {
             : state;
     final work =
         Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      ControlFeedback(
-          enabled: !(processing && !live),
-          child: SegmentedButton<_InputMode>(
-              segments: const [
-                ButtonSegment(
-                    value: _InputMode.live, label: Text('Live camera')),
-                ButtonSegment(
-                    value: _InputMode.photo, label: Text('Upload image'))
-              ],
-              selected: {
-                mode
-              },
-              showSelectedIcon: false,
-              onSelectionChanged:
-                  processing && !live ? null : (s) => onSelectMode(s.first))),
+      InputChoices<_InputMode>(choices: const {
+        _InputMode.live: 'Live camera',
+        _InputMode.photo: 'Upload image'
+      }, selected: mode, onChanged: processing && !live ? null : onSelectMode),
       const SizedBox(height: 16),
       if (inputState.image != null)
         EvidenceView(
@@ -560,22 +542,6 @@ class _InspectionView extends StatelessWidget {
                           ? 'Choose image'
                           : 'Choose another image')
                       : 'Start live inspection'),
-      if (processing)
-        Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Row(children: [
-              if (MediaQuery.disableAnimationsOf(context))
-                const Icon(Icons.hourglass_top_outlined, size: 18)
-              else
-                const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
-              const SizedBox(width: 10),
-              const Expanded(
-                  child: Text('Inspecting visible propellers…',
-                      style: TextStyle(fontSize: 15))),
-            ])),
       if (error != null || state.phase == InspectionPhase.error)
         Padding(
             padding: const EdgeInsets.only(top: 16),
@@ -656,7 +622,7 @@ class _ResultSummary extends StatelessWidget {
         decoration: BoxDecoration(
             color: c.surface,
             border: Border.all(color: inspectionLine),
-            borderRadius: BorderRadius.circular(12)),
+            borderRadius: BorderRadius.circular(inspectionSurfaceRadius)),
         child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -733,12 +699,11 @@ class _MotorFindings extends StatelessWidget {
                                 child: ListTile(
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 16, vertical: 4),
-                                    onTap: () =>
-                                        onSelect(selectedMotor == id ? '' : id),
+                                    onTap: () => onSelect(id),
                                     title: Text(id,
                                         style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500)),
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600)),
                                     subtitle: Text(switch (motor['finding']) {
                                       'match' => 'Matches reference',
                                       'mismatch' => 'Installation mismatch',
@@ -755,31 +720,6 @@ class _MotorFindings extends StatelessWidget {
                                           'mismatch' => c.bad,
                                           _ => c.caution
                                         }))),
-                            if (selectedMotor == id ||
-                                motor['finding'] == 'mismatch')
-                              Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            'Why: observed ${motorText(motor, 'observed_type') ?? 'Unknown'}; expected ${motorText(motor, 'expected_type') ?? 'Reference needed'}',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: c.onSurfaceVariant)),
-                                        const SizedBox(height: 5),
-                                        Text('Where: $id',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: c.onSurfaceVariant)),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                            'Correction: ${correctionGuidance(motor)}',
-                                            style:
-                                                const TextStyle(height: 1.5)),
-                                      ])),
                           ])))),
     ]);
   }

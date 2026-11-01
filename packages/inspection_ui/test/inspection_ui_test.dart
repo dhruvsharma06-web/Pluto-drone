@@ -452,6 +452,11 @@ void main() {
     expect(find.text('Where'), findsOneWidget);
     expect(find.text('Why'), findsOneWidget);
     expect(find.text('Correction'), findsOneWidget);
+    await tester.tap(find.byTooltip('Close guidance'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sample B'));
+    await tester.pumpAndSettle();
+    expect(find.text('Where'), findsOneWidget);
     c.show('prepare');
     await tester.pumpAndSettle();
     expect(find.text('Where'), findsNothing);

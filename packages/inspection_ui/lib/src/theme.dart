@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+const inspectionControlHeight = 52.0;
+const inspectionSurfaceRadius = 20.0;
+
 const inspectionGround = Color(0xff050505);
 const inspectionInk = Color(0xfff3f0f7);
 const inspectionMuted = Color(0xffa49cb2);
@@ -59,7 +62,8 @@ ThemeData inspectionTheme(Brightness brightness) {
           ? const BorderSide(color: inspectionAccent, width: 2)
           : BorderSide.none);
   final action = ButtonStyle(
-    minimumSize: const WidgetStatePropertyAll(Size(48, 52)),
+    minimumSize:
+        const WidgetStatePropertyAll(Size(48, inspectionControlHeight)),
     padding: const WidgetStatePropertyAll(
         EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
     textStyle: WidgetStatePropertyAll(type(17, FontWeight.w500)),
@@ -164,7 +168,7 @@ ThemeData inspectionTheme(Brightness brightness) {
     bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: inspectionGround,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             side: BorderSide(color: inspectionLine))),
     dividerTheme: const DividerThemeData(color: inspectionLine, space: 1),
   );

@@ -1,3 +1,9 @@
+## Minimal rounded refinement — 1 November 2026
+
+Visual-only refinement: separate pill-shaped input choices, shorter repeated helper copy, softer result/sheet corners, and motor details in the existing Where/Why/Correction sheet. Safety confirmation, exact result labels, fixture disclosures, error guidance and runtime logic are preserved. Existing colours/fonts/brand retained; no reference colours or business content copied. Motor sheets reopen on repeated taps and still close immediately when invalidated.
+
+UI analysis clean; all 25 tests passed, plus the extended sheet reopening check. Responsive checks cover 320/390/768/1440px at 1.0x/1.5x. Updated local phone start/result renders inspected. ADB lists no connected device, so updated hardware testing/installation is pending. Impeccable and Emil guided hierarchy, touch targets and restrained feedback. APK/source provenance is recorded in docs/app/FLUTTER_ALIGNMENT.md.
+
 ## 1 November 2026 — website alignment on app/runtime
 
 User explicitly selected app/runtime to preserve the stable camera and large capture screen. UI now follows black/white/purple with Inter/Playfair, labelled stage, shape-coded results and invalidation-safe motor sheets. Launcher text aligned by app owner. v1/runtime logic unchanged. No merge/push. Reconcile UI changes with frontend/flutter before coordinated integration; preserve runtime camera fixes.

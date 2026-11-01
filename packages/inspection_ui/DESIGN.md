@@ -35,3 +35,7 @@ Entrances fade/rise 20dp over 300ms; motor rows stagger 50ms (capped). Sheets ex
 ## Safety and honesty
 
 No shared controller/engine contract changes. Missing reference/engine fails closed. No invented motor identities, boxes, accuracy or predictions. Demo labels remain visible on all pages/sheets. Launcher text is Pluto Inspector; existing launcher artwork remains unchanged.
+
+## Minimal refinement
+
+Separate pill buttons select Live camera / Upload image with explicit selected semantics. Primary controls remain rounded with a 52dp minimum; result surfaces use a shared 20dp radius and sheets 24dp top corners. The start introduction is one short input instruction. Result-specific guidance appears once in its summary. Motor details remain in the existing Where/Why/Correction sheet instead of duplicating inline paragraphs. Capture retains one framing hint; mandatory safety confirmation, error guidance, exact statuses and honesty labels remain intact. Existing colours, fonts and content identity were retained; the later generic reference was used only for visual hierarchy and proportions.

@@ -72,8 +72,7 @@ class CaptureView extends StatelessWidget {
                 Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
-                    child: Text(
-                        'Keep the whole drone in view.\nDrone disarmed. Motors stopped.',
+                    child: Text('Keep the whole drone in view.',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium)),
               ])),

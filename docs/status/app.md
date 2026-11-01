@@ -1,3 +1,9 @@
+## Minimal rounded refinement — 1 November 2026
+
+Visual-only refinement: separate pill-shaped input choices, shorter repeated helper copy, softer result/sheet corners, and motor details in the existing Where/Why/Correction sheet. Safety confirmation, exact result labels, fixture disclosures, error guidance and runtime logic are preserved. Existing colours/fonts/brand retained; no reference colours or business content copied. Motor sheets reopen on repeated taps and still close immediately when invalidated.
+
+UI analysis clean; all 25 tests passed, plus the extended sheet reopening check. Responsive checks cover 320/390/768/1440px at 1.0x/1.5x. Updated local phone start/result renders inspected. ADB lists no connected device, so updated hardware testing/installation is pending. Impeccable and Emil guided hierarchy, touch targets and restrained feedback. APK/source provenance is recorded in docs/app/FLUTTER_ALIGNMENT.md.
+
 ## 1 November 2026 — release build installed and launched on Samsung device
 
 Release APK built (`apps/mobile/build/app/outputs/flutter-apk/app-release.apk`, SHA-256 `892fc40b3398d7094f8e8b8ad66cab3e42659e223e8b4ea160e8f312410202cd`, 17.7 MB).

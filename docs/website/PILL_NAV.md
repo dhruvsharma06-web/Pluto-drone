@@ -32,3 +32,7 @@ The general Taste audit is NOT clean: baseline 16 FAIL/10 WARN at its two widths
 Scoped review: navigation hierarchy and source emphasis are clear; rounded explorer and compact Project read coherently against the existing cinematic background. The transparent fixed header can pass over content during intermediate scroll positions, as requested. The existing mobile scene observer/reveal behavior and delayed hero title are the main remaining whole-site usability limitations; preserving scroll/animation behavior leaves those unchanged. Subjective whole-page scores: design 7/10, usability 6/10, creativity 7/10, content 7/10 (weighted 6.7/10), not an automated test result. No direction draw or stock media was introduced: this is the user's pinned incumbent design with a new original SVG drone mark.
 
 No deployment, external messages, push, merge or contract changes. Next receiver: frontend/website owner; review locally with npm run dev. App owner integrates only during the coordinated final window.
+
+## Navbar follow-up
+
+Removed the visible Pluto Inspector wordmark text, retaining the original drone logo and its accessible back-to-top name. Moved the bold purple Source link into the centered pill-navigation list. Header background remains transparent. Only index.html/styles.css changed; no 3D, scroll or animation source changes. npm run build (TypeScript + Vite) and git diff --check pass. Local preview updates automatically; no push/deployment.

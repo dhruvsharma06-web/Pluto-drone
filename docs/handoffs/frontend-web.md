@@ -77,3 +77,7 @@ See `docs/status/frontend-web.md` and `docs/website/CHECKS.md` for exact command
 - App owner: merge `frontend/website` during final integration. It touches only owned paths. Provide APK URL and real screenshots when available.
 - Research/ML: verified reference (front convention, motor IDs), measured results and dataset link. The website then replaces "pending" states with real links and numbers.
 - Website next: real screenshots/metrics/links once supplied; approved model per the asset brief; optional photo use if approved.
+
+## Navbar follow-up
+
+Removed the visible Pluto Inspector wordmark text, retaining the original drone logo and its accessible back-to-top name. Moved the bold purple Source link into the centered pill-navigation list. Header background remains transparent. Only index.html/styles.css changed; no 3D, scroll or animation source changes. npm run build (TypeScript + Vite) and git diff --check pass. Local preview updates automatically; no push/deployment.

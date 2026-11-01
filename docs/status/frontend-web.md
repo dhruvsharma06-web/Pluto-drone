@@ -28,3 +28,7 @@ Blockers / pending inputs:
 Preferences: desktop-first; black and white; gloss-black drone with white light and smoke; big justified text; minimal copy; Apple-like polish (recorded in the handoff).
 
 Next: push `frontend/website` when the owner approves; swap in real links, screenshots and metrics as teammates deliver them.
+
+## Navbar follow-up
+
+Removed the visible Pluto Inspector wordmark text, retaining the original drone logo and its accessible back-to-top name. Moved the bold purple Source link into the centered pill-navigation list. Header background remains transparent. Only index.html/styles.css changed; no 3D, scroll or animation source changes. npm run build (TypeScript + Vite) and git diff --check pass. Local preview updates automatically; no push/deployment.

@@ -302,13 +302,13 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.view.resetPhysicalSize);
-    final key = GlobalKey();
     for (final (name, scenario, width, height, dark) in [
       ('prepare-phone', 'prepare', 390.0, 844.0, true),
       ('reference-phone', 'reference', 390.0, 844.0, false),
       ('mismatch-tablet', 'incorrect', 1100.0, 1000.0, false),
       ('pass-dark', 'pass', 390.0, 844.0, true)
     ]) {
+      final key = GlobalKey();
       tester.view.physicalSize = Size(width, height);
       final c = await fixture(scenario);
       await tester.pumpWidget(RepaintBoundary(
@@ -320,6 +320,8 @@ void main() {
       await tester.pumpAndSettle();
       final boundary =
           key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      boundary.markNeedsPaint();
+      await tester.pump();
       await tester.runAsync(() async {
         final im = await boundary.toImage(pixelRatio: 2);
         final bytes = await im.toByteData(format: ui.ImageByteFormat.png);

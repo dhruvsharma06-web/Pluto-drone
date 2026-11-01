@@ -1,3 +1,15 @@
+## 1 November 2026 — release build installed and launched on Samsung device
+
+Built release ARM64 APK (`apps/mobile/build/app/outputs/flutter-apk/app-release.apk`, SHA-256 `892fc40b3398d7094f8e8b8ad66cab3e42659e223e8b4ea160e8f312410202cd`, 17.7 MB).
+Installed to connected Samsung phone (`SM-S731B`, serial `RZGL60BDTJL`) via ADB streamed install, launched `org.plutoinspection.pluto_inspector/.MainActivity` (PID 21765 confirmed running in foreground).
+All automated checks verified clean: 25 inspection_ui tests pass, 50 inspection_runtime tests pass, 1 mobile test passes, static analysis clean on all packages, contract validator passed.
+
+## 1 November 2026 — website alignment on app/runtime
+
+User explicitly selected app/runtime to preserve the stable camera and large capture screen. UI now follows black/white/purple with Inter/Playfair, labelled stage, shape-coded results and invalidation-safe motor sheets. Launcher text aligned by app owner. v1/runtime logic unchanged. No merge/push. Reconcile UI changes with frontend/flutter before coordinated integration; preserve runtime camera fixes.
+
+UI analyze clean, 25 UI tests passed; mobile analyze clean, 1 widget check passed. Nineteen local renders reviewed across the requested width/text matrix. ADB had no connected device; native screenshots/retesting not performed. Full scope, source/artifact follow-up and limitations: [alignment report](../app/FLUTTER_ALIGNMENT.md). Entries below describe earlier builds.
+
 # Person 3: Flutter application and integration: handoff
 
 Branch: `app/runtime`

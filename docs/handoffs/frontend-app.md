@@ -1,3 +1,9 @@
+## 1 November 2026 — website alignment on app/runtime
+
+User explicitly selected app/runtime to preserve the stable camera and large capture screen. UI now follows black/white/purple with Inter/Playfair, labelled stage, shape-coded results and invalidation-safe motor sheets. Launcher text aligned by app owner. v1/runtime logic unchanged. No merge/push. Reconcile UI changes with frontend/flutter before coordinated integration; preserve runtime camera fixes.
+
+UI analyze clean, 25 UI tests passed; mobile analyze clean, 1 widget check passed. Nineteen local renders reviewed across the requested width/text matrix. ADB had no connected device; native screenshots/retesting not performed. Full scope, source/artifact follow-up and limitations: [alignment report](../app/FLUTTER_ALIGNMENT.md). Entries below describe earlier builds.
+
 # Flutter frontend handoff
 
 Branch: frontend/flutter. Base: 78c704b0618d0e0a91b562e410ee098b64564584. UI implementation commit: 089932cae790a566aa87888f68dc50af78d72100. The subsequent handoff/icon-resource commit is the branch head. Primary owned paths (plus the user-requested Android launcher resource extension): packages/inspection_ui/, docs/frontend/, this handoff and frontend status. R1/R4/R5/R6/R7/R8/R11 UI coverage; contract v1.0.0 unchanged.

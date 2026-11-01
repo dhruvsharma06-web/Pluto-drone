@@ -7,6 +7,11 @@ import 'support_views.dart';
 import 'theme.dart';
 import 'inspection_mark.dart';
 import 'capture_view.dart';
+import 'drone_stage.dart';
+import 'result_symbol.dart';
+import 'reveal.dart';
+import 'motor_detail.dart';
+import 'control_feedback.dart';
 
 /// Drop-in presentation. The caller owns and disposes [controller].
 class InspectionApp extends StatelessWidget {
@@ -27,7 +32,7 @@ class InspectionApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Pluto Inspection',
+      title: 'Pluto Inspector',
       theme: inspectionTheme(Brightness.light),
       darkTheme: inspectionTheme(Brightness.dark),
       themeMode: themeMode,
@@ -62,6 +67,44 @@ class _InspectionShellState extends State<_InspectionShell>
   int _destination = 0;
   bool _operation = false, _liveRequested = false, _fixtureSession = false;
   String? _actionError, _selectedMotor;
+  BuildContext? _detailContext;
+
+  void _closeDetails() {
+    final detail = _detailContext;
+    _detailContext = null;
+    if (detail != null && detail.mounted) {
+      final route = ModalRoute.of(detail);
+      if (route != null && route.isActive)
+        Navigator.of(detail).removeRoute(route);
+    }
+  }
+
+  Future<void> _showMotor(String id) async {
+    final result = _result;
+    if (result == null) return;
+    final motors = result.motors.where((m) => m['motor_id'] == id);
+    if (motors.isEmpty) return;
+    _closeDetails();
+    setState(() => _selectedMotor = id);
+    BuildContext? openedContext;
+    await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        sheetAnimationStyle: MediaQuery.disableAnimationsOf(context)
+            ? AnimationStyle.noAnimation
+            : const AnimationStyle(
+                duration: Duration(milliseconds: 300),
+                reverseDuration: Duration(milliseconds: 180)),
+        builder: (detail) {
+          openedContext = detail;
+          _detailContext = detail;
+          return MotorDetail(
+              motor: motors.first,
+              demo: widget.demoMode || result.evidenceSource == 'fixture');
+        });
+    if (identical(_detailContext, openedContext)) _detailContext = null;
+  }
 
   @override
   void initState() {
@@ -77,6 +120,9 @@ class _InspectionShellState extends State<_InspectionShell>
     _fixtureSession = _state.result?.evidenceSource == 'fixture';
     _subscription = widget.controller.states.listen((state) {
       if (!mounted) return;
+      if (!identical(state.result, _state.result) ||
+          state.phase != InspectionPhase.result ||
+          !state.safetyConfirmed) _closeDetails();
       setState(() {
         _state = state;
         if (state.phase == InspectionPhase.result ||
@@ -92,6 +138,7 @@ class _InspectionShellState extends State<_InspectionShell>
             false) _liveRequested = false;
       });
     }, onError: (Object error) {
+      _closeDetails();
       if (mounted)
         setState(() {
           _blockedResult = _state.result;
@@ -106,6 +153,7 @@ class _InspectionShellState extends State<_InspectionShell>
   void didUpdateWidget(covariant _InspectionShell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
+      _closeDetails();
       _subscription?.cancel();
       _blockedResult = null;
       _actionError = null;
@@ -126,6 +174,7 @@ class _InspectionShellState extends State<_InspectionShell>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused) {
+      _closeDetails();
       if (mounted)
         setState(() {
           _blockedResult = _state.result;
@@ -148,6 +197,7 @@ class _InspectionShellState extends State<_InspectionShell>
   Future<void> _run(Future<void> Function() action,
       {bool live = false, bool stopping = false}) async {
     if (_operation && !stopping) return;
+    _closeDetails();
     setState(() {
       _operation = true;
       _actionError = null;
@@ -171,6 +221,7 @@ class _InspectionShellState extends State<_InspectionShell>
   }
 
   Future<void> _confirm(bool value) async {
+    _closeDetails();
     setState(() {
       _blockedResult = _state.result;
       _actionError = null;
@@ -190,6 +241,7 @@ class _InspectionShellState extends State<_InspectionShell>
 
   void _selectMode(_InputMode mode) {
     if (mode == _mode) return;
+    _closeDetails();
     if (_liveRequested) {
       unawaited(_run(widget.controller.stopLive, stopping: true));
     }
@@ -240,7 +292,7 @@ class _InspectionShellState extends State<_InspectionShell>
             error: _actionError,
             cameraPreview: widget.cameraPreview,
             selectedMotor: _selectedMotor,
-            onSelectMotor: (id) => setState(() => _selectedMotor = id),
+            onSelectMotor: _showMotor,
             onSelectMode: _selectMode,
             onConfirm: _confirm,
             onPrimary: () => _liveRequested
@@ -256,7 +308,7 @@ class _InspectionShellState extends State<_InspectionShell>
               InspectionMark(color: colors.primary, size: 28),
               const SizedBox(width: 11),
               const Flexible(
-                  child: Text('Pluto Inspection',
+                  child: Text('Pluto Inspector',
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
@@ -321,7 +373,9 @@ class _InspectionShellState extends State<_InspectionShell>
                                     BorderRadius.circular(expanded ? 16 : 0),
                                 child: ColoredBox(
                                     color: colors.surfaceContainerLowest,
-                                    child: page)))),
+                                    child: Reveal(
+                                        key: ValueKey(_destination),
+                                        child: page))))),
                   ])),
             ])),
       );
@@ -354,7 +408,7 @@ class _DemoNotice extends StatelessWidget {
                             child: Text('Demo · Simulated results',
                                 style: TextStyle(
                                     color: c.caution,
-                                    fontSize: 13,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500)))
                       ]),
                       if (controls != null)
@@ -395,20 +449,33 @@ class _InspectionView extends StatelessWidget {
     final c = Theme.of(context).colorScheme;
     final processing =
         error == null && (state.phase == InspectionPhase.processing || busy);
-    final title =
-        result == null ? 'Propeller inspection' : resultLabel(result!.status);
+    final title = result == null
+        ? 'Every propeller, verified.'
+        : resultLabel(result!.status);
     final heading =
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Semantics(
           header: true,
           liveRegion: result != null,
-          child: Text(title,
+          child: Text.rich(
+              TextSpan(
+                  children: result == null
+                      ? [
+                          const TextSpan(text: 'Every '),
+                          const TextSpan(
+                              text: 'propeller,',
+                              style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: inspectionTextAccent)),
+                          const TextSpan(text: ' verified.'),
+                        ]
+                      : [TextSpan(text: title)]),
               key: const ValueKey('inspection-heading'),
               style: Theme.of(context).textTheme.headlineSmall)),
       const SizedBox(height: 8),
       Text(
           result == null
-              ? 'Check the installation before you fly.'
+              ? 'Point the app at a disarmed drone. It checks every propeller against the verified reference.'
               : switch (result!.status) {
                   VerificationStatus.pass =>
                     'The visible installation matches the supplied reference.',
@@ -435,46 +502,45 @@ class _InspectionView extends StatelessWidget {
             : state;
     final work =
         Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      SegmentedButton<_InputMode>(
-          segments: const [
-            ButtonSegment(
-                value: _InputMode.live,
-                icon: Icon(Icons.videocam_outlined, size: 19),
-                label: Text('Live camera')),
-            ButtonSegment(
-                value: _InputMode.photo,
-                icon: Icon(Icons.image_outlined, size: 19),
-                label: Text('Upload image'))
-          ],
-          selected: {
-            mode
-          },
-          showSelectedIcon: false,
-          onSelectionChanged:
-              processing && !live ? null : (s) => onSelectMode(s.first)),
+      ControlFeedback(
+          enabled: !(processing && !live),
+          child: SegmentedButton<_InputMode>(
+              segments: const [
+                ButtonSegment(
+                    value: _InputMode.live, label: Text('Live camera')),
+                ButtonSegment(
+                    value: _InputMode.photo, label: Text('Upload image'))
+              ],
+              selected: {
+                mode
+              },
+              showSelectedIcon: false,
+              onSelectionChanged:
+                  processing && !live ? null : (s) => onSelectMode(s.first))),
       const SizedBox(height: 16),
-      EvidenceView(
-          state: inputState,
-          result: result,
-          cameraPreview: mode == _InputMode.live ? cameraPreview : null,
-          selectedMotor: selectedMotor,
-          onMotorSelected: onSelectMotor),
-      const SizedBox(height: 16),
+      if (inputState.image != null)
+        EvidenceView(
+            state: inputState,
+            result: result,
+            cameraPreview: mode == _InputMode.live ? cameraPreview : null,
+            selectedMotor: selectedMotor,
+            onMotorSelected: onSelectMotor),
+      if (inputState.image != null) const SizedBox(height: 16),
       Material(
           color: c.surfaceContainerLow,
           borderRadius: BorderRadius.circular(12),
           clipBehavior: Clip.antiAlias,
-          child: CheckboxListTile(
+          child: ControlFeedback(
+              child: CheckboxListTile(
             key: const ValueKey('safety-confirmation'),
             value: state.safetyConfirmed,
             onChanged: (v) => onConfirm(v ?? false),
             controlAffinity: ListTileControlAffinity.trailing,
             contentPadding: const EdgeInsets.only(left: 16, right: 6),
-            title: Text('Drone disarmed. Motors stopped.',
+            title: Text(
+                'I confirm the drone is disarmed and every motor is stopped.',
                 style: Theme.of(context).textTheme.titleSmall),
-            subtitle: const Text('I confirm both before inspection.',
-                style: TextStyle(fontSize: 13)),
-          )),
+          ))),
       const SizedBox(height: 12),
       _PressButton(
           onPressed: (!state.safetyConfirmed || processing && !live)
@@ -494,12 +560,6 @@ class _InspectionView extends StatelessWidget {
                           ? 'Choose image'
                           : 'Choose another image')
                       : 'Start live inspection'),
-      if (!state.safetyConfirmed)
-        Padding(
-            padding: const EdgeInsets.only(top: 9),
-            child: Text('Confirm the safety check to continue.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: c.onSurfaceVariant))),
       if (processing)
         Padding(
             padding: const EdgeInsets.only(top: 12),
@@ -514,7 +574,7 @@ class _InspectionView extends StatelessWidget {
               const SizedBox(width: 10),
               const Expanded(
                   child: Text('Inspecting visible propellers…',
-                      style: TextStyle(fontSize: 13))),
+                      style: TextStyle(fontSize: 15))),
             ])),
       if (error != null || state.phase == InspectionPhase.error)
         Padding(
@@ -527,7 +587,7 @@ class _InspectionView extends StatelessWidget {
                                 .contains(state.message)
                             ? reasonGuidance(state.message)
                             : 'Inspection could not finish. Check permissions, or try a different photo.'),
-                    style: TextStyle(color: c.bad, height: 1.5)))),
+                    style: TextStyle(color: c.error, height: 1.5)))),
     ]);
     return LayoutBuilder(builder: (context, box) {
       final wide = box.maxWidth >= 760;
@@ -542,7 +602,7 @@ class _InspectionView extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        heading,
+                        Reveal(key: ValueKey(title), child: heading),
                         const SizedBox(height: 24),
                         if (wide)
                           Row(
@@ -552,7 +612,8 @@ class _InspectionView extends StatelessWidget {
                                 const SizedBox(width: 24),
                                 Expanded(
                                     flex: 5,
-                                    child: resultPanel ?? const _ReadyNote())
+                                    child: resultPanel ??
+                                        DroneStage(processing: processing))
                               ])
                         else ...[
                           if (resultPanel != null) ...[
@@ -567,47 +628,10 @@ class _InspectionView extends StatelessWidget {
                                 selectedMotor: selectedMotor,
                                 onSelect: onSelectMotor)
                           else
-                            const _ReadyNote()
+                            DroneStage(processing: processing)
                         ],
-                        const SizedBox(height: 16),
-                        Text(
-                            'Visual installation check only. Follow the full pre-flight procedure.',
-                            style: TextStyle(
-                                fontSize: 12,
-                                height: 1.5,
-                                color: c.onSurfaceVariant)),
                       ]))));
     });
-  }
-}
-
-class _ReadyNote extends StatelessWidget {
-  const _ReadyNote();
-  @override
-  Widget build(BuildContext context) {
-    final c = Theme.of(context).colorScheme;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('What makes a useful image',
-          style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 12),
-      for (final text in [
-        'The complete drone, with every propeller visible',
-        'Even lighting and a sharp, steady image',
-        'The viewing angle specified by the supplied reference'
-      ])
-        Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(Icons.check, size: 18, color: c.onSurfaceVariant),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: Text(text,
-                      style: TextStyle(color: c.onSurfaceVariant, height: 1.5)))
-            ])),
-      const SizedBox(height: 10),
-      Text('Unclear image? We’ll ask for a better view.',
-          style: Theme.of(context).textTheme.titleSmall),
-    ]);
   }
 }
 
@@ -617,23 +641,6 @@ class _ResultSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme;
-    final (ink, bg, icon) = switch (result.status) {
-      VerificationStatus.pass => (
-          c.good,
-          c.goodSurface,
-          Icons.check_circle_outline
-        ),
-      VerificationStatus.incorrectInstallation => (
-          c.bad,
-          c.badSurface,
-          Icons.error_outline
-        ),
-      VerificationStatus.unableToVerify => (
-          c.caution,
-          c.cautionSurface,
-          Icons.visibility_off_outlined
-        )
-    };
     final reason = result.reasons.isEmpty ? null : result.reasons.first;
     final text = reason != null
         ? reasonGuidance(reason)
@@ -646,16 +653,19 @@ class _ResultSummary extends StatelessWidget {
               'A complete installation check was not possible. Retake the image or check the reference.'
           };
     return DecoratedBox(
-        decoration:
-            BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(
+            color: c.surface,
+            border: Border.all(color: inspectionLine),
+            borderRadius: BorderRadius.circular(12)),
         child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(icon, color: ink, size: 23),
+              ResultSymbol(status: result.status),
               const SizedBox(width: 12),
               Expanded(
                   child: Text(text,
-                      style: TextStyle(color: ink, height: 1.5, fontSize: 14))),
+                      style: TextStyle(
+                          color: c.onSurface, height: 1.5, fontSize: 17))),
             ])));
   }
 }
@@ -700,68 +710,77 @@ class _MotorFindings extends StatelessWidget {
       if (motors.isNotEmpty)
         Text(
             '${motors.where((m) => m['finding'] == 'match').length} of ${motors.length} visible findings match',
-            style: TextStyle(color: c.onSurfaceVariant, fontSize: 13)),
+            style: TextStyle(color: c.onSurfaceVariant, fontSize: 15)),
       const SizedBox(height: 12),
       for (final motor in motors)
         if (motorText(motor, 'motor_id') case final String id)
           Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Material(
-                  color: selectedMotor == id
-                      ? c.surfaceContainer
-                      : c.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(12),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            onTap: () =>
-                                onSelect(selectedMotor == id ? '' : id),
-                            title: Text(id,
-                                style: const TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w500)),
-                            subtitle: Text(switch (motor['finding']) {
-                              'match' => 'Matches reference',
-                              'mismatch' => 'Installation mismatch',
-                              _ => 'Not verified'
-                            }),
-                            trailing: Icon(
-                                switch (motor['finding']) {
-                                  'match' => Icons.check_circle_outline,
-                                  'mismatch' => Icons.error_outline,
-                                  _ => Icons.help_outline
-                                },
-                                color: switch (motor['finding']) {
-                                  'match' => c.good,
-                                  'mismatch' => c.bad,
-                                  _ => c.caution
-                                })),
-                        if (selectedMotor == id ||
-                            motor['finding'] == 'mismatch')
-                          Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        'Observed: ${motorText(motor, 'observed_type') ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: c.onSurfaceVariant)),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                        'Expected: ${motorText(motor, 'expected_type') ?? 'Reference needed'}',
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: c.onSurfaceVariant)),
-                                    const SizedBox(height: 12),
-                                    Text(correctionGuidance(motor),
-                                        style: const TextStyle(height: 1.5)),
-                                  ])),
-                      ]))),
+              child: Reveal(
+                  key: ValueKey('${result.inputId}-$id'),
+                  delayMs: motors.indexOf(motor) * 50,
+                  child: Material(
+                      color: selectedMotor == id
+                          ? c.surfaceContainer
+                          : c.surfaceContainerLow,
+                      shape: const Border(
+                          bottom: BorderSide(color: inspectionLine)),
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ControlFeedback(
+                                child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 4),
+                                    onTap: () =>
+                                        onSelect(selectedMotor == id ? '' : id),
+                                    title: Text(id,
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500)),
+                                    subtitle: Text(switch (motor['finding']) {
+                                      'match' => 'Matches reference',
+                                      'mismatch' => 'Installation mismatch',
+                                      _ => 'Not verified'
+                                    }),
+                                    trailing: Icon(
+                                        switch (motor['finding']) {
+                                          'match' => Icons.check_circle_outline,
+                                          'mismatch' => Icons.error_outline,
+                                          _ => Icons.help_outline
+                                        },
+                                        color: switch (motor['finding']) {
+                                          'match' => c.good,
+                                          'mismatch' => c.bad,
+                                          _ => c.caution
+                                        }))),
+                            if (selectedMotor == id ||
+                                motor['finding'] == 'mismatch')
+                              Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            'Why: observed ${motorText(motor, 'observed_type') ?? 'Unknown'}; expected ${motorText(motor, 'expected_type') ?? 'Reference needed'}',
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                color: c.onSurfaceVariant)),
+                                        const SizedBox(height: 5),
+                                        Text('Where: $id',
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                color: c.onSurfaceVariant)),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                            'Correction: ${correctionGuidance(motor)}',
+                                            style:
+                                                const TextStyle(height: 1.5)),
+                                      ])),
+                          ])))),
     ]);
   }
 }
@@ -789,13 +808,20 @@ class _PressButtonState extends State<_PressButton> {
       onPointerUp: (_) => _press(false),
       onPointerCancel: (_) => _press(false),
       child: AnimatedScale(
-          scale: pressed && widget.onPressed != null ? .98 : 1,
+          scale: pressed &&
+                  widget.onPressed != null &&
+                  !MediaQuery.disableAnimationsOf(context)
+              ? .97
+              : 1,
           duration: MediaQuery.disableAnimationsOf(context)
               ? Duration.zero
               : Duration(milliseconds: pressed ? 100 : 140),
           curve: const Cubic(.23, 1, .32, 1),
           child: FilledButton.icon(
               key: const ValueKey('primary-inspection-action'),
+              style: ButtonStyle(
+                  foregroundBuilder: (context, states, child) =>
+                      child ?? const SizedBox.shrink()),
               onPressed: widget.onPressed,
               icon: Icon(widget.icon, size: 20),
               label: Text(widget.label, textAlign: TextAlign.center))));

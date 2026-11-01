@@ -91,24 +91,27 @@ class EvidenceView extends StatelessWidget {
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 )
-                              : Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    child,
-                                    if (result != null &&
-                                        result!.inputId == image.id)
-                                      for (final motor in result!.motors)
-                                        if (motorBoxRect(motor['bbox'], rect)
-                                            case final Rect bounds)
-                                          _MotorTarget(
-                                            bounds: bounds,
-                                            motor: motor,
-                                            selected: selectedMotor ==
-                                                motor['motor_id'],
-                                            onSelected: onMotorSelected,
-                                          ),
-                                  ],
-                                ),
+                              : InteractiveViewer(
+                                  minScale: 1,
+                                  maxScale: 4,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      child,
+                                      if (result != null &&
+                                          result!.inputId == image.id)
+                                        for (final motor in result!.motors)
+                                          if (motorBoxRect(motor['bbox'], rect)
+                                              case final Rect bounds)
+                                            _MotorTarget(
+                                              bounds: bounds,
+                                              motor: motor,
+                                              selected: selectedMotor ==
+                                                  motor['motor_id'],
+                                              onSelected: onMotorSelected,
+                                            ),
+                                    ],
+                                  )),
                     )
                   else if (cameraPreview != null)
                     cameraPreview!
@@ -140,7 +143,7 @@ class EvidenceView extends StatelessWidget {
                                         : 'Camera not started',
                             style: const TextStyle(
                               color: Color(0xffe1e7ed),
-                              fontSize: 12,
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -200,7 +203,7 @@ class _EmptyCanvas extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xffb9c3cd),
-                fontSize: 13,
+                fontSize: 15,
                 height: 1.5,
               ),
             ),
@@ -261,7 +264,7 @@ class _MotorTarget extends StatelessWidget {
     final color = switch (motor['finding']) {
       'match' => c.good,
       'mismatch' => c.bad,
-      _ => c.caution,
+      _ => inspectionInk,
     };
     final symbol = switch (motor['finding']) {
       'match' => Icons.check,
@@ -270,11 +273,12 @@ class _MotorTarget extends StatelessWidget {
     };
     return Positioned.fromRect(
       rect: bounds,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border.all(color: color, width: selected ? 3 : 2),
-          borderRadius: BorderRadius.circular(8),
-        ),
+      child: CustomPaint(
+        painter: _EvidenceOutline(
+            color: color,
+            unknown:
+                motor['finding'] != 'match' && motor['finding'] != 'mismatch',
+            selected: selected),
         child: Align(
           alignment: Alignment.topLeft,
           child: Semantics(
@@ -293,4 +297,42 @@ class _MotorTarget extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Black outer stroke stays visible on bright evidence; dashed white means unknown.
+class _EvidenceOutline extends CustomPainter {
+  const _EvidenceOutline(
+      {required this.color, required this.unknown, required this.selected});
+  final Color color;
+  final bool unknown, selected;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+          (Offset.zero & size).deflate(3), const Radius.circular(5)));
+    canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.black
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = selected ? 7 : 6);
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = selected ? 3 : 2;
+    if (!unknown) {
+      canvas.drawPath(path, stroke);
+      return;
+    }
+    for (final metric in path.computeMetrics()) {
+      for (double d = 0; d < metric.length; d += 12) {
+        canvas.drawPath(
+            metric.extractPath(d, math.min(d + 7, metric.length)), stroke);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_EvidenceOutline old) =>
+      color != old.color || unknown != old.unknown || selected != old.selected;
 }

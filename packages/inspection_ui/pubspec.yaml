@@ -15,12 +15,22 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
+  assets:
+    - assets/fonts/Inter-OFL.txt
+    - assets/fonts/PlayfairDisplay-OFL.txt
   fonts:
     - family: InspectionSans
       fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Inter.ttf
           weight: 400
-        - asset: assets/fonts/Roboto-Medium.ttf
+        - asset: assets/fonts/Inter.ttf
           weight: 500
-        - asset: assets/fonts/Roboto-Bold.ttf
-          weight: 700
+        - asset: assets/fonts/Inter.ttf
+          weight: 600
+    - family: InspectionDisplay
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay.ttf
+          weight: 500
+        - asset: assets/fonts/PlayfairDisplay-Italic.ttf
+          weight: 500
+          style: italic

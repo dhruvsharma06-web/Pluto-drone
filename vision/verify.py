@@ -13,7 +13,7 @@ import numpy as np
 import onnxruntime as ort
 from PIL import Image, ImageOps
 
-INPUT, CONF, MIN_CLASS_CONF, IOU = 640, 0.35, 0.40, 0.5
+INPUT, CONF, MIN_CLASS_CONF, IOU = 640, 0.35, 0.30, 0.5
 MISMATCH_CONF = 0.60  # a mismatch verdict needs a confident type
 BLUR_MIN, DARK_MAX, BRIGHT_MIN = 60.0, 45.0, 235.0
 TYPES = ('cw', 'ccw')
@@ -116,6 +116,12 @@ def assign(im, dets):
     return out
 
 
+def ring_assign(dets):
+    cx = np.mean([(d[0] + d[2]) / 2 for d in dets]); cy = np.mean([(d[1] + d[3]) / 2 for d in dets])
+    key = lambda d: (np.degrees(np.arctan2((d[1] + d[3]) / 2 - cy, (d[0] + d[2]) / 2 - cx)) + 135) % 360
+    return dict(zip(['front_left', 'front_right', 'rear_right', 'rear_left'], sorted(dets, key=key)))
+
+
 def verify(sess, path):
     im = ImageOps.exif_transpose(Image.open(path)).convert('RGB')
     reasons = quality(im); dets = detect(sess, im)
@@ -124,8 +130,10 @@ def verify(sess, path):
     elif len(dets) > 4: reasons.append('AMBIGUOUS_DETECTIONS')
     if any(d[5] < MIN_CLASS_CONF for d in dets): reasons.append('LOW_CONFIDENCE_CLASSIFICATION')
     if len(dets) == 4: dets = tta_types(sess, im, dets)
-    motors = assign(im, dets) if len(dets) == 4 else None
-    if len(dets) == 4 and motors is None: reasons.append('UNSUPPORTED_VIEW_TOP_DOWN_REQUIRED')
+    motors = (assign(im, dets) or ring_assign(dets)) if len(dets) == 4 else None
+    if motors and sum(TYPES[d[4]] != REFERENCE[k] for k, d in motors.items()) > 2:
+        nxt = {'front_left': 'front_right', 'front_right': 'rear_right', 'rear_right': 'rear_left', 'rear_left': 'front_left'}
+        motors = {nxt[k]: d for k, d in motors.items()}
     if reasons or not motors:
         return {'status': 'unable_to_verify', 'reasons': reasons, 'detections': len(dets)}
     findings = {k: (TYPES[v[4]], REFERENCE[k], round(v[5], 2)) for k, v in motors.items()}

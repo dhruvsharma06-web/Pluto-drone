@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Pluto Inspector — propeller installation check</title>
+    <meta
+      name="description"
+      content="An Android app, in development, that checks a disarmed drone's propeller installation from a photo or the live camera and answers Pass, Incorrect Installation or Unable to Verify."
+    />
+    <meta name="theme-color" content="#050505" />
+    <meta name="color-scheme" content="dark" />
+    <!-- Paint black before any stylesheet arrives: no white flash on load. -->
+    <style>
+      html,
+      body {
+        background: #050505;
+        color: #f3f0f7;
+      }
+    </style>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <!-- Shared drawings. Top-view schematic: illustrative proportions only, no motor identities. -->
+    <svg class="sprite" aria-hidden="true" focusable="false">
+      <symbol id="prop" viewBox="-60 -60 120 120">
+        <path d="M6,-4 C20,-13 44,-13 54,-5 Q59,0 54,4 C44,8 22,7 6,4 Z" />
+        <path d="M6,-4 C20,-13 44,-13 54,-5 Q59,0 54,4 C44,8 22,7 6,4 Z" transform="rotate(180)" />
+        <circle r="7" />
+      </symbol>
+      <symbol id="drone-top" viewBox="-180 -180 360 360">
+        <g class="d-arms"><path d="M38,60 L126,124 M-38,60 L-126,124 M-38,-64 L-126,-120 M38,-64 L126,-120" /></g>
+        <rect class="d-body" x="-46" y="-100" width="92" height="196" rx="36" />
+        <g class="d-pods">
+          <circle cx="126" cy="124" r="12" /><circle cx="-126" cy="124" r="12" />
+          <circle cx="-126" cy="-120" r="12" /><circle cx="126" cy="-120" r="12" />
+        </g>
+        <g class="d-props">
+          <use href="#prop" x="66" y="64" width="120" height="120" transform="rotate(29 126 124)" />
+          <use href="#prop" x="-186" y="64" width="120" height="120" transform="rotate(126 -126 124)" />
+          <use href="#prop" x="-186" y="-180" width="120" height="120" transform="rotate(158 -126 -120)" />
+          <use href="#prop" x="66" y="-180" width="120" height="120" transform="rotate(63 126 -120)" />
+        </g>
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 4.5 4.5M10.5 8v5M8 10.5h5" /></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 4.5 4.5M8 10.5h5" /></symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.8" /><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6" /></symbol>
+      <symbol id="i-split" viewBox="0 0 24 24"><path d="M12 3v6M12 15v6M3 12h6M15 12h6M8 8 5 5M16 8l3-3M8 16l-3 3M16 16l3 3" /></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.3-5.2L5 9M5 4.5V9h4.5" /></symbol>
+      <symbol id="i-ccw" viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.3-5.2L5 9M5 4.5V9h4.5" /></symbol>
+      <symbol id="i-cw" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.3-5.2L19 9M19 4.5V9h-4.5" /></symbol>
+      <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8.5 12V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0v4.5c0 3.3-2.2 5.5-5.5 5.5-2.5 0-4-1-5.3-3.2L4.5 13.5c-.6-1.2 1-2.3 2-1.2l2 2.2" /></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M3 12h17M15 7l5 5-5 5" /></symbol>
+    </svg>
+
+    <!-- Ambient purple smoke (CSS) behind the persistent 3D stage. -->
+    <div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+    <figure class="stage stage--global" data-viewer="global" data-state="poster">
+      <div class="stage__poster" aria-hidden="true">
+        <svg viewBox="-180 -180 360 360"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /></svg>
+      </div>
+      <div class="stage__canvas" data-canvas></div>
+      <div class="stage__tags" aria-hidden="true">
+        <span class="tag" data-anchor="body" data-land="body" data-scene="apart">Body shell</span>
+        <span class="tag" data-anchor="arm1" data-land="arm" data-scene="apart">Arms</span>
+        <span class="tag" data-anchor="motor3" data-land="motor" data-scene="apart">Motors</span>
+        <span class="tag" data-anchor="propTip0" data-land="propeller" data-scene="apart">Propellers</span>
+        <span class="tag" data-anchor="propTip0" data-scene="propeller">Resting angle — never an error</span>
+      </div>
+      <figcaption class="visually-hidden">Illustrative schematic drone, drawn in code. Not the supplied drone's measured geometry or motor map.</figcaption>
+      <p class="visually-hidden" role="status" data-viewer-status></p>
+    </figure>
+    <div class="veil" aria-hidden="true"></div>
+    <div class="reticle" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <circle class="reticle__ring" cx="32" cy="32" r="24" />
+        <path class="reticle__ticks" d="M32 2v9M32 53v9M2 32h9M53 32h9" />
+      </svg>
+      <span class="reticle__dot"></span>
+    </div>
+
+    <header class="bar">
+      <a class="wordmark" href="#hero" aria-label="Pluto Inspector, back to top">Pluto <em>Inspector</em></a>
+      <nav aria-label="Sections">
+        <ul>
+          <li><a href="#apart">Drone</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#results">Results</a></li>
+          <li><a href="#explore">Explore</a></li>
+          <li><a href="#project">Project</a></li>
+        </ul>
+      </nav>
+      <a class="bar__src" href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">Source <svg class="ico"><use href="#i-arrow" /></svg></a>
+    </header>
+
+    <nav class="dots" aria-label="Scenes" data-dots>
+      <a href="#hero"><span>Intro</span></a>
+      <a href="#apart"><span>Drone</span></a>
+      <a href="#propeller"><span>Propeller</span></a>
+      <a href="#flight"><span>Flight</span></a>
+      <a href="#how"><span>How</span></a>
+      <a href="#results"><span>Results</span></a>
+      <a href="#explore"><span>Explore</span></a>
+      <a href="#project"><span>Project</span></a>
+    </nav>
+
+    <main id="main">
+      <!-- 1. Hero -->
+      <section class="scene scene--hero" id="hero" data-scene="hero" aria-labelledby="hero-title">
+        <div class="hero__copy">
+          <h1 id="hero-title" class="display" data-in>Every <em>propeller,</em> verified.</h1>
+          <p class="lede" data-in>Point the app at a disarmed drone. It checks every propeller against the verified reference and tells you what to fix.</p>
+          <div class="cta" data-in>
+            <a class="btn-pill" href="#how">How it works</a>
+            <a class="btn-link" href="#explore">Inspect the drone <span aria-hidden="true">›</span></a>
+          </div>
+        </div>
+        <p class="note" data-in>Drone shown is an illustrative schematic.</p>
+      </section>
+
+      <!-- 2. Taken apart -->
+      <section class="scene scene--apart" id="apart" data-scene="apart" aria-labelledby="apart-title">
+        <div class="scene__copy scene__copy--bottom">
+          <h2 id="apart-title" class="title" data-in>Taken <em>apart.</em></h2>
+          <p data-in>Shell, arms, motors, propellers — every part the check depends on.</p>
+        </div>
+      </section>
+
+      <!-- 3. The propeller -->
+      <section class="scene scene--prop" id="propeller" data-scene="propeller" aria-labelledby="prop-title">
+        <div class="scene__copy scene__copy--left">
+          <h2 id="prop-title" class="title" data-in>Right type. Right motor. <em>Right way up.</em></h2>
+          <dl class="checks" data-in>
+            <div><dt>Type</dt><dd>The propeller made for that motor.</dd></div>
+            <div><dt>Position</dt><dd>On the motor the reference names.</dd></div>
+            <div><dt>Orientation</dt><dd>Seated the right way up, where the image shows it.</dd></div>
+          </dl>
+          <p data-in>A blade's resting angle is never an error. Anything one photo can't show ends in Unable to Verify.</p>
+        </div>
+      </section>
+
+      <!-- 3b. Flight (illustration only) -->
+      <section class="scene scene--flight" id="flight" data-scene="flight" aria-labelledby="flight-title">
+        <div class="scene__copy scene__copy--bottom">
+          <h2 id="flight-title" class="title" data-in>Made to <em>fly.</em></h2>
+          <p data-in>Checked on the ground first — every inspection happens disarmed, motors stopped.</p>
+          <p class="flight__hint" data-in>Move the cursor to steer. Keyboard: <kbd>←</kbd> <kbd>→</kbd>, and <kbd>Shift</kbd> + <kbd>↑</kbd> <kbd>↓</kbd> for height.</p>
+          <p class="flight__note" data-in>Flight is shown for illustration only.</p>
+        </div>
+      </section>
+
+      <!-- 4. How it works -->
+      <section class="scene scene--how" id="how" data-scene="how" aria-labelledby="how-title">
+        <div class="scene__copy scene__copy--left">
+          <h2 id="how-title" class="title" data-in>How a check <em>works.</em></h2>
+          <ol class="flow" data-in>
+            <li><b>Disarm and confirm</b><span>The app never arms the drone or spins a motor.</span></li>
+            <li><b>Photo or live camera</b><span>Whole drone in frame, in focus, in good light.</span></li>
+            <li><b>Find each propeller</b><span>Position, type, and the orientation the image shows.</span></li>
+            <li><b>Compare and guide</b><span>Against the verified reference, then what to fix.</span></li>
+          </ol>
+        </div>
+        <div class="phone" data-in>
+          <p class="phone__flag">Mockup</p>
+          <p class="phone__title">Result</p>
+          <p class="phone__verdict">Incorrect Installation</p>
+          <svg class="phone__map" viewBox="-180 -180 360 360" aria-hidden="true"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /><circle cx="126" cy="124" r="34" class="phone__ring" /></svg>
+          <p class="phone__small">FIXTURE_1 — swap for the type the reference lists.</p>
+        </div>
+      </section>
+
+      <!-- 5. Results + fixture demo -->
+      <section class="scene scene--results" id="results" data-scene="results" aria-labelledby="results-title">
+        <div class="results__head" data-in>
+          <h2 id="results-title" class="title">Three results. <em>Nothing in between.</em></h2>
+        </div>
+        <dl class="verdicts" data-in>
+          <div class="verdict verdict--pass">
+            <dt><span class="glyph" aria-hidden="true">✓</span>Pass</dt>
+            <dd>Every check observable, every propeller matches.</dd>
+          </div>
+          <div class="verdict verdict--fail">
+            <dt><span class="glyph" aria-hidden="true">✕</span>Incorrect Installation</dt>
+            <dd>Clear evidence of at least one mismatch.</dd>
+          </div>
+          <div class="verdict verdict--unable">
+            <dt><span class="glyph" aria-hidden="true">?</span>Unable to Verify</dt>
+            <dd>No reference, or the image can't support a check. Never a guess.</dd>
+          </div>
+        </dl>
+
+        <div class="demo" id="demo" data-in>
+          <form class="demo__controls" data-demo-form aria-label="Fixture demo inputs">
+            <p class="demo__flag"><b>Fixture demo</b> — the contract's rules on made-up inputs. No photo, no detector.</p>
+            <div class="preset-row" role="group" aria-label="Load a shared fixture file">
+              <button type="button" class="chip" data-preset="pass">pass.json</button>
+              <button type="button" class="chip" data-preset="incorrect">incorrect.json</button>
+              <button type="button" class="chip" data-preset="unclear">unclear.json</button>
+              <button type="button" class="chip" data-preset="pending">pending.json</button>
+            </div>
+            <fieldset class="switches">
+              <legend class="visually-hidden">Evidence in the image</legend>
+              <label class="switch"><input type="checkbox" name="referenceLoaded" checked /><span>Reference</span></label>
+              <label class="switch"><input type="checkbox" name="wholeDrone" checked /><span>Whole drone</span></label>
+              <label class="switch"><input type="checkbox" name="inFocus" checked /><span>In focus</span></label>
+              <label class="switch"><input type="checkbox" name="usableLight" checked /><span>Good light</span></label>
+              <label class="switch"><input type="checkbox" name="allClassified" checked /><span>All classified</span></label>
+            </fieldset>
+            <fieldset class="faults">
+              <legend class="visually-hidden">Installation</legend>
+              <label class="radio"><input type="radio" name="fault" value="none" checked /><span>As referenced</span></label>
+              <label class="radio"><input type="radio" name="fault" value="type" /><span>Wrong type</span></label>
+              <label class="radio"><input type="radio" name="fault" value="orientation" /><span>Upside down</span></label>
+              <label class="select"><span class="visually-hidden">At position</span>
+                <select name="faultMotor">
+                  <option>FIXTURE_1</option>
+                  <option>FIXTURE_2</option>
+                  <option>FIXTURE_3</option>
+                  <option>FIXTURE_4</option>
+                </select>
+              </label>
+            </fieldset>
+          </form>
+          <div class="demo__out" data-demo-out aria-live="polite" aria-atomic="true">
+            <noscript><p>The fixture demo needs JavaScript.</p></noscript>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Explore (own interactive viewer) -->
+      <section class="scene scene--explore explore" id="explore" data-scene="explore" aria-labelledby="explore-title">
+        <div class="plate">
+          <div class="plate__main">
+            <div class="plate__head">
+              <h2 id="explore-title" class="title" data-in>Inspect the <em>airframe.</em></h2>
+              <div class="tabs" role="tablist" aria-label="Drone components" data-tabs></div>
+            </div>
+
+            <figure class="stage stage--plate" data-viewer="explore" data-state="poster">
+              <div class="stage__poster" aria-hidden="true">
+                <svg viewBox="-180 -180 360 360"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /></svg>
+              </div>
+              <div
+                class="stage__canvas stage__canvas--interactive"
+                data-canvas
+                tabindex="0"
+                role="application"
+                aria-roledescription="3D viewer"
+                aria-label="Illustrative drone schematic. Drag to rotate. Arrow keys rotate, plus and minus zoom, 0 resets, T top view, S side view, P perspective. Double-click resets."
+              ></div>
+              <p class="stage__hint" data-hint aria-hidden="true"><svg class="ico"><use href="#i-hand" /></svg>Drag to turn</p>
+
+              <div class="rail" role="toolbar" aria-label="Viewer tools" aria-orientation="vertical">
+                <button type="button" class="rail__btn" data-act="zoom-in" aria-label="Zoom in"><svg class="ico"><use href="#i-plus" /></svg></button>
+                <button type="button" class="rail__btn" data-act="zoom-out" aria-label="Zoom out"><svg class="ico"><use href="#i-minus" /></svg></button>
+                <button type="button" class="rail__btn" data-act="explode" aria-pressed="false" aria-label="Separate parts"><svg class="ico"><use href="#i-split" /></svg></button>
+                <button type="button" class="rail__btn" data-act="light" aria-pressed="false" aria-label="Switch to low light"><svg class="ico"><use href="#i-sun" /></svg></button>
+                <button type="button" class="rail__btn" data-act="reset" aria-label="Reset view"><svg class="ico"><use href="#i-reset" /></svg></button>
+                <button type="button" class="rail__btn" data-act="expand" aria-label="Expand viewer"><svg class="ico"><use href="#i-expand" /></svg></button>
+              </div>
+
+              <div class="turn" role="group" aria-label="Turn and views">
+                <button type="button" data-act="turn-left" aria-label="Turn left 90 degrees"><svg class="ico"><use href="#i-ccw" /></svg></button>
+                <button type="button" data-act="turn" aria-label="Turn once, 360 degrees">360°</button>
+                <button type="button" data-act="turn-right" aria-label="Turn right 90 degrees"><svg class="ico"><use href="#i-cw" /></svg></button>
+                <span class="turn__sep" aria-hidden="true"></span>
+                <button type="button" data-view="top" aria-label="Top view">Top</button>
+                <button type="button" data-view="side" aria-label="Side view">Side</button>
+                <button type="button" data-view="perspective" aria-label="Perspective view">3/4</button>
+              </div>
+
+              <figcaption class="stage__caption" data-caption>Four arms, four motors, four propellers.</figcaption>
+              <p class="visually-hidden" role="status" data-viewer-status></p>
+            </figure>
+          </div>
+
+          <aside class="card" aria-label="Component notes">
+            <article class="detail" data-detail aria-live="polite"></article>
+          </aside>
+        </div>
+
+        <dialog class="expanded" data-expanded aria-labelledby="expanded-title">
+          <div class="expanded__bar">
+            <h2 id="expanded-title">Schematic, expanded</h2>
+            <p>Scroll or pinch to zoom. Esc closes.</p>
+            <button type="button" class="btn-line" data-act="collapse">Close</button>
+          </div>
+          <div class="expanded__slot" data-expanded-slot></div>
+        </dialog>
+      </section>
+
+      <!-- 7. Project: architecture, evidence, resources, team -->
+      <section class="scene scene--project" id="project" data-scene="project" aria-labelledby="project-title">
+        <h2 id="project-title" class="title" data-in>Built <em>honestly.</em></h2>
+        <div class="project__grid" data-in>
+          <div>
+            <h3>Architecture</h3>
+            <ol class="arch">
+              <li><b>App screens</b><code>packages/inspection_ui</code></li>
+              <li><b>Camera and Android runtime</b><code>packages/inspection_runtime</code></li>
+              <li class="arch__core"><b>Vision and verification core</b><code>vision/ · ml/</code></li>
+              <li><b>Verified reference</b><code>reference/config</code></li>
+              <li><b>Shared contract v1.0.0</b><code>contracts/</code></li>
+            </ol>
+          </div>
+          <div>
+            <h3>Evidence</h3>
+            <p class="big">Pending.</p>
+            <p>Accuracy and timing will be published after testing on real photos of the supplied drone. Nothing here is estimated.</p>
+            <p class="limits">Limits: blur, low light, hidden arms, unsupported views, details one photo can't show.</p>
+          </div>
+          <div>
+            <h3>Resources</h3>
+            <ul class="links">
+              <li><a href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">Source code <svg class="ico"><use href="#i-arrow" /></svg></a></li>
+              <li><a href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/ARCHITECTURE.md" rel="noopener">Architecture <svg class="ico"><use href="#i-arrow" /></svg></a></li>
+              <li><a href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/CONTRACT.md" rel="noopener">Result contract <svg class="ico"><use href="#i-arrow" /></svg></a></li>
+            </ul>
+            <p class="muted">Downloads, dataset and validation report will be linked here.</p>
+          </div>
+        </div>
+        <footer class="foot" data-in>
+          <p class="foot__mark">Pluto <em>Inspector</em></p>
+          <p class="foot__team">Research · App interface &amp; website · Runtime &amp; integration · Vision &amp; evaluation</p>
+          <p class="foot__safe">Inspect disarmed, motors stopped. A Pass is a visual check, not flight clearance. Drone shown is an illustrative schematic.</p>
+        </footer>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

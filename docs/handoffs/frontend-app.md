@@ -1,6 +1,6 @@
 # Flutter frontend handoff
 
-Branch: frontend/flutter. Base: 78c704b0618d0e0a91b562e410ee098b64564584. Find the delivered head with git rev-parse HEAD; no self-referential commit hash is embedded. Owned paths only: packages/inspection_ui/, docs/frontend/, this handoff and frontend status. R1/R4/R5/R6/R7/R8/R11 UI coverage; contract v1.0.0 unchanged.
+Branch: frontend/flutter. Base: 78c704b0618d0e0a91b562e410ee098b64564584. UI implementation commit: 089932cae790a566aa87888f68dc50af78d72100. The subsequent handoff/icon-resource commit is the branch head. Primary owned paths (plus the user-requested Android launcher resource extension): packages/inspection_ui/, docs/frontend/, this handoff and frontend status. R1/R4/R5/R6/R7/R8/R11 UI coverage; contract v1.0.0 unchanged.
 
 ## Integration
 
@@ -12,7 +12,7 @@ InspectionApp(controller: appController, cameraPreview: cameraPreview)
 
 Caller disposes controller. Supply fresh state/result identities, current upright image bytes and exact normalized boxes. UI prefers the analyzed image over external preview when image bytes exist. No overlays are guessed onto a bare camera preview. Ensure the engine validates full expected-motor coverage; the UI guard cannot independently prove that from v1. Sample motor identities/types in preview are deliberately fictional.
 
-At final integration app owner runs: python packages/inspection_ui/tool/install_app_icon.py . Preview launcher already branded; production launcher copies are packaged but apps/mobile is untouched on this isolated branch.
+At final integration app owner runs: python packages/inspection_ui/tool/install_app_icon.py . Preview launcher already branded; production launcher copies are packaged but Only Android launcher resources in apps/mobile are updated, as explicitly requested; runtime code is untouched.
 
 Optional args: themeMode, demoMode, developmentControls. Production uses demoMode false with no developmentControls. Fixture evidence always shows a simulated-results notice. No pubspec/composition-root change outside this package is needed; run flutter pub get after merge to refresh local path dependencies.
 

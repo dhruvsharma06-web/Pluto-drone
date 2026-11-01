@@ -1,23 +1,20 @@
-# Interactive frontend redesign
+# Frontend design and findings
 
-User requested a stronger, professional visual treatment with animations and motion graphics. The prior blue/graphite brand and logo are retained; the default view is now dark, with the complete light scheme still available through themeMode.
+Latest user direction supersedes the blue/graphite treatment: black and white authored UI and launcher branding, 32sp headings, 24sp product title and 18sp body/controls. Camera/photo evidence stays unfiltered. Removed tagline, progress strip, repeated tips and redundant safety copy. Detailed setup remains in Guide.
 
-- Interactive original drone framing scene: metallic material shading, camera framing, pointer-tracked viewpoint tilt and eased return. It is explicitly illustrative, not a motor map. Propellers never spin.
-- Processing-only scan sweep, including over analyzed images. Removed for reduced-motion preference (static scan indication). It is processing feedback, never detection output.
-- Uploaded evidence supports coordinated image + annotation pinch zoom. Input IDs reset viewport state.
-- Prepare / Inspect / Review wayfinding reflects safety/result state, not an invented approval metric.
-- Status emblem settles at 180ms only on a status change, not on each camera frame; result text remains immediate. Existing stale-result/safety guards remain unchanged.
-- Pointer feedback, native control focus and native navigation retained. Reduced motion removes viewpoint travel and continuous scanning. No new package or external asset dependency.
+The original framing illustration responds directly to dragging, then settles. Propellers never spin. A scan line appears only during processing; reduced motion uses static feedback. Evidence and annotations zoom together. Exact status names and distinct icons communicate outcomes without colour.
 
-The supplied architecture reminder is preserved: UI consumes InspectionController / InspectionState / VerificationResult. Camera lifecycle, model/training and core detection stay outside the Flutter presentation package. Neither detection nor reference logic is embedded into motion graphics.
+## Model findings
+
+PRISM_2.0_Demo.html supplied by the user is a behavior reference, not a source of validated drone predictions. Highlight mismatch/unknown boxes by default. A matching motor is boxed when selected from the list. Boxes use the model's normalized coordinates on the exact analyzed image, with dual black/white outlines and supplied motor IDs where space permits. Invalid/missing coordinates never produce guessed boxes.
+
+Tap a box for a native, scrollable detail sheet with Where, Why and Correction. The same details appear in the findings list. Where shows the reference motor ID and image-relative position; it never infers drone-front mapping. Why compares supplied observed and expected type/orientation. Unknown findings stay unverified; absent explanations are stated honestly. Details close when their inspection changes, safety is revoked, the service errors or the app is backgrounded. Fixtures remain labelled in the sheet.
 
 | Before | After | Why |
 |---|---|---|
-| Flat empty-camera outline | Interactive shaded framing scene | A product-specific focal point and useful framing interaction |
-| Static photo | Image and annotations zoom together | Inspect blade details without breaking overlay coordinates |
-| Indeterminate spinner only | Bounded scan sweep during processing | Make active work visible without implying a result |
-| Repeated frame identity could restart result animation | Animate status changes only | Keep live-camera updates stable |
+| Blue accents and shaded scene | Flat black/white geometry and branding | Follow the explicit visual brief |
+| Small secondary copy and setup repetition | Larger text and fewer competing elements | Keep the inspection task clear |
+| Status-only motor icons | Tappable issue boxes and Where/Why/Correction | Locate the affected part and explain the supplied finding |
+| Image separate from viewing controls | Image and annotations zoom together | Preserve annotation coordinates while inspecting details |
 
-Rendered layout and interaction checks cover compact, tablet, expanded, dark and enlarged-text modes. Native device/refresh-rate validation remains pending; widget renders are not device screenshots. Private user photos remain excluded from public Git.
-
-Final validation: flutter analyze reported no issues; all 16 UI/geometry/gesture/reduced-motion/layout/render checks passed. Reviewed updated compact preparation and expanded mismatch renders. No native-device performance claim.
+Controller/core separation, v1 schema and safety/result guards remain unchanged. Rendering and interaction evidence is recorded in VALIDATION.md. No native-device performance or real inference claim. Private photographs remain excluded from public Git.

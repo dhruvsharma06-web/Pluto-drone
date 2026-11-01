@@ -9,6 +9,8 @@ Show motor-localized visual findings, correction guidance, and Pass / Incorrect 
 ## Capabilities and Constraints
 Flutter presentation only; shared controller/result contract v1. Core, acquisition, APK and dataset are separate owner workstreams. Correct motor/propeller reference remains pending. Do not infer labels from photos or reuse the excluded earlier ZIP.
 ## Brand Commitments
-User approved neutral graphite-and-ice surfaces, blue actions and distinct result colours. User requested an original logo and app icon. Native Material components preserve Android conventions; Apple/Emil principles guide responsive feedback.
+Latest user direction: true black and white, large text and minimal supporting copy; distinct icons and exact names distinguish outcomes. User requested an original logo and app icon. Native Material components preserve Android conventions; Apple/Emil principles guide responsive feedback.
 ## Evidence on Hand
 22 team-supplied drone photos arrived in the WhatsApp ZIP. One original was used only for local render review; public preview uses an original geometry diagram. It is unlabelled and does not establish a correct installation. No accuracy/model claim is supplied here.
+
+Latest user direction: true black/white authored UI and launcher branding, 32sp headings / 24sp title / 18sp controls and body. Removed tagline, setup-tip repetition, progress strip, decorative source captions and duplicate safety subtitle. Detailed instructions remain under Guide. Evidence photographs remain unfiltered. Controller/core separation and result/safety rules unchanged.

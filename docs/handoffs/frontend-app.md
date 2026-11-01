@@ -1,6 +1,6 @@
 # Flutter frontend handoff
 
-Branch: frontend/flutter. Base: 78c704b0618d0e0a91b562e410ee098b64564584. UI implementation commit: 089932cae790a566aa87888f68dc50af78d72100. The subsequent handoff/icon-resource commit is the branch head. Primary owned paths (plus the user-requested Android launcher resource extension): packages/inspection_ui/, docs/frontend/, this handoff and frontend status. R1/R4/R5/R6/R7/R8/R11 UI coverage; contract v1.0.0 unchanged.
+Branch: frontend/flutter. Primary owned paths (plus the user-requested Android launcher resource extension): packages/inspection_ui/, docs/frontend/, this handoff and frontend status. R1/R4/R5/R6/R7/R8/R11 UI coverage; contract v1.0.0 unchanged.
 
 ## Integration
 
@@ -23,7 +23,7 @@ From its example: flutter pub get; flutter run.
 Native screenshot follow-up: set PLUTO_SCREENSHOTS to your output folder; flutter drive --driver=test_driver/integration_test.dart --target=integration_test/inspection_smoke_test.dart -d YOUR_DEVICE_ID.
 For widget PNGs: flutter test --dart-define=SCREENSHOT_DIR=ABSOLUTE_OUTPUT_FOLDER.
 
-Final analysis: no issues. Final UI suite: 14 checks passed. Current tests cover safety blocking, immediate removal of old Pass, inconsistent/missing evidence refusal, controller failure recovery, fixture provenance labelling, mode changes, normalized portrait/rotated geometry, invalid boxes, responsive widths and enlarged dark text. Final results recorded in docs/frontend/VALIDATION.md.
+Final analysis: no issues. Current UI suite: see docs/frontend/VALIDATION.md. Current tests cover safety blocking, immediate removal of old Pass, inconsistent/missing evidence refusal, controller failure recovery, fixture provenance labelling, mode changes, normalized portrait/rotated geometry, invalid boxes, responsive widths and enlarged dark text. Final results recorded in docs/frontend/VALIDATION.md.
 
 ## Resources and limitations
 
@@ -33,4 +33,14 @@ No real camera, picker, ML inference, dataset evaluation or verified motor map i
 
 Next receiver: app owner. Merge only in the agreed final integration window, connect actual controller/core and test installed APK/device lifecycle. ML owner supplies real reference/engine outputs; no model/data choice was changed. Shared change proposals: none required; app owner may expand stable error codes for more specific permission/device failures.
 
-Visual redesign: interactive original framing scene, processing scan graphics, evidence pinch zoom, native preparation steps and status-change feedback. Contract v1 and detection separation unchanged. Validation updated in docs/frontend/REDESIGN.md.
+Visual redesign: interactive original framing scene, processing scan graphics, evidence pinch zoom, status-change feedback. Contract v1 and detection separation unchanged. Validation updated in docs/frontend/REDESIGN.md.
+
+Latest user direction: true black/white authored UI and launcher branding, 32sp headings / 24sp title / 18sp controls and body. Removed tagline, setup-tip repetition, progress strip, decorative source captions and duplicate safety subtitle. Detailed instructions remain under Guide. Evidence photographs remain unfiltered. Controller/core separation and result/safety rules unchanged.
+
+## Findings integration (PRISM behavior reference)
+
+Supply motor_id, normalized bbox, finding and observed/expected type/orientation through the existing v1 motor maps. The UI highlights mismatch/unknown boxes, opens Where/Why/Correction on tap, and repeats the same explanation in the list. Positions are explicitly image-relative, not an inferred physical motor map. Missing coordinates produce no box. New inspection/state invalidation dismisses old detail sheets.
+
+The v1 schema has no per-motor narrative-reason field. Current Why text is derived only from observed/expected differences; a mismatch without a supplied distinction says its specific reason was not supplied. Do not inject unscoped overall reasons into a particular motor. If the ML producer needs richer per-motor explanations (for example visible absence versus occlusion), coordinate an optional schema extension with app and UI consumers before emitting new fields. No shared schema changes were made here and no model/dataset choices were prescribed.
+
+Final latest validation: analysis clean; all 18 UI checks passed. See docs/frontend/VALIDATION.md.

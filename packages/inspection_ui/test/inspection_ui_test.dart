@@ -9,6 +9,8 @@ import 'package:inspection_contract/inspection_contract.dart';
 import 'package:inspection_ui/inspection_ui.dart';
 import '../example/lib/fixture_controller.dart';
 import 'package:inspection_ui/src/drone_stage.dart';
+import 'package:inspection_ui/src/motor_finding.dart';
+import 'package:inspection_ui/src/presentation.dart' show motorWhy;
 
 late Uint8List photoBytes;
 
@@ -92,6 +94,83 @@ void main() {
     expect(motorBoxRect([.9, 0, .2, .2], landscape), isNull);
     expect(motorBoxRect([double.nan, 0, .1, .1], landscape), isNull);
     expect(motorBoxRect([0, 0, 0, .2], landscape), isNull);
+  });
+  test('finding explains only supplied differences and image coordinates', () {
+    final motor = <String, Object?>{
+      'motor_id': 'M2',
+      'bbox': [.7, .1, .2, .2],
+      'finding': 'mismatch',
+      'observed_type': 'B',
+      'expected_type': 'A',
+      'observed_orientation': 'face down',
+      'expected_orientation': 'face up',
+    };
+    expect(motorWhere(motor), 'M2 · Upper right of image.');
+    expect(motorWhy(motor), contains('Type: observed B; expected A.'));
+    expect(motorWhy(motor),
+        contains('Orientation: observed face down; expected face up.'));
+    expect(motorWhy({...motor, 'finding': 'unknown'}),
+        'This part could not be verified from the image.');
+    expect(motorWhy({'finding': 'mismatch'}),
+        contains('a specific reason was not supplied'));
+    expect(
+        motorWhere({
+          ...motor,
+          'bbox': [double.nan, 0, .1, .2]
+        }),
+        'M2 · Image location not supplied.');
+    expect(motorWhere({...motor, 'bbox': null}),
+        'M2 · Image location not supplied.');
+  });
+
+  testWidgets('issue box opens matching details and closes on new inspection',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    final c = await fixture('incorrect');
+    await tester.pumpWidget(InspectionApp(controller: c));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() => precacheImage(MemoryImage(photoBytes),
+        tester.element(find.byType(InteractiveViewer))));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('motor-box-Sample A')), findsNothing);
+    final box = find.byKey(const ValueKey('motor-box-Sample B'));
+    expect(box, findsOneWidget);
+    await tester.tap(box);
+    await tester.pumpAndSettle();
+    expect(find.byType(MotorFindingSheet), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet), matching: find.text('Where')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet), matching: find.text('Why')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet),
+            matching: find.text('Correction')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(MotorFindingSheet),
+            matching: find.text('Sample B · Upper right of image.')),
+        findsOneWidget);
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    c.show('processing');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    // The broadcast event pops the route, then its reverse ticker starts.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byType(MotorFindingSheet), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await c.dispose();
   });
   test('processing and mismatched image identity suppress stale result',
       () async {
@@ -306,6 +385,7 @@ void main() {
       ('prepare-phone', 'prepare', 390.0, 844.0, true),
       ('reference-phone', 'reference', 390.0, 844.0, false),
       ('mismatch-tablet', 'incorrect', 1100.0, 1000.0, false),
+      ('finding-phone', 'incorrect', 390.0, 844.0, true),
       ('pass-dark', 'pass', 390.0, 844.0, true)
     ]) {
       final key = GlobalKey();
@@ -318,6 +398,15 @@ void main() {
               demoMode: true,
               themeMode: dark ? ThemeMode.dark : ThemeMode.light)));
       await tester.pumpAndSettle();
+      if (c.current.image != null) {
+        await tester.runAsync(() => precacheImage(MemoryImage(photoBytes),
+            tester.element(find.byType(InteractiveViewer))));
+        await tester.pumpAndSettle();
+      }
+      if (name == 'finding-phone') {
+        await tester.tap(find.byKey(const ValueKey('motor-box-Sample B')));
+        await tester.pumpAndSettle();
+      }
       final boundary =
           key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       boundary.markNeedsPaint();

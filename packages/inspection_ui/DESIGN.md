@@ -1,73 +1,51 @@
 ---
 name: Pluto Inspection
-description: A clear inspection surface with evidence beside the result.
 colors:
-  action-blue: "#1259d9"
-  camera-graphite: "#141719"
-  ice-frame: "#f2f5f8"
-  sheet: "#ffffff"
-  ink: "#182026"
-  secondary-ink: "#53606d"
-  pass: "#17643f"
-  mismatch: "#a8271f"
-  uncertainty: "#775000"
+  ink-dark: "#ffffff"
+  ground-dark: "#000000"
+  ink-light: "#000000"
+  ground-light: "#ffffff"
 typography:
   headline:
     fontFamily: Roboto
-    fontSize: "28sp"
+    fontSize: "32sp"
     fontWeight: 700
-    lineHeight: 1.18
-    letterSpacing: "-0.4sp"
+    lineHeight: 1.12
   title:
     fontFamily: Roboto
-    fontSize: "22sp"
+    fontSize: "24sp"
     fontWeight: 700
-    lineHeight: 1.2
   body:
     fontFamily: Roboto
-    fontSize: "14sp"
+    fontSize: "18sp"
     fontWeight: 400
 rounded:
-  working-surface: "16dp"
-  controls: "12dp"
-  annotation: "8dp"
+  controls: "8dp"
+  evidence: "16dp"
 spacing:
-  related: "8dp"
   group: "16dp"
   section: "24dp"
-components:
-  button-primary:
-    backgroundColor: "{colors.action-blue}"
-    textColor: "{colors.sheet}"
-    rounded: "{rounded.controls}"
-    height: "54dp"
 ---
 # Design System: Pluto Inspection
 ## Overview
-**Creative North Star: "Evidence in view"**
-The user's graphite-and-ice direction is expressed through Material 3 components. Opaque surfaces, readable text, a clear photo, and a precise next action provide the identity. The original rotor-aperture mark adds a small distinctive face.
-**Key Characteristics:**
-- Real image evidence paired with motor findings.
-- Quiet native navigation, blue primary action, semantic result colours.
-- System scaling and separate light/dark palettes.
+User-pinned true black and white, large readable text, minimal working copy. This supersedes the earlier blue/graphite palette and shaded illustration.
 ## Colors
-Primary blue identifies the action and mark. Neutral surfaces separate frame, work and camera. Status colours encode results with an icon and text. Dark-role values are defined in lib/src/theme.dart; no arbitrary invert.
-**The Result Rule.** A brand colour never substitutes for a result label or creates an approval.
+Only black and white for authored UI, status indicators, framing graphics and branding. No colored status surfaces, artificial grey cards or gradients. Preserve original camera/photo evidence without filtering it; photographic cues may be needed for detection.
 ## Typography
-Self-hosted Roboto regular/medium/bold, Apache 2.0; Material title/body/label roles. Long labels wrap. Text follows platform scaling. No decorative display or technical monospace voice.
+Self-hosted Roboto. Headings 32sp; product title 24sp; body/control text 18sp. Native text scaling remains enabled. No small decorative labels.
 ## Layout
-Equal 16dp margins below 360dp and 24dp otherwise; at most 1120dp content. One 24dp gutter in the expanded two-column inspection view. Rail at 900dp; bottom navigation on compact widths. Portrait evidence remains complete via contain-and-centre geometry.
+One clear inspection heading, camera/photo selection, evidence, explicit safety confirmation and primary action. No tagline, progress strip, repeated tip list or duplicate disclaimer. Detailed setup guidance and project metadata live in their dedicated views. Compact views stack; expanded results show evidence and motor findings side by side.
 ## Elevation & Depth
-Working surfaces use tone steps, no resting shadows or blur. Native feedback remains on its Material ancestor.
+Flat surfaces. White/black outlines and native feedback; no decorative shadows or glass.
 ## Shapes
-16dp canvas/sheet, 12dp controls and finding surfaces, 8dp annotations. Launcher background is square; Android applies its own icon mask.
+8dp controls, 16dp evidence frame. Avoid extra containers when spacing is sufficient.
 ## Components
-Primary action is 54dp high; standard minimum native targets are 48dp. Segmented input selection, checkbox confirmation, native nav/rail and motor rows use Material behaviour. Pointer-only press scale .98 uses 100ms down / 140ms release with Cubic(.23,1,.32,1). Remove Animations disables that movement; keyboard activation never starts it. Results and frame overlays update immediately. Processing has a static hourglass alternative when animations are removed.
+Result status is conveyed by its exact name and distinct icon, never colour. Pointer feedback, direct viewpoint manipulation, processing scan and image zoom remain restrained. No propeller spinning. Reduced motion uses static feedback.
 ## Do's and Don'ts
-- Do retain the simulated-results notice in every fixture view.
-- Do attach annotations to the actual analyzed image and its identity.
-- Do use the supplied reference's motor identities.
-- Don't fabricate model/dataset metrics, confidence or flight-clearance claims.
-- Don't replace Material Android controls with Cupertino controls.
+- Do keep safety confirmation and actionable correction guidance.
+- Do keep fixtures visibly labelled as simulated.
+- Do preserve the reusable UI/controller/core boundary.
+- Don't add tiny filler, taglines, fake metrics, accent colours or decorative effects.
 
-User-requested visual update: default dark graphite scheme; authored material shading is confined to the illustrative drone scene. A processing-only scan sweep, direct viewpoint manipulation and evidence zoom are supported. Continuous motion never indicates a classification result; reduced motion uses static feedback. Inspect/Review state text changes immediately.
+## Findings
+Mismatch and unknown boxes use dual black/white outlines. Tap for a native scrollable Where/Why/Correction sheet; list uses the same content. Positions are relative to the analyzed image. No guessed boxes or causes. Detail sheets dismiss on inspection invalidation.

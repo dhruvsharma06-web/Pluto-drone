@@ -29,3 +29,5 @@ Real Android/device verification remains pending: the initially connected device
 
 ## Interactive visual update
 Default theme is now dark (override themeMode as needed). Camera framing scene supports drag-to-tilt; imported images and their annotations support pinch zoom. A scan sweep indicates actual processing only. Reduced-motion support and all existing safety/provenance states remain. See docs/frontend/REDESIGN.md.
+
+Latest user direction: true black/white authored UI and launcher branding, 32sp headings / 24sp title / 18sp controls and body. Removed tagline, setup-tip repetition, progress strip, decorative source captions and duplicate safety subtitle. Detailed instructions remain under Guide. Evidence photographs remain unfiltered. Controller/core separation and result/safety rules unchanged.

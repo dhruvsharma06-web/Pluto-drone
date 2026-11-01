@@ -6,7 +6,7 @@ import 'presentation.dart';
 import 'support_views.dart';
 import 'theme.dart';
 import 'inspection_mark.dart';
-part 'inspection_steps.dart';
+import 'motor_finding.dart';
 
 /// Drop-in presentation. The caller owns and disposes [controller].
 class InspectionApp extends StatelessWidget {
@@ -203,6 +203,24 @@ class _InspectionShellState extends State<_InspectionShell>
     setState(() => _destination = index);
   }
 
+  void _showMotor(String id) {
+    final result = _result;
+    if (result == null) return;
+    final matches = result.motors.where((m) => m['motor_id'] == id);
+    if (matches.length != 1) return;
+    setState(() => _selectedMotor = id);
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      constraints: BoxConstraints(
+          maxWidth: 640, maxHeight: MediaQuery.sizeOf(context).height * .85),
+      builder: (_) => MotorFindingSheet(
+          motor: matches.single, result: result, controller: widget.controller),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -223,6 +241,7 @@ class _InspectionShellState extends State<_InspectionShell>
             cameraPreview: widget.cameraPreview,
             selectedMotor: _selectedMotor,
             onSelectMotor: (id) => setState(() => _selectedMotor = id),
+            onMotorBoxSelected: _showMotor,
             onSelectMode: _selectMode,
             onConfirm: _confirm,
             onPrimary: () => _liveRequested
@@ -240,7 +259,7 @@ class _InspectionShellState extends State<_InspectionShell>
               const Flexible(
                   child: Text('Pluto Inspection',
                       style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -.3))),
             ])),
@@ -336,7 +355,7 @@ class _DemoNotice extends StatelessWidget {
                             child: Text('Demo · Simulated results',
                                 style: TextStyle(
                                     color: c.caution,
-                                    fontSize: 13,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w500)))
                       ]),
                       if (controls != null)
@@ -358,6 +377,7 @@ class _InspectionView extends StatelessWidget {
       required this.cameraPreview,
       required this.selectedMotor,
       required this.onSelectMotor,
+      required this.onMotorBoxSelected,
       required this.onSelectMode,
       required this.onConfirm,
       required this.onPrimary});
@@ -368,6 +388,7 @@ class _InspectionView extends StatelessWidget {
   final String? error, selectedMotor;
   final Widget? cameraPreview;
   final ValueChanged<String> onSelectMotor;
+  final ValueChanged<String> onMotorBoxSelected;
   final ValueChanged<_InputMode> onSelectMode;
   final ValueChanged<bool> onConfirm;
   final VoidCallback onPrimary;
@@ -378,7 +399,7 @@ class _InspectionView extends StatelessWidget {
     final processing =
         error == null && (state.phase == InspectionPhase.processing || busy);
     final title =
-        result == null ? 'Propeller inspection' : resultLabel(result!.status);
+        result == null ? 'Inspect propellers' : resultLabel(result!.status);
     final heading =
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Semantics(
@@ -387,19 +408,6 @@ class _InspectionView extends StatelessWidget {
           child: Text(title,
               key: const ValueKey('inspection-heading'),
               style: Theme.of(context).textTheme.headlineSmall)),
-      const SizedBox(height: 8),
-      Text(
-          result == null
-              ? 'A clear view. A confident installation check.'
-              : switch (result!.status) {
-                  VerificationStatus.pass =>
-                    'The visible installation matches the supplied reference.',
-                  VerificationStatus.incorrectInstallation =>
-                    'Correct the highlighted motor before inspecting again.',
-                  VerificationStatus.unableToVerify =>
-                    'This image has not been approved.',
-                },
-          style: TextStyle(color: c.onSurfaceVariant, height: 1.45)),
     ]);
     final resultPanel = result != null
         ? _ResultPanel(
@@ -419,14 +427,8 @@ class _InspectionView extends StatelessWidget {
         Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       SegmentedButton<_InputMode>(
           segments: const [
-            ButtonSegment(
-                value: _InputMode.live,
-                icon: Icon(Icons.videocam_outlined, size: 19),
-                label: Text('Live camera')),
-            ButtonSegment(
-                value: _InputMode.photo,
-                icon: Icon(Icons.image_outlined, size: 19),
-                label: Text('Upload image'))
+            ButtonSegment(value: _InputMode.live, label: Text('Live camera')),
+            ButtonSegment(value: _InputMode.photo, label: Text('Upload image'))
           ],
           selected: {
             mode
@@ -440,7 +442,7 @@ class _InspectionView extends StatelessWidget {
           result: result,
           cameraPreview: mode == _InputMode.live ? cameraPreview : null,
           selectedMotor: selectedMotor,
-          onMotorSelected: onSelectMotor),
+          onMotorSelected: onMotorBoxSelected),
       const SizedBox(height: 16),
       Material(
           color: c.surfaceContainerLow,
@@ -452,10 +454,8 @@ class _InspectionView extends StatelessWidget {
             onChanged: (v) => onConfirm(v ?? false),
             controlAffinity: ListTileControlAffinity.trailing,
             contentPadding: const EdgeInsets.only(left: 16, right: 6),
-            title: Text('Drone disarmed. Motors stopped.',
+            title: Text('I confirm: disarmed, motors stopped.',
                 style: Theme.of(context).textTheme.titleSmall),
-            subtitle: const Text('I confirm both before inspection.',
-                style: TextStyle(fontSize: 13)),
           )),
       const SizedBox(height: 12),
       _PressButton(
@@ -476,12 +476,6 @@ class _InspectionView extends StatelessWidget {
                           ? 'Choose image'
                           : 'Choose another image')
                       : 'Start live inspection'),
-      if (!state.safetyConfirmed)
-        Padding(
-            padding: const EdgeInsets.only(top: 9),
-            child: Text('Confirm the safety check to continue.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: c.onSurfaceVariant))),
       if (processing)
         Padding(
             padding: const EdgeInsets.only(top: 12),
@@ -496,7 +490,7 @@ class _InspectionView extends StatelessWidget {
               const SizedBox(width: 10),
               const Expanded(
                   child: Text('Inspecting visible propellers…',
-                      style: TextStyle(fontSize: 13))),
+                      style: TextStyle(fontSize: 18))),
             ])),
       if (error != null || state.phase == InspectionPhase.error)
         Padding(
@@ -526,22 +520,13 @@ class _InspectionView extends StatelessWidget {
                       children: [
                         heading,
                         const SizedBox(height: 20),
-                        _InspectionSteps(
-                            stage: result != null
-                                ? 2
-                                : state.safetyConfirmed
-                                    ? 1
-                                    : 0),
-                        const SizedBox(height: 20),
-                        if (wide)
+                        if (wide && resultPanel != null)
                           Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(flex: 6, child: work),
                                 const SizedBox(width: 24),
-                                Expanded(
-                                    flex: 5,
-                                    child: resultPanel ?? const _ReadyNote())
+                                Expanded(flex: 5, child: resultPanel)
                               ])
                         else ...[
                           if (resultPanel != null) ...[
@@ -555,48 +540,9 @@ class _InspectionView extends StatelessWidget {
                                 result: result!,
                                 selectedMotor: selectedMotor,
                                 onSelect: onSelectMotor)
-                          else
-                            const _ReadyNote()
                         ],
-                        const SizedBox(height: 16),
-                        Text(
-                            'Visual installation check only. Follow the full pre-flight procedure.',
-                            style: TextStyle(
-                                fontSize: 12,
-                                height: 1.5,
-                                color: c.onSurfaceVariant)),
                       ]))));
     });
-  }
-}
-
-class _ReadyNote extends StatelessWidget {
-  const _ReadyNote();
-  @override
-  Widget build(BuildContext context) {
-    final c = Theme.of(context).colorScheme;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Set up your inspection',
-          style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 12),
-      for (final text in [
-        'The complete drone, with every propeller visible',
-        'Even lighting and a sharp, steady image',
-        'The viewing angle specified by the supplied reference'
-      ])
-        Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(Icons.check, size: 18, color: c.onSurfaceVariant),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: Text(text,
-                      style: TextStyle(color: c.onSurfaceVariant, height: 1.5)))
-            ])),
-      const SizedBox(height: 10),
-      Text('Unclear image? We’ll ask for a better view.',
-          style: Theme.of(context).textTheme.titleSmall),
-    ]);
   }
 }
 
@@ -628,11 +574,11 @@ class _ResultSummary extends StatelessWidget {
         ? reasonGuidance(reason)
         : switch (result.status) {
             VerificationStatus.pass =>
-              'All required visible checks match. This does not replace the full pre-flight procedure.',
+              'Visible checks match. Complete the full pre-flight procedure.',
             VerificationStatus.incorrectInstallation =>
-              'Review the affected motor below, correct its installation, then inspect again.',
+              'Correct the indicated motor, then inspect again.',
             VerificationStatus.unableToVerify =>
-              'A complete installation check was not possible. Retake the image or check the reference.'
+              'Retake a clearer image or check the supplied reference.'
           };
     return DecoratedBox(
         decoration:
@@ -653,7 +599,7 @@ class _ResultSummary extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                   child: Text(text,
-                      style: TextStyle(color: ink, height: 1.5, fontSize: 14))),
+                      style: TextStyle(color: ink, height: 1.5, fontSize: 18))),
             ])));
   }
 }
@@ -698,7 +644,7 @@ class _MotorFindings extends StatelessWidget {
       if (motors.isNotEmpty)
         Text(
             '${motors.where((m) => m['finding'] == 'match').length} of ${motors.length} visible findings match',
-            style: TextStyle(color: c.onSurfaceVariant, fontSize: 13)),
+            style: TextStyle(color: c.onSurfaceVariant, fontSize: 18)),
       const SizedBox(height: 12),
       for (final motor in motors)
         if (motorText(motor, 'motor_id') case final String id)
@@ -720,7 +666,7 @@ class _MotorFindings extends StatelessWidget {
                                 onSelect(selectedMotor == id ? '' : id),
                             title: Text(id,
                                 style: const TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w500)),
+                                    fontSize: 18, fontWeight: FontWeight.w500)),
                             subtitle: Text(switch (motor['finding']) {
                               'match' => 'Matches reference',
                               'mismatch' => 'Installation mismatch',
@@ -741,24 +687,7 @@ class _MotorFindings extends StatelessWidget {
                             motor['finding'] == 'mismatch')
                           Padding(
                               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        'Observed: ${motorText(motor, 'observed_type') ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: c.onSurfaceVariant)),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                        'Expected: ${motorText(motor, 'expected_type') ?? 'Reference needed'}',
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: c.onSurfaceVariant)),
-                                    const SizedBox(height: 12),
-                                    Text(correctionGuidance(motor),
-                                        style: const TextStyle(height: 1.5)),
-                                  ])),
+                              child: MotorFindingDetails(motor: motor)),
                       ]))),
     ]);
   }

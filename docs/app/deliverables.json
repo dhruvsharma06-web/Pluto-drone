@@ -1,0 +1,49 @@
+{
+  "version": "0.1.0+1",
+  "workstream": "app/runtime",
+  "contract_version": "1.0.0",
+  "runtime_source_commit": "e06f4362fc8eb73bbbbf0cb94ee31bebfc3b3ac4",
+  "source_repository": "https://github.com/dhruvsharma06-web/Pluto-drone",
+  "source_availability": "Local role-branch commits; no push performed",
+  "apk": {
+    "location": "apps/mobile/build/app/outputs/flutter-apk/app-release.apk",
+    "metadata": "docs/app/apk.json",
+    "sha256": "789cec3c654e341567192f8675a969ca8ae417e52ff99a054da2e6949823761c",
+    "bytes": 17286343,
+    "abi": "arm64-v8a",
+    "minimum_android_api": 24,
+    "signature_verified": true,
+    "signing": "Android debug identity; hackathon sideload only",
+    "physical_device_validated": false,
+    "shared_download": null
+  },
+  "reference": {
+    "location": "apps/mobile/assets/reference.json",
+    "version": "pending",
+    "verified": false,
+    "motor_mapping": null
+  },
+  "android_detector": null,
+  "model": null,
+  "real_labelled_dataset": null,
+  "documentation": {
+    "build_and_demo": "docs/app/README.md",
+    "adapter_proposal": "docs/app/ENGINE_ADAPTER.md",
+    "validation_report": "docs/app/VALIDATION.md",
+    "physical_acceptance": "docs/app/DEVICE_CHECKLIST.md",
+    "handoff": "docs/handoffs/app.md"
+  },
+  "actual_checks": {
+    "runtime_tests_passed": 46,
+    "mobile_widget_tests_passed": 1,
+    "flutter_analysis": "No issues found in runtime and mobile",
+    "contracts": "PASS; schemas, four labelled fixtures, pending references, seven rejected unsafe mutations"
+  },
+  "remaining_release_work": [
+    "Supply exact drone variant, reviewed reference, real data and Android inference engine",
+    "Complete frontend package and agreed end-stage branch integration",
+    "Run physical-device checklist and exact-APK detector evaluation",
+    "Coordinate full team resource bundle, rights, hashes, access and root resource manifest",
+    "Open reviewed final PR; publishing remains separately authorized"
+  ]
+}

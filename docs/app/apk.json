@@ -1,0 +1,19 @@
+{
+  "artifact": "pluto-inspector-runtime-candidate",
+  "version": "0.1.0+1",
+  "source_commit": "e06f4362fc8eb73bbbbf0cb94ee31bebfc3b3ac4",
+  "working_tree_dirty_at_index": true,
+  "location": "apps/mobile/build/app/outputs/flutter-apk/app-release.apk",
+  "sha256": "789cec3c654e341567192f8675a969ca8ae417e52ff99a054da2e6949823761c",
+  "bytes": 17286343,
+  "signing": "Android debug identity; hackathon sideload only",
+  "abi": "arm64-v8a",
+  "minimum_android_api": 24,
+  "physical_device_tested": false,
+  "detector_integrated": false,
+  "reference_version": "pending",
+  "dataset": null,
+  "model": null,
+  "access": "Local build; no shared release uploaded",
+  "rights": "Team source; third-party notices retained in APK. Repository licence undecided."
+}

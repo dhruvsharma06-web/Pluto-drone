@@ -8,6 +8,8 @@ dependencies:
   flutter:
     sdk: flutter
   camera: ^0.12.2
+  inspection_contract:
+    path: ../../packages/inspection_contract
   inspection_ui:
     path: ../../packages/inspection_ui
   inspection_runtime:

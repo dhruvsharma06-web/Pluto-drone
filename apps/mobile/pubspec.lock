@@ -257,7 +257,7 @@ packages:
     source: hosted
     version: "0.2.2"
   inspection_contract:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../packages/inspection_contract"
       relative: true

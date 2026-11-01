@@ -165,7 +165,21 @@ void main() {
     await controller.selectImage();
     expect(controller.current.image, isNotNull);
   });
-  test('live sampling bounded and cannot claim tracked Pass', () async {
+  test('camera preview does not capture or reopen until shutter pressed',
+      () async {
+    await controller.setSafetyConfirmed(true);
+    await controller.startLive();
+    final closes = acquisition.closes;
+    await Future<void>.delayed(const Duration(milliseconds: 850));
+    await controller.startLive();
+    expect(acquisition.opens, 1);
+    expect(acquisition.captures, 0);
+    expect(acquisition.closes, closes);
+    expect(controller.current.phase, InspectionPhase.idle);
+    await controller.stopLive();
+    expect(acquisition.closes, closes + 1);
+  });
+  test('manual capture freezes one result without reopening camera', () async {
     final response = Completer<VerificationResult>();
     final entered = Completer<InspectionImage>();
     await controller.replaceEngine(FakeEngine((image) {
@@ -174,12 +188,16 @@ void main() {
     }));
     await controller.setSafetyConfirmed(true);
     await controller.startLive();
+    final capture = controller.captureLiveImage();
     final image = await entered.future;
     await tick();
     expect(acquisition.captures, 1);
     response.complete(syntheticPass(image));
-    await tick();
+    await capture;
     expect(controller.current.result!.reasons, ['LIVE_TRACKING_UNAVAILABLE']);
+    expect(controller.current.image!.source, 'live');
+    expect(acquisition.opens, 1);
+    expect(acquisition.captures, 1);
     await controller.stopLive();
     expect(controller.current.result, null);
   });
@@ -188,12 +206,54 @@ void main() {
     acquisition.capturer = () => captured.future;
     await controller.setSafetyConfirmed(true);
     await controller.startLive();
+    final capture = controller.captureLiveImage();
     await tick();
     await controller.stopLive();
     captured.complete(Uint8List(1));
-    await tick();
+    await capture;
     expect(controller.current.result, null);
     expect(controller.current.image, null);
+  });
+  test('double shutter press produces one capture', () async {
+    final captured = Completer<Uint8List>();
+    acquisition.capturer = () => captured.future;
+    await controller.setSafetyConfirmed(true);
+    await controller.startLive();
+    final capture = controller.captureLiveImage();
+    await tick();
+    await controller.captureLiveImage();
+    expect(acquisition.captures, 1);
+    captured.complete(Uint8List(1));
+    await capture;
+    expect(controller.current.result!.reasons, ['REFERENCE_NOT_CONFIGURED']);
+    await controller.captureLiveImage();
+    expect(acquisition.captures, 1);
+  });
+  test('capture failure closes camera and allows explicit retry', () async {
+    acquisition.capturer =
+        () async => throw CameraException('captureFailed', 'fixture');
+    await controller.setSafetyConfirmed(true);
+    await controller.startLive();
+    await controller.captureLiveImage();
+    expect(controller.current.phase, InspectionPhase.error);
+    expect(controller.current.result, null);
+    expect(acquisition.opens, 1);
+    acquisition.capturer = null;
+    await controller.startLive();
+    expect(acquisition.opens, 2);
+    expect(acquisition.captures, 1);
+  });
+  test('background closes idle preview and does not restart on resume',
+      () async {
+    await controller.setSafetyConfirmed(true);
+    await controller.startLive();
+    await controller.suspend();
+    controller.resume();
+    expect(controller.current.safetyConfirmed, false);
+    expect(acquisition.opens, 1);
+    expect(acquisition.captures, 0);
+    await controller.captureLiveImage();
+    expect(acquisition.captures, 0);
   });
   test('recovered upload requires fresh safety action', () async {
     acquisition.recovered = Uint8List(1);

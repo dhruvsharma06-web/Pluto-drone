@@ -64,7 +64,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
     const privatePhoto = String.fromEnvironment('TEAM_PHOTO_PATH');
-    photoBytes = await File(privatePhoto.isEmpty ? 'example/assets/illustrative-drone.png' : privatePhoto).readAsBytes();
+    photoBytes = await File(privatePhoto.isEmpty
+            ? 'example/assets/illustrative-drone.png'
+            : privatePhoto)
+        .readAsBytes();
     final loader = FontLoader('packages/inspection_ui/InspectionSans');
     for (final name in ['Regular', 'Medium', 'Bold'])
       loader.addFont(File('assets/fonts/Roboto-$name.ttf')
@@ -178,6 +181,28 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('primary-inspection-action')));
     await tester.pump();
     expect(c.liveCalls, 1);
+    await tester.pumpWidget(const SizedBox());
+    await c.dispose();
+  });
+  testWidgets('inactive camera permission prompt does not stop camera startup',
+      (tester) async {
+    final c = TestController(const InspectionState(safetyConfirmed: true))
+      ..pending = Completer<void>();
+    await tester.pumpWidget(InspectionApp(controller: c));
+    final action = find.byKey(const ValueKey('primary-inspection-action'));
+    await tester.ensureVisible(action);
+    await tester.tap(action);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    await tester.pump();
+    expect(c.stopCalls, 0);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    c.pending!.complete();
+    await tester.pumpAndSettle();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    expect(c.stopCalls, 1);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpWidget(const SizedBox());
     await c.dispose();
   });

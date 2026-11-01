@@ -12,8 +12,7 @@ class RuntimeInspectionController implements InspectionController {
   RuntimeInspectionController(
       {required this.acquisition,
       required VerificationEngine engine,
-      ImageNormalizer normalizer = normalizeImage,
-      this.sampleInterval = const Duration(milliseconds: 750)})
+      ImageNormalizer normalizer = normalizeImage})
       : _engine = engine,
         _normalizer = normalizer;
 
@@ -21,18 +20,16 @@ class RuntimeInspectionController implements InspectionController {
   VerificationEngine _engine;
   final ImageNormalizer _normalizer;
 
-  /// Sampling delay, not a throughput claim or measured FPS target.
-  final Duration sampleInterval;
   final _events = StreamController<InspectionState>.broadcast();
   InspectionState _current = const InspectionState(
-      message:
-          'Follow the supplied drone disarming procedure and '
+      message: 'Follow the supplied drone disarming procedure and '
           'visually confirm every motor is stopped before inspecting. '
           'Confirmation cannot prove hardware disarm.');
   bool _disposed = false,
       _live = false,
       _foreground = true,
-      _queuedUpload = false;
+      _queuedUpload = false,
+      _capturing = false;
   int? _pickerGeneration;
   bool get _picking => _pickerGeneration != null;
   int _generation = 0, _inputNumber = 0;
@@ -147,7 +144,7 @@ class RuntimeInspectionController implements InspectionController {
     try {
       await acquisition.openCamera();
       if (!_valid(generation)) return;
-      unawaited(_runLive(generation));
+      _clear('Camera ready. Frame the whole drone, then tap Take photo.');
     } catch (error) {
       if (_valid(generation)) {
         _live = false;
@@ -157,28 +154,33 @@ class RuntimeInspectionController implements InspectionController {
     }
   }
 
-  Future<void> _runLive(int generation) async {
-    while (_valid(generation) && _live) {
-      // Clear before each new still, not after an old inference completes.
-      _clear('Sampling a camera still. No continuous tracking is available.',
-          phase: InspectionPhase.processing);
-      try {
-        // Wait before capture: one decode/inference in flight; no frame queue.
-        await _waitForWork();
-        if (!_valid(generation)) return;
-        final endToEnd = Stopwatch()..start();
-        final bytes = await acquisition.capture();
-        if (!_valid(generation)) return;
-        await _inspect(bytes, 'live', generation, endToEnd: endToEnd);
-      } catch (error) {
-        if (_valid(generation)) {
-          _live = false;
-          _deviceError(error);
-          await _closeCamera();
-        }
-        return;
+  /// App-owned shutter injected with the camera preview; shared v1 stays intact.
+  /// Preview never takes pictures or runs inference until this is pressed.
+  Future<void> captureLiveImage() async {
+    if (!_allowInput() || !_live || _capturing) return;
+    final generation = _generation;
+    _capturing = true;
+    _clear('Taking photo...', phase: InspectionPhase.processing);
+    try {
+      await _waitForWork();
+      if (!_valid(generation)) return;
+      final endToEnd = Stopwatch()..start();
+      final bytes = await acquisition.capture();
+      if (!_valid(generation)) return;
+      // Freeze the chosen still once. Never alternate it with later preview
+      // frames, and never reopen the camera after inference completes.
+      _live = false;
+      await _closeCamera();
+      if (!_valid(generation)) return;
+      await _inspect(bytes, 'live', generation, endToEnd: endToEnd);
+    } catch (error) {
+      if (_valid(generation)) {
+        _live = false;
+        _deviceError(error);
+        await _closeCamera();
       }
-      await Future<void>.delayed(sampleInterval);
+    } finally {
+      _capturing = false;
     }
   }
 

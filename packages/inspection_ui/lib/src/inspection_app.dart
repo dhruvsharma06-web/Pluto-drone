@@ -78,6 +78,8 @@ class _InspectionShellState extends State<_InspectionShell>
       if (!mounted) return;
       setState(() {
         _state = state;
+        if (state.phase == InspectionPhase.result ||
+            state.phase == InspectionPhase.error) _liveRequested = false;
         if (state.result?.evidenceSource == 'fixture') _fixtureSession = true;
         if (state.result?.evidenceSource == 'real') _fixtureSession = false;
         if (state.result?.reasons.any((r) => [
@@ -128,7 +130,9 @@ class _InspectionShellState extends State<_InspectionShell>
           _blockedResult = _state.result;
           _selectedMotor = null;
         });
-      if (_liveRequested) {
+      // Permission dialogs can make the app inactive while the camera is
+      // initializing. Only actual backgrounding should cancel acquisition.
+      if (_liveRequested && state == AppLifecycleState.paused) {
         _liveRequested = false;
         unawaited(widget.controller.stopLive().catchError((Object _) {}));
       }

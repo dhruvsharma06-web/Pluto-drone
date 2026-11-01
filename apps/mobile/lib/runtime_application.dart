@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:inspection_contract/inspection_contract.dart';
 import 'package:inspection_runtime/inspection_runtime.dart';
 import 'package:inspection_ui/inspection_ui.dart';
 
@@ -58,14 +59,8 @@ class _RuntimeApplicationState extends State<RuntimeApplication>
   @override
   Widget build(BuildContext context) => InspectionApp(
       controller: controller,
-      cameraPreview: ValueListenableBuilder<CameraController?>(
-        valueListenable: acquisition.camera,
-        builder: (context, camera, _) => camera == null
-            ? const SizedBox.shrink()
-            : AspectRatio(
-                aspectRatio: camera.value.aspectRatio,
-                child: CameraPreview(camera)),
-      ));
+      cameraPreview: RuntimeCameraPreview(
+          acquisition: acquisition, controller: controller));
 
   @override
   void dispose() {
@@ -73,4 +68,45 @@ class _RuntimeApplicationState extends State<RuntimeApplication>
     unawaited(controller.dispose());
     super.dispose();
   }
+}
+
+/// Keep the camera surface mounted while the user frames a single photograph.
+/// This platform-owned shutter needs no change to the shared controller API.
+class RuntimeCameraPreview extends StatelessWidget {
+  const RuntimeCameraPreview(
+      {super.key, required this.acquisition, required this.controller});
+  final AndroidImageAcquisition acquisition;
+  final RuntimeInspectionController controller;
+
+  @override
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<CameraController?>(
+        valueListenable: acquisition.camera,
+        builder: (context, camera, _) {
+          if (camera == null) return const SizedBox.shrink();
+          return StreamBuilder<InspectionState>(
+            stream: controller.states,
+            initialData: controller.current,
+            builder: (context, snapshot) {
+              final busy = snapshot.data!.phase == InspectionPhase.processing;
+              return Stack(fit: StackFit.expand, children: [
+                Center(child: CameraPreview(camera)),
+                Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 56,
+                    child: Center(
+                        child: FilledButton.icon(
+                      key: const ValueKey('take-photo'),
+                      style: FilledButton.styleFrom(
+                          minimumSize: const Size(144, 48)),
+                      onPressed: busy ? null : controller.captureLiveImage,
+                      icon: const Icon(Icons.camera_alt_outlined),
+                      label: Text(busy ? 'Taking photo...' : 'Take photo'),
+                    ))),
+              ]);
+            },
+          );
+        },
+      );
 }

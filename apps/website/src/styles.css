@@ -297,23 +297,11 @@ html:not(.js) .stage__poster,
   position: fixed;
   inset: max(16px, env(safe-area-inset-top)) 24px auto;
   z-index: 30;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
   background: transparent;
 }
-.wordmark {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  justify-self: start;
-  text-decoration: none;
-  font-size: 1rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.wordmark img { flex: none; }
 .pill-nav { min-width: 0; max-width: 100%; background: transparent; }
 .pill-nav ul { display: flex; align-items: center; gap: 5px; }
 .pill-nav a {
@@ -357,8 +345,7 @@ html:not(.js) .stage__poster,
 }
 .pill-nav a:active, .bar__src:active { transform: scale(.97); }
 @media (max-width: 1150px) {
-  .bar { grid-template-columns: 1fr 1fr; gap: 12px; }
-  .pill-nav { grid-column: 1 / -1; grid-row: 2; justify-self: center; overflow-x: auto; scrollbar-width: none; }
+  .pill-nav { overflow-x: auto; scrollbar-width: none; }
   .pill-nav::-webkit-scrollbar { display: none; }
 }
 @media (max-width: 640px) {

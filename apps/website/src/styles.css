@@ -1798,3 +1798,12 @@ html[data-scene='flight'] .reticle.is-live {
   .phone3 { width: min(62vw, 34vh); scroll-snap-align: center; }
 }
 @media (prefers-reduced-motion: reduce) { .phone3 { transition: none; } }
+
+/* Project video */
+.film { margin-top: clamp(28px, 4vw, 48px); max-width: 960px; }
+.film__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.film__head h3 { margin: 0; }
+.film__link { color: var(--accent-hi); font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.film__link:hover { text-decoration: underline; }
+.film__frame { position: relative; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); background: #000; box-shadow: 0 30px 70px -40px rgba(var(--accent-glow), 0.6); }
+.film__frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }

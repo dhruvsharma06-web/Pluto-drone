@@ -34,7 +34,7 @@ class PropellerEngine(context: Context) {
         const val CONF = 0.35f
         const val MIN_CLASS_CONF = 0.50f
         const val IOU = 0.5f
-        const val BLUR_MIN = 40.0      // Laplacian variance on 320px grey
+        const val BLUR_MIN = 60.0      // Laplacian variance on 320px grey (sharp photos >= 134, blurred <= 12)
         const val DARK_MAX = 45.0      // mean grey below => too dark
         const val BRIGHT_MIN = 235.0   // mean grey above => washed out
         val TYPES = arrayOf("cw", "ccw")
@@ -249,6 +249,16 @@ class PropellerEngine(context: Context) {
             val id = (if (along > 0) "front_" else "rear_") + (if (across > 0) "right" else "left")
             if (out.put(id, d) != null) return null
         }
-        return if (out.size == 4) out else null
+        if (out.size != 4) return null
+        // Perspective check: in a true top-down view opposite sides of the
+        // propeller rectangle have similar lengths.
+        fun dist(a: String, b: String): Float {
+            val p = out.getValue(a); val q = out.getValue(b)
+            return sqrt((p.cx - q.cx) * (p.cx - q.cx) + (p.cy - q.cy) * (p.cy - q.cy))
+        }
+        val pairs = listOf(dist("front_left", "front_right") to dist("rear_left", "rear_right"),
+            dist("front_left", "rear_left") to dist("front_right", "rear_right"))
+        if (pairs.any { (a, b) -> min(a, b) / max(a, b) < 0.8f }) return null
+        return out
     }
 }

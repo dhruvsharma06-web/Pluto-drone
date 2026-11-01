@@ -37,3 +37,4 @@ Visual-only refinement: separate pill-shaped input choices, shorter repeated hel
 
 UI analysis clean; all 25 tests passed, plus the extended sheet reopening check. Responsive checks cover 320/390/768/1440px at 1.0x/1.5x. Updated local phone start/result renders inspected. ADB lists no connected device, so updated hardware testing/installation is pending. Impeccable and Emil guided hierarchy, touch targets and restrained feedback. APK/source provenance is recorded in docs/app/FLUTTER_ALIGNMENT.md.
 
+Final APK built from clean source 67275ac59d4f31734111f8bfff55776ab6f18e66: 18427797 bytes; SHA256 f8e7adbbdefbeb4ac9a41890f78861cd833057f5f5b60576198bee76123c10d0. Android signature verified. APK path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk. App-level fail-closed test passed (1/1). Phone disconnected; installation remains pending.

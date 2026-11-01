@@ -1,3 +1,5 @@
+Source: 67275ac59d4f31734111f8bfff55776ab6f18e66. Updated APK built and signature verified; see docs/app/apk.json.
+
 ## Minimal rounded refinement — 1 November 2026
 
 Visual-only refinement: separate pill-shaped input choices, shorter repeated helper copy, softer result/sheet corners, and motor details in the existing Where/Why/Correction sheet. Safety confirmation, exact result labels, fixture disclosures, error guidance and runtime logic are preserved. Existing colours/fonts/brand retained; no reference colours or business content copied. Motor sheets reopen on repeated taps and still close immediately when invalidated.

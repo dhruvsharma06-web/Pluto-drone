@@ -2,22 +2,22 @@
   "version": "0.1.0+1",
   "workstream": "app/runtime",
   "contract_version": "1.0.0",
-  "runtime_source_commit": "fe2e1dd8f624afea91bc30455db7f63f9386dff5",
+  "runtime_source_commit": "67275ac59d4f31734111f8bfff55776ab6f18e66",
   "frontend_source_commit": "4c28f735d6a0ec0f1c07f8a3d04db9e413fdf55c",
   "source_repository": "https://github.com/dhruvsharma06-web/Pluto-drone",
   "source_availability": "Local role-branch commits; no push performed",
   "apk": {
     "location": "apps/mobile/build/app/outputs/flutter-apk/app-release.apk",
     "metadata": "docs/app/apk.json",
-    "sha256": "a913f2f9921f1abc038bc112997471a192869da57b5b357d3bc053be64ea349a",
-    "bytes": 17969297,
+    "sha256": "f8e7adbbdefbeb4ac9a41890f78861cd833057f5f5b60576198bee76123c10d0",
+    "bytes": 18427797,
     "abi": "arm64-v8a",
     "minimum_android_api": 24,
     "signature_verified": true,
     "signing": "Android debug identity; hackathon sideload only",
     "physical_device_validated": false,
-    "physical_device_smoke_tested": true,
-    "physical_device_report": "docs/app/LARGE_CAPTURE_VIEW.md",
+    "physical_device_smoke_tested": false,
+    "physical_device_report": "docs/app/FLUTTER_ALIGNMENT.md",
     "shared_download": null
   },
   "reference": {
@@ -36,13 +36,14 @@
     "physical_acceptance": "docs/app/DEVICE_CHECKLIST.md",
     "camera_fix": "docs/app/CAMERA_FIX.md",
     "large_capture_view": "docs/app/LARGE_CAPTURE_VIEW.md",
-    "handoff": "docs/handoffs/app.md"
+    "handoff": "docs/handoffs/app.md",
+    "flutter_alignment": "docs/app/FLUTTER_ALIGNMENT.md"
   },
   "actual_checks": {
     "runtime_tests_passed": 50,
-    "frontend_tests_passed": 17,
+    "frontend_tests_passed": 25,
     "mobile_widget_tests_passed": 1,
-    "flutter_analysis": "No issues found in runtime, frontend and mobile after camera fix",
+    "flutter_analysis": "UI analysis clean for minimal refinement; runtime logic unchanged",
     "contracts": "PASS; schemas, four labelled fixtures, pending references, seven rejected unsafe mutations"
   },
   "remaining_release_work": [

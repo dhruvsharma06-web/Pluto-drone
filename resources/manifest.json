@@ -1,0 +1,5 @@
+{
+  "version": "1.0.0",
+  "resources": [],
+  "notes": "Real drone images, configuration ZIP, model weights, APK and approved website asset pending. Each future resource records id, version, kind, source/rights, sha256, location and access instructions. No secrets. Excluded: pluto-x-glb.zip."
+}

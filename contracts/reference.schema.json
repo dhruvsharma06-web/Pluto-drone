@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reference v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "reference_version",
+    "status",
+    "drone_variant",
+    "front_convention",
+    "source_evidence",
+    "supported_views",
+    "motors"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "reference_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "verified"
+      ]
+    },
+    "drone_variant": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "front_convention": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "supported_views": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "motors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "motor_id",
+          "expected_type",
+          "expected_orientation"
+        ],
+        "properties": {
+          "motor_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_orientation": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

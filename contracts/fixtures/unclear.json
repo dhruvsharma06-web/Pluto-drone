@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "input_id": "fixture-unclear",
+  "status": "unable_to_verify",
+  "evidence_source": "fixture",
+  "reference_version": "fixture-reference-v1",
+  "engine_version": "fixture-only",
+  "all_required_checks_observable": false,
+  "reasons": [
+    "BLUR"
+  ],
+  "motors": [
+    {
+      "motor_id": "FIXTURE_1",
+      "bbox": null,
+      "observed_type": "fixture_type",
+      "expected_type": "fixture_type",
+      "observed_orientation": "fixture_orientation",
+      "expected_orientation": "fixture_orientation",
+      "finding": "unknown",
+      "correction_code": null
+    },
+    {
+      "motor_id": "FIXTURE_2",
+      "bbox": null,
+      "observed_type": "fixture_type",
+      "expected_type": "fixture_type",
+      "observed_orientation": "fixture_orientation",
+      "expected_orientation": "fixture_orientation",
+      "finding": "unknown",
+      "correction_code": null
+    },
+    {
+      "motor_id": "FIXTURE_3",
+      "bbox": null,
+      "observed_type": "fixture_type",
+      "expected_type": "fixture_type",
+      "observed_orientation": "fixture_orientation",
+      "expected_orientation": "fixture_orientation",
+      "finding": "unknown",
+      "correction_code": null
+    },
+    {
+      "motor_id": "FIXTURE_4",
+      "bbox": null,
+      "observed_type": "fixture_type",
+      "expected_type": "fixture_type",
+      "observed_orientation": "fixture_orientation",
+      "expected_orientation": "fixture_orientation",
+      "finding": "unknown",
+      "correction_code": null
+    }
+  ],
+  "elapsed_ms": null
+}

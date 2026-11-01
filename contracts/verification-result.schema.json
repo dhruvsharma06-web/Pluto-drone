@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VerificationResult v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "input_id",
+    "status",
+    "evidence_source",
+    "reference_version",
+    "engine_version",
+    "all_required_checks_observable",
+    "reasons",
+    "elapsed_ms",
+    "motors"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "input_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "incorrect_installation",
+        "unable_to_verify"
+      ]
+    },
+    "evidence_source": {
+      "enum": [
+        "real",
+        "fixture"
+      ]
+    },
+    "reference_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "engine_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "all_required_checks_observable": {
+      "type": "boolean"
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "elapsed_ms": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "motors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "motor_id",
+          "bbox",
+          "observed_type",
+          "expected_type",
+          "observed_orientation",
+          "expected_orientation",
+          "finding",
+          "correction_code"
+        ],
+        "properties": {
+          "motor_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bbox": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 4,
+                "maxItems": 4
+              }
+            ]
+          },
+          "observed_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expected_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observed_orientation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expected_orientation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finding": {
+            "enum": [
+              "match",
+              "mismatch",
+              "unknown"
+            ]
+          },
+          "correction_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

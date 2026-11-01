@@ -1,0 +1,16 @@
+name: inspection_ui
+description: Flutter presentation workspace owned by frontend developer.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  inspection_contract:
+    path: ../inspection_contract
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true

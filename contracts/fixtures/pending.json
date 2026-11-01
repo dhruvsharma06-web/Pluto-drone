@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "input_id": "fixture-pending",
+  "status": "unable_to_verify",
+  "evidence_source": "fixture",
+  "reference_version": null,
+  "engine_version": "fixture-only",
+  "all_required_checks_observable": false,
+  "reasons": [
+    "REFERENCE_NOT_CONFIGURED"
+  ],
+  "motors": [],
+  "elapsed_ms": null
+}

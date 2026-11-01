@@ -9,6 +9,15 @@
       content="An Android app, in development, that checks a disarmed drone's propeller installation from a photo or the live camera and answers Pass, Incorrect Installation or Unable to Verify."
     />
     <meta name="theme-color" content="#050505" />
+    <meta name="color-scheme" content="dark" />
+    <!-- Paint black before any stylesheet arrives: no white flash on load. -->
+    <style>
+      html,
+      body {
+        background: #050505;
+        color: #f3f0f7;
+      }
+    </style>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <script>
       document.documentElement.classList.add('js');

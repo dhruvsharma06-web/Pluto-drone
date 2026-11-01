@@ -4,9 +4,14 @@ import '@fontsource-variable/playfair-display/wght-italic.css';
 import './styles.css';
 import { initDemo } from './demo/demo';
 import { mountExplore } from './explore';
+import { mountSplashCursor } from './splash-cursor';
 import { mountStage } from './stage';
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Every load starts at the opening scene, so the assembly is what you see first.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+if (!location.hash) window.scrollTo(0, 0);
 
 // Entry: the drone assembles first on a clean stage; the opening copy arrives
 // once it has locked together. Safety net so text never stays hidden.
@@ -28,3 +33,17 @@ document.querySelectorAll('.scene').forEach((scene) =>
 initDemo(reducedMotion);
 mountStage(reducedMotion);
 mountExplore(reducedMotion);
+
+// Fluid ink cursor in the site's purple palette (fine pointers only).
+if (!reducedMotion && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  mountSplashCursor({
+    colors: ['#5a1fa8', '#8a5cd6', '#b79cf0'],
+    intensity: 0.85,
+    size: 0.9,
+    swirl: 3,
+    trail: 0.9,
+    intro: false,
+    quality: 'medium',
+    zIndex: 20,
+  });
+}

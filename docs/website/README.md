@@ -13,4 +13,6 @@ Design decisions (current, 2026-11-01):
 - Lighting and atmosphere: a gloss-black schematic drone, a gliding white key light, slow-breathing violet rim lights, and shader-based stage fog. The fog is domain-warped noise in a deep purple (#2B0B55): it hugs the floor, billows upward and evolves slowly, like smoke-machine haze.
 - The opening assembles the drone from its parts before the headline appears. "Taken apart" separates it in stages with part labels.
 - Results are told apart by glyph and shape (white ✓ circle, purple ✕ square, grey dashed ? ring) and their exact labels.
-- Flight scene uses a custom reticle cursor (rotating dashed ring, glides after the pointer); the fog reads as soft mist that climbs from the floor.
+- Cursors: a site-wide custom cursor (black core, purple ring, white centre; larger ring over links/buttons) and a fluid "ink" trail (`src/splash-cursor.ts`, a plain-TypeScript port of the SplashCursor component the frontend owner supplied; WebGL2 stable-fluids, purple palette, click bursts, off for reduced motion and touch). Licence of the original component should be confirmed by the owner.
+- Load sequence: black is painted inline before CSS arrives; the static drawing appears only if 3D fails; reloads start at the top, so a load always goes black → parts flying in.
+- Flight scene uses a custom reticle cursor (purple rotating dashed ring with a black core, glides after the pointer); the fog reads as soft mist that climbs from the floor.

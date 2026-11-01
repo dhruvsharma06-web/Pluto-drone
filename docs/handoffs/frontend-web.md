@@ -1,3 +1,9 @@
+## Centered pill navigation and cleanup — 1 November 2026
+
+User-authorized scoped refinement on frontend/website: centered transparent header with active-dot pills, original drone mark, purple Source CTA; rounded unnumbered Explore tabs/cards/tools; removed projected model text; simplified Project and footer. The 3D stage/viewer/cursor source files and scroll/animation timing remain unchanged. No React dependency or other-branch merge.
+
+npm run check passes (TypeScript, 8 tests, production build); diff whitespace clean. Browser renders reviewed at 1440/768/390px using the installed Taste inspector. General design audit retains existing site-wide/reveal findings; no manual click-through or physical-device check claimed. Full changes, render critique and limits: docs/website/PILL_NAV.md. Source commit recorded in the follow-up below. Untracked Flutter files left untouched; no push/deployment.
+
 # Person 2 (you): website UI with Claude: handoff
 
 Branch: `frontend/website` (based on `78c704b`). Exact commit: see `git log -1 origin/frontend/website`; the commit that added this file is recorded in `docs/status/frontend-web.md`.

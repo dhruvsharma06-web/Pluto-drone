@@ -10,7 +10,6 @@ import type { DroneViewer, ViewName } from './viewer/viewer';
 
 interface Component {
   id: PartKind | 'all';
-  no: string;
   name: string;
   sub: string;
   pose: Pose;
@@ -24,7 +23,6 @@ interface Component {
 const COMPONENTS: Component[] = [
   {
     id: 'all',
-    no: '00',
     name: 'Whole drone',
     sub: 'Airframe',
     pose: { az: 32, el: 26, dist: 0.8, target: null, explode: 0, focus: null },
@@ -41,7 +39,6 @@ const COMPONENTS: Component[] = [
   },
   {
     id: 'body',
-    no: '01',
     name: 'Body shell',
     sub: 'Locates the drone',
     pose: { az: 64, el: 30, dist: 0.62, target: 'body', explode: 0, focus: 'body' },
@@ -57,7 +54,6 @@ const COMPONENTS: Component[] = [
   },
   {
     id: 'arm',
-    no: '02',
     name: 'Arms',
     sub: 'Carry the motors',
     pose: { az: -58, el: 38, dist: 0.82, target: null, explode: 0.55, focus: 'arm' },
@@ -73,7 +69,6 @@ const COMPONENTS: Component[] = [
   },
   {
     id: 'motor',
-    no: '03',
     name: 'Motors',
     sub: 'Inspection points',
     pose: { az: 18, el: 22, dist: 0.52, target: 'motor0', explode: 0, focus: 'motor' },
@@ -90,7 +85,6 @@ const COMPONENTS: Component[] = [
   },
   {
     id: 'propeller',
-    no: '04',
     name: 'Propellers',
     sub: 'The question',
     pose: { az: 44, el: 26, dist: 0.4, target: 'prop0', explode: 0, focus: 'propeller' },
@@ -134,7 +128,6 @@ export function mountExplore(reducedMotion: boolean) {
     b.className = 'tab';
     b.id = `tab-${c.id}`;
     b.setAttribute('role', 'tab');
-    b.dataset.no = c.no;
     b.innerHTML = `<b>${c.name}</b><i>${c.sub}</i>`;
     b.addEventListener('click', () => select(i));
     b.addEventListener('keydown', (e) => {
@@ -154,7 +147,6 @@ export function mountExplore(reducedMotion: boolean) {
     const fill = () => {
       detail.classList.remove('leaving');
       detail.innerHTML = `
-        <p class="eyebrow" style="--i:0">Component · ${c.no}</p>
         <h3 style="--i:1">${c.name}<em>${c.sub}</em></h3>
         <p class="tags" style="--i:2">${c.tags.map((t) => `<span>${t}</span>`).join('')}</p>
         <p class="lede" style="--i:3">${c.lede}</p>

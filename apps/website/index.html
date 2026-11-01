@@ -67,13 +67,6 @@
         <svg viewBox="-180 -180 360 360"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /></svg>
       </div>
       <div class="stage__canvas" data-canvas></div>
-      <div class="stage__tags" aria-hidden="true">
-        <span class="tag" data-anchor="body" data-land="body" data-scene="apart">Body shell</span>
-        <span class="tag" data-anchor="arm1" data-land="arm" data-scene="apart">Arms</span>
-        <span class="tag" data-anchor="motor3" data-land="motor" data-scene="apart">Motors</span>
-        <span class="tag" data-anchor="propTip0" data-land="propeller" data-scene="apart">Propellers</span>
-        <span class="tag" data-anchor="propTip0" data-scene="propeller">Resting angle — never an error</span>
-      </div>
       <figcaption class="visually-hidden">Illustrative schematic drone, drawn in code. Not the supplied drone's measured geometry or motor map.</figcaption>
       <p class="visually-hidden" role="status" data-viewer-status></p>
     </figure>
@@ -87,9 +80,13 @@
     </div>
 
     <header class="bar">
-      <a class="wordmark" href="#hero" aria-label="Pluto Inspector, back to top">Pluto <em>Inspector</em></a>
-      <nav aria-label="Sections">
+      <a class="wordmark" href="#hero" aria-label="Pluto Inspector, back to top">
+        <img src="/drone-mark.svg" width="40" height="40" alt="" />
+        <span>Pluto <em>Inspector</em></span>
+      </a>
+      <nav class="pill-nav" aria-label="Sections">
         <ul>
+          <li><a href="#hero" aria-current="page">Home</a></li>
           <li><a href="#apart">Drone</a></li>
           <li><a href="#how">How it works</a></li>
           <li><a href="#results">Results</a></li>
@@ -119,7 +116,7 @@
           <p class="lede" data-in>Point the app at a disarmed drone. It checks every propeller against the verified reference and tells you what to fix.</p>
           <div class="cta" data-in>
             <a class="btn-pill" href="#how">How it works</a>
-            <a class="btn-link" href="#explore">Inspect the drone <span aria-hidden="true">›</span></a>
+            <a class="btn-pill btn-pill--secondary" href="#explore">Inspect the drone <span aria-hidden="true">›</span></a>
           </div>
         </div>
         <p class="note" data-in>Drone shown is an illustrative schematic.</p>
@@ -298,38 +295,29 @@
 
       <!-- 7. Project: architecture, evidence, resources, team -->
       <section class="scene scene--project" id="project" data-scene="project" aria-labelledby="project-title">
-        <h2 id="project-title" class="title" data-in>Built <em>honestly.</em></h2>
+        <h2 id="project-title" class="title" data-in>The <em>project.</em></h2>
         <div class="project__grid" data-in>
           <div>
-            <h3>Architecture</h3>
-            <ol class="arch">
-              <li><b>App screens</b><code>packages/inspection_ui</code></li>
-              <li><b>Camera and Android runtime</b><code>packages/inspection_runtime</code></li>
-              <li class="arch__core"><b>Vision and verification core</b><code>vision/ · ml/</code></li>
-              <li><b>Verified reference</b><code>reference/config</code></li>
-              <li><b>Shared contract v1.0.0</b><code>contracts/</code></li>
-            </ol>
+            <h3>One check. Three parts.</h3>
+            <p>The Flutter app captures the image. The vision core compares each propeller with a verified reference. The result explains what needs attention.</p>
+            <a class="btn-pill btn-pill--secondary" href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/ARCHITECTURE.md" rel="noopener">Architecture <svg class="ico"><use href="#i-arrow" /></svg></a>
           </div>
           <div>
-            <h3>Evidence</h3>
-            <p class="big">Pending.</p>
-            <p>Accuracy and timing will be published after testing on real photos of the supplied drone. Nothing here is estimated.</p>
-            <p class="limits">Limits: blur, low light, hidden arms, unsupported views, details one photo can't show.</p>
+            <h3>Validation pending</h3>
+            <p>Accuracy and timing will be published after testing on real photos of the supplied drone.</p>
+            <p class="muted">APK, dataset and validation downloads will be linked when released.</p>
           </div>
           <div>
-            <h3>Resources</h3>
+            <h3>Explore the source</h3>
             <ul class="links">
-              <li><a href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">Source code <svg class="ico"><use href="#i-arrow" /></svg></a></li>
-              <li><a href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/ARCHITECTURE.md" rel="noopener">Architecture <svg class="ico"><use href="#i-arrow" /></svg></a></li>
+              <li><a href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">Repository <svg class="ico"><use href="#i-arrow" /></svg></a></li>
               <li><a href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/CONTRACT.md" rel="noopener">Result contract <svg class="ico"><use href="#i-arrow" /></svg></a></li>
             </ul>
-            <p class="muted">Downloads, dataset and validation report will be linked here.</p>
           </div>
         </div>
         <footer class="foot" data-in>
           <p class="foot__mark">Pluto <em>Inspector</em></p>
-          <p class="foot__team">Research · App interface &amp; website · Runtime &amp; integration · Vision &amp; evaluation</p>
-          <p class="foot__safe">Inspect disarmed, motors stopped. A Pass is a visual check, not flight clearance. Drone shown is an illustrative schematic.</p>
+          <p class="foot__safe">Inspect disarmed, motors stopped. A Pass is a visual check, not flight clearance. Drone shown is illustrative.</p>
         </footer>
       </section>
     </main>

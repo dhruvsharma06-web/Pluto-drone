@@ -18,6 +18,12 @@ jobs:
           flutter pub get --enforce-lockfile
           flutter analyze
           flutter test
+      - name: Integrated Flutter UI checks
+        working-directory: packages/inspection_ui
+        run: |
+          flutter pub get --enforce-lockfile
+          flutter analyze
+          flutter test
       - name: Mobile analysis and tests
         working-directory: apps/mobile
         run: |

@@ -24,7 +24,7 @@ Shared methods and `InspectionApp(controller:, cameraPreview:)` are unchanged. T
 
 Live sampling always abstains from verified status until a tracking/observability protocol is agreed. Proposed reason `LIVE_TRACKING_UNAVAILABLE` is an app-local stable string, allowed by v1; producer/consumer review is pending. `elapsed_ms` is measured to result construction: live begins before camera capture/file read; upload begins after selected bytes become available and after any queue wait. Upload excludes picker interaction and file read. Neither value includes Flutter raster/display latency; full device capture-to-visible-result measurement is still required. No FPS or device latency is claimed.
 
-Frontend next: render `state.image` for upload findings, use the injected preview, wire Stop to `stopLive`, keep loading/device errors separate, and replace the baseline button labels that still say pending. Keep synthetic demos persistently labelled fixture. Layout remains frontend-owned.
+Frontend `4c28f73` is now merged into `app/runtime` at the user's explicit request. It renders `state.image`/findings, consumes the injected preview and wires Stop to `stopLive`. Integrated UI tests pass; verify permission-prompt/lifecycle behavior on the connected phone once ADB is authorized. Keep synthetic demos persistently labelled fixture. Layout remains frontend-owned.
 
 ## ML proof required before final integration
 

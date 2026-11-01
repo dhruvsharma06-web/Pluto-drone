@@ -1,6 +1,6 @@
 # App/runtime candidate
 
-Workstream `app/runtime`; shared contract v1.0.0. UI widgets remain frontend-owned. This is local acquisition and safety infrastructure, **not a functioning propeller detector**. Real reference, Android inference, real dataset, phone validation and end-stage branch integration are still required.
+Workstream `app/runtime`; shared contract v1.0.0. Latest `frontend/flutter` (`4c28f73`) merged at the user's explicit request into `app/runtime` as `0f9c249`. UI widgets remain frontend-owned. This is integrated UI, local acquisition and safety infrastructure, **not a functioning propeller detector**. Real reference, Android inference, real dataset, phone validation and remaining end-stage branch integration are still required.
 
 ## Reproduce
 
@@ -45,6 +45,6 @@ The index script records the current HEAD and dirty state; run it immediately af
 
 ## Honest demo now
 
-Explain disarm/stopped-motor procedure → confirm → choose a supported upload or start sampled camera input → show **Unable to Verify** due to pending reference/engine → withdraw confirmation/background and show cleared results. Frontend baseline labels still say pending. Do not show a synthetic Pass as production output. After the exact real drone/reference and Android engine arrive, use the device checklist for correct/incorrect/unclear examples and record evidence on the exact final APK.
+Explain disarm/stopped-motor procedure → confirm → choose a supported upload or start sampled camera input → show **Unable to Verify** due to pending reference/engine → stop/withdraw confirmation/background and show cleared results. The merged frontend includes upload evidence rendering, safety flow and Stop controls. Do not show a synthetic Pass as production output. After the exact real drone/reference and Android engine arrive, use the device checklist for correct/incorrect/unclear examples and record evidence on the exact final APK.
 
-Keep all role branches independent. Planning estimates remain first round 14:33 IST / second 17:33 IST on 1 November 2026; official times are unconfirmed. Target integration windows approximately 13:03 / 16:03 IST or earlier only with agreed ready handoffs. This work did not merge teammate branches, push, deploy or publish.
+The user explicitly authorized the frontend Flutter merge into `app/runtime`; other role branches remain independent. Planning estimates remain first round 14:33 IST / second 17:33 IST on 1 November 2026; official times are unconfirmed. Target remaining integration windows approximately 13:03 / 16:03 IST or earlier with agreed handoffs. No push, deployment or publication was performed by this work.

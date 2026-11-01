@@ -1,5 +1,15 @@
 # Runtime validation — 1 November 2026
 
+## Latest combined frontend/runtime candidate
+
+At the user's explicit request, `frontend/flutter` (`4c28f735d6a0ec0f1c07f8a3d04db9e413fdf55c`) was fetched and merged without conflicts into `app/runtime`: **`0f9c249faeb876f5e6d63d63f20959cf6c1096cc`**. No other role branch was merged and no push/publication was performed. This supersedes the original frontend-baseline and independent-branch statements below.
+
+Actual post-merge checks: UI `flutter analyze` clean and **14 tests passed**; mobile analysis clean and **1 widget test passed**; runtime **46 tests passed**; contract checks passed. `flutter pub get --enforce-lockfile` succeeded for UI/mobile. Built release-mode arm64 APK: **17,969,237 bytes**, SHA-256 **`e290b046ad624ccd78bff6983f751d4ded8ba689aacb2056994208a6282943a2`**. `apksigner` verifies v2; `aapt` reports arm64-v8a only, API24 minimum/API36 target, CAMERA/ACCESS_NETWORK_STATE/app-scoped receiver permission. Actual merged APK metadata is in `apk.json`; previous artifact hashes below are historical.
+
+Windows detects the USB-connected Samsung phone, but ADB still lists no devices. The user is fixing debugging setup while merge/build checks complete. No app installation, phone screenshot, camera/permission/lifecycle validation, Android version or on-device timing has been recorded. Full detector/reference remain absent; expected production status remains Unable to Verify. No design changes were made to the frontend during integration; its supplied layout/assets were preserved.
+
+## Original runtime-only candidate evidence
+
 Branch `app/runtime`. Runtime source commit: `e06f4362fc8eb73bbbbf0cb94ee31bebfc3b3ac4` (implementation `03166f6`, ignore correction `fbd43fc`, release packaging fixes `fa908db` / `e06f436`). Later documentation/index commits do not change runtime source. Host Windows; Flutter 3.47.9 stable / Dart 3.13.7; JDK 21.0.12. Temporary local SDKs/caches were installed, without committing their paths or binaries.
 
 ## Actual automated results

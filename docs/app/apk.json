@@ -1,19 +1,21 @@
 {
   "artifact": "pluto-inspector-runtime-candidate",
   "version": "0.1.0+1",
-  "source_commit": "1dbe0b783de3c28c063d56e62c1e466fa6c5b850",
-  "working_tree_dirty_at_index": true,
+  "source_commit": "d578cdc2044184dc661a1d2d4723edf1c3656b78",
+  "working_tree_dirty_at_index": false,
   "location": "apps/mobile/build/app/outputs/flutter-apk/app-release.apk",
-  "sha256": "892fc40b3398d7094f8e8b8ad66cab3e42659e223e8b4ea160e8f312410202cd",
-  "bytes": 18558929,
+  "sha256": "1d84d267336de7d722625c7d0f0fb3dd842210a03c50821f30f1e0362e49dc74",
+  "bytes": 18427797,
   "signing": "Android debug identity; hackathon sideload only",
   "abi": "arm64-v8a",
   "minimum_android_api": 24,
-  "physical_device_tested": false,
+  "physical_device_tested": true,
   "detector_integrated": false,
   "reference_version": "pending",
   "dataset": null,
   "model": null,
   "access": "Local build; no shared release uploaded",
-  "rights": "Team source; third-party notices retained in APK. Repository licence undecided."
+  "rights": "Team source; third-party notices retained in APK. Repository licence undecided.",
+  "physical_device_test_scope": "Installed and launched on Samsung SM-S731B; typography visually checked in local Flutter renders. Camera and inference were not retested.",
+  "physical_device_report": "docs/app/FLUTTER_ALIGNMENT.md"
 }

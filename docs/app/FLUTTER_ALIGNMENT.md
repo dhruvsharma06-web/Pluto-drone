@@ -30,3 +30,19 @@ Downloaded 1 November 2026 from official Google Fonts:
 - https://github.com/google/fonts/tree/main/ofl/playfairdisplay — PlayfairDisplay[wght].ttf, PlayfairDisplay-Italic[wght].ttf and OFL.txt.
 
 Filenames simplified; font bytes unmodified. OFL notices accompany fonts and are bundled. No new runtime dependency. Impeccable guided native hierarchy/accessibility; Emil guided limited motion/feedback; Taste informed app composition, with the supplied palette/type/hairlines taking precedence. Browser-only inspectors were not used to claim native validation.
+
+## Minimal rounded refinement — 1 November 2026
+
+Visual-only refinement: separate pill-shaped input choices, shorter repeated helper copy, softer result/sheet corners, and motor details in the existing Where/Why/Correction sheet. Safety confirmation, exact result labels, fixture disclosures, error guidance and runtime logic are preserved. Existing colours/fonts/brand retained; no reference colours or business content copied. Motor sheets reopen on repeated taps and still close immediately when invalidated.
+
+UI analysis clean; all 25 tests passed, plus the extended sheet reopening check. Responsive checks cover 320/390/768/1440px at 1.0x/1.5x. Updated local phone start/result renders inspected. ADB lists no connected device, so updated hardware testing/installation is pending. Impeccable and Emil guided hierarchy, touch targets and restrained feedback. APK/source provenance is recorded in docs/app/FLUTTER_ALIGNMENT.md.
+
+Final APK built from clean source 67275ac59d4f31734111f8bfff55776ab6f18e66: 18427797 bytes; SHA256 f8e7adbbdefbeb4ac9a41890f78861cd833057f5f5b60576198bee76123c10d0. Android signature verified. APK path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk. App-level fail-closed test passed (1/1). Phone disconnected; installation remains pending.
+
+## Calmer typography — 1 November 2026
+
+User found the text overwhelming. Switched current headings to Inter, reduced headline 34→28sp, body/controls 17→16sp, softened title/safety weights, and simplified the start heading to “Inspect your drone.” Shortened only the illustration helper disclosure. Palette, rounded controls, safety meaning, result labels, camera and runtime logic unchanged. Impeccable/Emil guidance applied to hierarchy and readability.
+
+UI analysis clean; all 25 UI tests pass, including four widths and 1.0x/1.5x text. Local 390px normal and 320px enlarged-text renders inspected. Device connected; updated APK installation recorded in the artifact follow-up.
+
+Typography APK source d578cdc2044184dc661a1d2d4723edf1c3656b78, SHA256 1d84d267336de7d722625c7d0f0fb3dd842210a03c50821f30f1e0362e49dc74. Signature verified; installed with data retained and launched successfully on Samsung SM-S731B. Native typography appearance/camera/inference not separately retested.

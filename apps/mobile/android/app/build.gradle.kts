@@ -55,3 +55,8 @@ flutter {
 dependencies {
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.20.0")
 }
+
+// Google Sign-In: applied only once the Firebase config is downloaded into android/app/.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}

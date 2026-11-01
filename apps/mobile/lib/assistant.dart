@@ -7,8 +7,13 @@ import 'package:http/http.dart' as http;
 import 'package:inspection_contract/inspection_contract.dart';
 import 'package:inspection_runtime/inspection_runtime.dart';
 
+import 'login.dart';
+
 /// Supplied at build time: --dart-define=GEMINI_API_KEY=... (never committed).
 const _geminiKey = String.fromEnvironment('GEMINI_API_KEY');
+
+/// Cloud Run explain proxy (holds the Gemini key server-side). Preferred when set.
+const _proxyUrl = String.fromEnvironment('EXPLAIN_PROXY_URL');
 /// Tried in order; Gemini returns 503 under load, so fall through to the next.
 const _geminiModels = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
 
@@ -50,8 +55,7 @@ String spokenSummary(VerificationResult r) {
 }
 
 Future<String> explainWithGemini(VerificationResult r) async {
-  if (_geminiKey.isEmpty) return spokenSummary(r);
-  final facts = jsonEncode({
+  final summary = {
     'status': r.status.name,
     'reasons': r.reasons,
     'motors': [
@@ -63,7 +67,22 @@ Future<String> explainWithGemini(VerificationResult r) async {
           'finding': m['finding'],
         }
     ],
-  });
+  };
+  if (_proxyUrl.isNotEmpty) {
+    final token = await idToken();
+    final res = await http
+        .post(Uri.parse('$_proxyUrl/explain'),
+            headers: {
+              'Content-Type': 'application/json',
+              if (token != null) 'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(summary))
+        .timeout(const Duration(seconds: 30));
+    if (res.statusCode != 200) throw Exception('proxy ${res.statusCode}');
+    return (jsonDecode(res.body) as Map<String, dynamic>)['text'] as String;
+  }
+  if (_geminiKey.isEmpty) return spokenSummary(r);
+  final facts = jsonEncode(summary);
   final prompt = 'You are the assistant in a Pluto mini-drone propeller '
       'inspection app. The on-device detector produced this result: $facts. '
       'Explain to a beginner, in under 120 words, what the result means and '
@@ -179,8 +198,8 @@ class _AssistantLayerState extends State<AssistantLayer> {
         widget.child,
         if (r != null)
           Positioned(
-            right: 16,
-            bottom: 96,
+            right: 14,
+            bottom: 92,
             child: SafeArea(
               child: Material(
                 color: Colors.transparent,
@@ -196,20 +215,24 @@ class _AssistantLayerState extends State<AssistantLayer> {
                           border: Border.all(color: const Color(0x5539D7E6))),
                       child: SingleChildScrollView(
                           child: Text(_explanation!,
-                              style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4))),
+                              style: const TextStyle(color: Colors.white, fontSize: 13.5, height: 1.5, fontFamily: 'InspectionSans'))),
                     ),
                   Row(mainAxisSize: MainAxisSize.min, children: [
-                    _Pill(
-                        icon: _voice ? Icons.volume_up : Icons.volume_off,
-                        label: _voice ? 'Voice on' : 'Voice off',
-                        onTap: () {
-                          setState(() => _voice = !_voice);
-                          if (!_voice) unawaited(_tts.stop());
-                        }),
-                    const SizedBox(width: 8),
-                    _Pill(
-                        icon: Icons.auto_awesome,
-                        label: _loading ? 'Thinking…' : (_explanation == null ? 'Explain' : 'Hide'),
+                    if (_explanation != null) ...[
+                      _Round(
+                          icon: _voice ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                          tooltip: _voice ? 'Mute voice' : 'Unmute voice',
+                          onTap: () {
+                            setState(() => _voice = !_voice);
+                            if (!_voice) unawaited(_tts.stop());
+                          }),
+                      const SizedBox(width: 8),
+                    ],
+                    _Round(
+                        icon: _loading
+                            ? Icons.hourglass_top_rounded
+                            : (_explanation == null ? Icons.auto_awesome : Icons.close_rounded),
+                        tooltip: _explanation == null ? 'Explain result' : 'Close',
                         onTap: _loading
                             ? null
                             : () => _explanation == null
@@ -225,25 +248,24 @@ class _AssistantLayerState extends State<AssistantLayer> {
   }
 }
 
-class _Pill extends StatelessWidget {
-  const _Pill({required this.icon, required this.label, this.onTap});
+class _Round extends StatelessWidget {
+  const _Round({required this.icon, required this.tooltip, this.onTap});
   final IconData icon;
-  final String label;
+  final String tooltip;
   final VoidCallback? onTap;
   @override
-  Widget build(BuildContext context) => InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-              color: const Color(0xFF39D7E6), borderRadius: BorderRadius.circular(24)),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 18, color: Colors.black),
-            const SizedBox(width: 6),
-            Text(label,
-                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
-          ]),
+  Widget build(BuildContext context) => Tooltip(
+        message: tooltip,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(color: Color(0xFFEDE7F6), shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Color(0x66000000), blurRadius: 10)]),
+            child: Icon(icon, size: 22, color: const Color(0xFF1B1424)),
+          ),
         ),
       );
 }

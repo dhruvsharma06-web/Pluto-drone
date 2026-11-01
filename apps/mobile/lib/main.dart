@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+
+import 'login.dart';
 import 'runtime_application.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const RuntimeApplication());
+  await initFirebase();
+  runApp(const LoginGate(child: RuntimeApplication()));
 }

@@ -191,7 +191,7 @@ class _EmptyCanvas extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 14.5,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -203,7 +203,7 @@ class _EmptyCanvas extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xffb9c3cd),
-                fontSize: 15,
+                fontSize: 13.5,
                 height: 1.5,
               ),
             ),

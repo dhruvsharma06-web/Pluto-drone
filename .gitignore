@@ -39,3 +39,4 @@ datasets/**/*.heic
 runs/
 *.pt
 *.onnx
+apps/mobile/android/app/google-services.json

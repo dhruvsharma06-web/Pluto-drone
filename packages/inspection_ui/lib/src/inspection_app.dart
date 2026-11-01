@@ -311,7 +311,7 @@ class _InspectionShellState extends State<_InspectionShell>
               const Flexible(
                   child: Text('Pluto Inspector',
                       style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
                           letterSpacing: -.3))),
             ])),
@@ -409,7 +409,7 @@ class _DemoNotice extends StatelessWidget {
                             child: Text('Demo · Simulated results',
                                 style: TextStyle(
                                     color: c.caution,
-                                    fontSize: 15,
+                                    fontSize: 13.5,
                                     fontWeight: FontWeight.w500)))
                       ]),
                       if (controls != null)
@@ -618,7 +618,7 @@ class _ResultSummary extends StatelessWidget {
               Expanded(
                   child: Text(text,
                       style: TextStyle(
-                          color: c.onSurface, height: 1.5, fontSize: 16))),
+                          color: c.onSurface, height: 1.5, fontSize: 14.5))),
             ])));
   }
 }
@@ -663,7 +663,7 @@ class _MotorFindings extends StatelessWidget {
       if (motors.isNotEmpty)
         Text(
             '${motors.where((m) => m['finding'] == 'match').length} of ${motors.length} visible findings match',
-            style: TextStyle(color: c.onSurfaceVariant, fontSize: 15)),
+            style: TextStyle(color: c.onSurfaceVariant, fontSize: 13.5)),
       const SizedBox(height: 12),
       for (final motor in motors)
         if (motorText(motor, 'motor_id') case final String id)
@@ -687,9 +687,9 @@ class _MotorFindings extends StatelessWidget {
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 16, vertical: 4),
                                     onTap: () => onSelect(id),
-                                    title: Text(id,
+                                    title: Text(motorLabel(id),
                                         style: const TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.w500)),
                                     subtitle: Text(switch (motor['finding']) {
                                       'match' => 'Matches reference',

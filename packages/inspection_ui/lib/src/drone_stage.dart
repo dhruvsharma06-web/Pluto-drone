@@ -83,7 +83,7 @@ class _DroneStageState extends State<DroneStage>
         const Text("Illustration only · not a reference model",
             textAlign: TextAlign.center,
             style:
-                TextStyle(color: inspectionMuted, fontSize: 14, height: 1.4)),
+                TextStyle(color: inspectionMuted, fontSize: 12.5, height: 1.4)),
       ]);
 }
 

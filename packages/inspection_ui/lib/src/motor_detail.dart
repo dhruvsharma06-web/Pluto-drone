@@ -14,7 +14,7 @@ class MotorDetail extends StatelessWidget {
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
             Expanded(
-                child: Text(motorText(motor, 'motor_id') ?? 'Motor guidance',
+                child: Text(motorName(motor, 'Motor guidance'),
                     style: Theme.of(context).textTheme.titleLarge)),
             IconButton(
                 tooltip: 'Close guidance',
@@ -27,7 +27,7 @@ class MotorDetail extends StatelessWidget {
                 child: Text('Demo · Simulated results',
                     style: TextStyle(color: inspectionMuted))),
           for (final row in [
-            ('Where', motorText(motor, 'motor_id') ?? 'Position not supplied'),
+            ('Where', motorName(motor, 'Position not supplied')),
             (
               'Why',
               'Observed: ${motorText(motor, 'observed_type') ?? 'Unknown'}. '

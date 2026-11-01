@@ -92,6 +92,17 @@ String reasonGuidance(String reason) => switch (reason) {
         'This image could not be verified. Retake it with every propeller clearly visible.',
     };
 
+/// Human label for a motor id: `front_left` -> `Front left`.
+String motorLabel(String id) {
+  final words = id.replaceAll('_', ' ').trim();
+  return words.isEmpty ? id : words[0].toUpperCase() + words.substring(1);
+}
+
+String motorName(Map<String, Object?> motor, String fallback) {
+  final id = motorText(motor, 'motor_id');
+  return id == null ? fallback : motorLabel(id);
+}
+
 String? motorText(Map<String, Object?> motor, String field) {
   final v = motor[field];
   return v is String && v.trim().isNotEmpty ? v : null;

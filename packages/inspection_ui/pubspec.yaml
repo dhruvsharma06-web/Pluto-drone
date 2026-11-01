@@ -21,12 +21,14 @@ flutter:
   fonts:
     - family: InspectionSans
       fonts:
-        - asset: assets/fonts/Inter.ttf
+        - asset: assets/fonts/Manrope.ttf
           weight: 400
-        - asset: assets/fonts/Inter.ttf
+        - asset: assets/fonts/Manrope.ttf
           weight: 500
-        - asset: assets/fonts/Inter.ttf
+        - asset: assets/fonts/Manrope.ttf
           weight: 600
+        - asset: assets/fonts/Manrope.ttf
+          weight: 700
     - family: InspectionDisplay
       fonts:
         - asset: assets/fonts/PlayfairDisplay.ttf

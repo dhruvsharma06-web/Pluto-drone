@@ -50,13 +50,17 @@ ThemeData inspectionTheme(Brightness brightness) {
   );
   final base =
       ThemeData(useMaterial3: true, colorScheme: c, fontFamily: inspectionSans);
-  TextStyle type(double size, [FontWeight weight = FontWeight.w400]) =>
+  // Calm scale: smaller body, softer body colour, tighter headings.
+  TextStyle type(double size,
+          [FontWeight weight = FontWeight.w400, Color? color]) =>
       TextStyle(
           fontFamily: inspectionSans,
           fontSize: size,
-          height: 1.4,
+          height: 1.45,
+          letterSpacing: size >= 18 ? -0.2 : 0,
           fontWeight: weight,
-          color: inspectionInk);
+          color: color ?? inspectionInk);
+  final soft = inspectionInk.withValues(alpha: .78);
   final focusSide = WidgetStateProperty.resolveWith<BorderSide>((states) =>
       states.contains(WidgetState.focused)
           ? const BorderSide(color: inspectionAccent, width: 2)
@@ -89,19 +93,20 @@ ThemeData inspectionTheme(Brightness brightness) {
     textTheme: base.textTheme.copyWith(
       headlineSmall: const TextStyle(
           fontFamily: inspectionSans,
-          fontSize: 28,
+          fontSize: 26,
           height: 1.2,
-          fontWeight: FontWeight.w500,
+          letterSpacing: -0.5,
+          fontWeight: FontWeight.w600,
           color: inspectionInk),
-      titleLarge: type(22, FontWeight.w500),
-      titleMedium: type(20, FontWeight.w500),
-      titleSmall: type(16, FontWeight.w500),
-      bodyLarge: type(17),
-      bodyMedium: type(16),
-      bodySmall: type(15),
-      labelLarge: type(16, FontWeight.w500),
-      labelMedium: type(15, FontWeight.w500),
-      labelSmall: type(14),
+      titleLarge: type(19, FontWeight.w600),
+      titleMedium: type(17, FontWeight.w600),
+      titleSmall: type(15, FontWeight.w600),
+      bodyLarge: type(15, FontWeight.w400, soft),
+      bodyMedium: type(14, FontWeight.w400, soft),
+      bodySmall: type(13, FontWeight.w400, soft),
+      labelLarge: type(15, FontWeight.w600),
+      labelMedium: type(14, FontWeight.w500),
+      labelSmall: type(12.5, FontWeight.w500),
     ),
     appBarTheme: AppBarTheme(
         backgroundColor: inspectionGround,

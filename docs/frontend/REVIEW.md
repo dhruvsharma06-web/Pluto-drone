@@ -14,3 +14,13 @@ Motion verdict: Approve the authored UI motion at source level. Only pointer pre
 Native adaptations: DOM/h1/CSS inspect scripts do not audit Flutter's native render tree; native widget/layout checks and raster review used instead. Impeccable context launcher could not install its engine; project context read directly. Finish review/documentation performed inline; no claim of independent subagent review or comp-led approval.
 
 Final visual assessment: task hierarchy, geometry, status semantics, opacity/contrast, resource honesty and responsive reflow are satisfactory for the frontend handoff. Remaining: actual camera/data/core integration; physical Android/system-font/gesture validation; final supplied reference. No numerical aesthetic or model-quality score is invented.
+
+## Latest monochrome and findings review
+
+| Before | After | Why |
+|---|---|---|
+| Earlier coloured design | True black/white authored UI and launcher | Follow latest user direction |
+| Status-only overlays | Issue box opens Where/Why/Correction | Connect the affected image region to the model finding |
+| Detail could outlive its inspection | Sheet dismisses on new result/processing or invalidation | Keep explanations attached to the analyzed input |
+
+Latest motion review: direct manipulation follows the pointer immediately, returns with a restrained ease, and stops under reduced motion. Scan line is processing-only; no rotor animation. Overlay coordinates and finding text update without decorative animation. Native bottom sheet owns its transition, drag and Back behavior. Reviewed actual test renders and passed all 18 checks; hardware motion performance remains pending.

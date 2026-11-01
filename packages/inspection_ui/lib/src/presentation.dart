@@ -60,9 +60,9 @@ VerificationResult? displayedResult(InspectionState state) {
 
 String reasonGuidance(String reason) => switch (reason) {
       'REFERENCE_NOT_CONFIGURED' =>
-        'The supplied drone reference is needed before installation can be verified.',
+        'Load the supplied drone reference to verify installation.',
       'ENGINE_UNAVAILABLE' =>
-        'The inspection service is not available. Try again when it is connected.',
+        'Inspection unavailable. Try again or choose a photo.',
       'SAFETY_NOT_CONFIRMED' =>
         'Confirm the drone is disarmed and all motors have stopped before inspecting.',
       'BLUR' => 'Hold the camera steady or choose a sharper photo.',
@@ -95,6 +95,25 @@ String reasonGuidance(String reason) => switch (reason) {
 String? motorText(Map<String, Object?> motor, String field) {
   final v = motor[field];
   return v is String && v.trim().isNotEmpty ? v : null;
+}
+
+/// Explain only supplied observations; never infer an unseen installation fault.
+String motorWhy(Map<String, Object?> motor) {
+  if (motor['finding'] == 'unknown')
+    return 'This part could not be verified from the image.';
+  if (motor['finding'] == 'match')
+    return 'The visible checks match the supplied reference.';
+  final differences = <String>[];
+  for (final field in ['type', 'orientation']) {
+    final observed = motorText(motor, 'observed_$field');
+    final expected = motorText(motor, 'expected_$field');
+    if (observed != null && expected != null && observed != expected)
+      differences.add(
+          '${field == 'type' ? 'Type' : 'Orientation'}: observed $observed; expected $expected.');
+  }
+  return differences.isEmpty
+      ? 'The model flagged a mismatch; a specific reason was not supplied.'
+      : differences.join('\n');
 }
 
 String correctionGuidance(Map<String, Object?> motor) {

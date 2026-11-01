@@ -1,5 +1,7 @@
 # Physical device smoke test — 1 November 2026
 
+Latest replacement: [camera fix/device follow-up](CAMERA_FIX.md), source `ddc5f40`. User confirmed steady preview and successful capture after the manual-shutter fix. The observations below describe the preceding `0f9c249` APK and remain historical, including that candidate's unresolved upload/camera tests.
+
 Device: Samsung **SM-S731B**, Android **17**, API **37**, ABI **arm64-v8a** (read through ADB). Device serial is intentionally not recorded.
 
 Artifact: merged frontend/runtime source `0f9c249faeb876f5e6d63d63f20959cf6c1096cc`; version 0.1.0/code 1; APK SHA-256 `e290b046ad624ccd78bff6983f751d4ded8ba689aacb2056994208a6282943a2`. The APK matches the committed artifact index.

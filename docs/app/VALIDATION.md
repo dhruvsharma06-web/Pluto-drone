@@ -1,5 +1,7 @@
 # Runtime validation — 1 November 2026
 
+Current replacement: [camera fix](CAMERA_FIX.md), source `ddc5f40`, 50 runtime + 15 UI + 1 mobile checks passed (66 total); analysis clean. Stable preview/manual shutter built, installed and user-tested on Samsung; user reported steady preview and successful photo capture. Current APK identity is in `apk.json`; prior hashes/tests below are historical.
+
 Latest physical evidence: [device smoke report](DEVICE_SMOKE.md). The merged APK now installs and launches on Samsung SM-S731B / Android17 / API37 / arm64-v8a; startup safety gate observed. This supersedes prior no-ADB/no-install statements below. Full gallery/camera/lifecycle and detector validation remain pending.
 
 ## Latest combined frontend/runtime candidate

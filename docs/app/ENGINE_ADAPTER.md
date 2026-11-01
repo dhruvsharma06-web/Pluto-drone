@@ -13,7 +13,7 @@ Android's handler runs on a serial background task queue. It currently returns p
 ## Image and geometry
 
 - Gallery: Android's system picker; no broad storage permission. Recover interrupted picks with `retrieveLostData` and require fresh safety confirmation.
-- Camera: rear camera only, microphone disabled, sequential `takePicture` stills. No raw YUV/BGRA data is passed as encoded JPEG. This is sampled live input, **not proven continuous tracking or real-time performance**.
+- Camera: rear camera only, microphone disabled. Start opens a stable preview; the app-owned Take photo shutter calls `captureLiveImage` once, closes the camera and analyzes the frozen still. No timer/autocapture loop. No raw YUV/BGRA data is passed as encoded JPEG; **no continuous tracking or real-time claim**.
 - Supported encoded input: single-frame JPEG/PNG, at most 20 MiB and 16,000,000 pixels. Unsupported formats including HEIC/GIF, damaged data and larger inputs abstain. No inference resizing is hidden in acquisition.
 - Decode, EXIF rotation/reflection (all eight orientations), EXIF metadata removal and PNG encoding run in a Dart isolate. Width/height describe the upright, unmirrored analysis bitmap. Rear-camera device behavior still needs physical validation. Mirrored EXIF is corrected; an undocumented mirrored source with no metadata cannot be inferred.
 - Bounding boxes remain normalized `[x,y,width,height]` in **that exact analyzed still**. `UprightImageGeometry` maps boxes to a centered `BoxFit.contain` or cropped viewport. Use it over `state.image`, not over a later preview frame. Preview and capture crop/calibration alignment is unverified; no live overlays are claimed.

@@ -43,6 +43,10 @@ python tools/write_apk_manifest.py apps/mobile/build/app/outputs/flutter-apk/app
 
 The index script records the current HEAD and dirty state; run it immediately after a build from that exact source. It does not prove the APK came from HEAD, sign anything, upload a release, or certify device behavior. Final integration must add the agreed externally shared resource metadata/hash to `resources/manifest.json` with all owners' versions.
 
+## Camera fix and current phone evidence
+
+Latest source `ddc5f40` replaces automatic camera sampling with a stable preview and explicit Take photo shutter. It is installed on the Samsung phone; the user confirmed a steady preview and successful capture. All 66 Flutter tests/checks pass with clean analysis. Full report and current artifact identity: [camera fix](CAMERA_FIX.md). A physical camera smoke test does not validate the missing detector.
+
 ## Honest demo now
 
 Explain disarm/stopped-motor procedure → confirm → choose a supported upload or start sampled camera input → show **Unable to Verify** due to pending reference/engine → stop/withdraw confirmation/background and show cleared results. The merged frontend includes upload evidence rendering, safety flow and Stop controls. Do not show a synthetic Pass as production output. After the exact real drone/reference and Android engine arrive, use the device checklist for correct/incorrect/unclear examples and record evidence on the exact final APK.

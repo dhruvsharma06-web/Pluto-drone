@@ -2,6 +2,8 @@
 
 On 1 November 2026 the indexed APK installed and launched successfully on Samsung SM-S731B, Android17/API37, arm64-v8a. Initial unchecked safety gate and disabled Start were observed. See `DEVICE_SMOKE.md` for actual scope. Gallery/camera/permissions/lifecycle acceptance, latency, FPS and detection accuracy remain pending; one startup smoke test does not establish full device support.
 
+Camera-fix follow-up: source `ddc5f40` installed; user confirmed steady preview and successful Take photo. Start now opens preview without automatic sampling; press the injected shutter to capture once. See `CAMERA_FIX.md`. Remaining checklist coverage is still required for full acceptance.
+
 1. Record source commit, APK SHA-256, phone model/Android version and `adb shell getprop ro.product.cpu.abilist`. Use a supplied drone with motors stopped and follow its actual disarming procedure. The app cannot prove disarm and provides no drone control commands.
 2. Install the arm64 candidate with `adb install -r apps/mobile/build/app/outputs/flutter-apk/app-release.apk`; launch Pluto Inspection. Confirm it starts without a camera permission request until Live is chosen. No microphone/storage permission should be requested.
 3. Without safety confirmation, controls should not acquire input. After confirmation, choose Upload: cancel, select a JPEG, select a rotated JPEG, select a PNG, then an unsupported/damaged image. Pending reference must always give Unable to Verify; invalid evidence must never give Pass.

@@ -6,6 +6,8 @@ Owned paths: apps/mobile/, packages/inspection_runtime/, tools/, .github/workflo
 
 Contract: v1.0.0
 
+Current camera repair: `ddc5f409a511e91e15595a3af8ef15561bdc8586` on app/runtime. At the user's explicit request, removed automatic 750-ms captures, injected a native-themed Take photo shutter, and made minimal frontend lifecycle/final-state repairs (retain these when reconciling frontend ownership). Shared v1 interface unchanged; concrete `captureLiveImage` is app-owned. 66 Flutter checks pass with clean analysis. Replacement APK installed on Samsung SM-S731B; user confirmed steady preview and successful capture, app semantics showed a frozen image and Start available. Actual source/hash/tests/limits in `docs/app/CAMERA_FIX.md` and indexes; historical evidence below is superseded where noted. No private photo committed or deployment performed.
+
 Latest device update: the indexed merged APK installed and launched successfully on Samsung SM-S731B, Android17/API37, arm64-v8a. Startup safety checkbox unchecked/Start disabled; camera permission initially ungranted. App-scoped sampled logs showed no matching fatal errors. User-assisted gallery selection is ongoing; no successful upload result or camera acceptance recorded yet. `docs/app/DEVICE_SMOKE.md` supersedes prior no-device statements below. Local screenshots stay in ignored build output; private photos must not enter Git.
 
 ## Completed and commit

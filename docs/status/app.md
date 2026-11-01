@@ -4,6 +4,8 @@ Branch: `app/runtime`
 
 State: MERGED CANDIDATE INSTALLED/LAUNCHED ON PHONE; FULL DEVICE ACCEPTANCE AND REAL DETECTOR PENDING.
 
+Latest fix: `ddc5f409a511e91e15595a3af8ef15561bdc8586`. Replaced 750-ms automatic still loop with steady preview and explicit Take photo; fixed permission-dialog cancellation and final UI session flag. 50 runtime + 15 UI + 1 mobile checks pass, all analysis clean. Rebuilt/installed on Samsung; user confirmed “Preview steady; photo captured.” Accessibility showed a frozen image and Start available again. No private photo committed. See `docs/app/CAMERA_FIX.md`; full permission/lifecycle/rotation and real detector checks remain pending. Subsequent entries are earlier milestone evidence.
+
 Latest physical smoke: USB debugging authorized; APK installed and launched successfully on Samsung SM-S731B, Android17/API37, arm64-v8a. Initial unchecked safety gate/disabled Start observed; no matching fatal errors in sampled app logs. User is trying gallery upload; captured upload screen has not yet shown selected photo/result. Camera and complete acquisition/lifecycle tests remain pending. See `docs/app/DEVICE_SMOKE.md`; no private photo committed.
 
 Combined APK source commit: `0f9c249faeb876f5e6d63d63f20959cf6c1096cc`, merging latest `frontend/flutter` `4c28f735d6a0ec0f1c07f8a3d04db9e413fdf55c` at the user's explicit request. Earlier runtime implementation source: `e06f4362fc8eb73bbbbf0cb94ee31bebfc3b3ac4`.

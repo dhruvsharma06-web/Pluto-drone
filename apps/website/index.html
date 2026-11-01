@@ -177,44 +177,39 @@
           <h2 id="results-title" class="title">Three <em>results.</em></h2>
         </div>
 
-        <div class="cases-wrap" id="demo" data-in>
-          <p class="cases__lead">Captured from the Android app on a real phone, running the on-device model.</p>
-          <ol class="cases">
-            <li class="case case--pass">
-              <figure class="case__shot"><img src="./app/result-pass.jpg" width="640" height="710" loading="lazy" decoding="async" alt="App showing Pass with all four propellers ticked" /></figure>
-              <div class="case__body">
-                <h3 class="case__title">Pass</h3>
-                <p class="case__line">All four propellers found and matched to the reference.</p>
-                <details class="case__explain">
-                  <summary>What the app says</summary>
-                  <p>All four motors have the correct propellers installed. The rear left is counter-clockwise, the rear right is clockwise, the front left is clockwise, and the front right is counter-clockwise. You do not need to swap any propellers or retake the photo.</p>
-                </details>
-              </div>
-            </li>
-            <li class="case case--fail">
-              <figure class="case__shot"><img src="./app/result-fail.jpg" width="640" height="710" loading="lazy" decoding="async" alt="App showing Incorrect Installation with the front-left propeller marked" /></figure>
-              <div class="case__body">
-                <h3 class="case__title">Incorrect Installation</h3>
-                <p class="case__line">The exact motor to fix is marked, with the correct propeller type.</p>
-                <details class="case__explain">
-                  <summary>What the app says</summary>
-                  <p>The front left motor has a mismatch. It currently has a counter-clockwise propeller, but it needs a clockwise one. Remove the incorrect propeller from the front left motor and replace it with a clockwise propeller.</p>
-                </details>
-                <p class="case__note">Test photo edited to mirror one propeller, simulating a swap.</p>
-              </div>
-            </li>
-            <li class="case case--unable">
-              <figure class="case__shot"><img src="./app/result-unable.jpg" width="640" height="710" loading="lazy" decoding="async" alt="App showing Unable to Verify for a close-up of one propeller" /></figure>
-              <div class="case__body">
-                <h3 class="case__title">Unable to Verify</h3>
-                <p class="case__line">Incomplete, blurry or dark photos are refused, never guessed.</p>
-                <details class="case__explain">
-                  <summary>What the app says</summary>
-                  <p>The detector could not verify the propeller status because the drone view is incomplete. No specific propeller needs to be swapped yet. Retake the photo top-down, with the whole drone visible, the camera steady and good lighting.</p>
-                </details>
-              </div>
-            </li>
-          </ol>
+        <div class="stage3-wrap" id="demo" data-in>
+          <p class="cases__lead">Captured from the Android app on a real phone, running the on-device model. Hover a phone to focus it.</p>
+          <div class="stage3" data-stage3>
+            <button type="button" class="phone3 phone3--pass" data-case="pass" aria-pressed="false" aria-label="Show Pass">
+              <span class="phone3__notch" aria-hidden="true"></span>
+              <img src="./app/phone-pass.jpg" width="560" height="1182" loading="lazy" decoding="async" alt="App showing Pass with all four propellers ticked" />
+            </button>
+            <button type="button" class="phone3 phone3--fail is-active" data-case="fail" aria-pressed="true" aria-label="Show Incorrect Installation">
+              <span class="phone3__notch" aria-hidden="true"></span>
+              <img src="./app/phone-fail.jpg" width="560" height="1182" loading="lazy" decoding="async" alt="App showing Incorrect Installation with the front-left propeller marked" />
+            </button>
+            <button type="button" class="phone3 phone3--unable" data-case="unable" aria-pressed="false" aria-label="Show Unable to Verify">
+              <span class="phone3__notch" aria-hidden="true"></span>
+              <img src="./app/phone-unable.jpg" width="560" height="1182" loading="lazy" decoding="async" alt="App showing Unable to Verify for a close-up of one propeller" />
+            </button>
+          </div>
+          <div class="stage3__panel" aria-live="polite">
+            <div class="stage3__info stage3__info--pass" data-info="pass" hidden>
+              <h3>Pass</h3>
+              <p class="stage3__line">All four propellers found and matched to the reference.</p>
+              <blockquote>&ldquo;All four motors have the correct propellers installed. The rear left is counter-clockwise, the rear right is clockwise, the front left is clockwise, and the front right is counter-clockwise. You do not need to swap any propellers or retake the photo.&rdquo;</blockquote>
+            </div>
+            <div class="stage3__info stage3__info--fail" data-info="fail">
+              <h3>Incorrect Installation</h3>
+              <p class="stage3__line">The exact motor to fix is marked, with the correct propeller type.</p>
+              <blockquote>&ldquo;The front left motor has a mismatch. It currently has a counter-clockwise propeller, but it needs a clockwise one. Remove the incorrect propeller from the front left motor and replace it with a clockwise propeller.&rdquo;</blockquote><p class="stage3__note">Test photo edited to mirror one propeller, simulating a swap.</p>
+            </div>
+            <div class="stage3__info stage3__info--unable" data-info="unable" hidden>
+              <h3>Unable to Verify</h3>
+              <p class="stage3__line">Incomplete, blurry or dark photos are refused, never guessed.</p>
+              <blockquote>&ldquo;The detector could not verify the propeller status because the drone view is incomplete. No specific propeller needs to be swapped yet. Retake the photo top-down, with the whole drone visible, the camera steady and good lighting.&rdquo;</blockquote>
+            </div>
+          </div>
         </div>
       </section>
 

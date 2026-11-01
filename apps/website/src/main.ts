@@ -3,6 +3,7 @@ import '@fontsource-variable/playfair-display/wght.css';
 import '@fontsource-variable/playfair-display/wght-italic.css';
 import './styles.css';
 import { initDemo } from './demo/demo';
+import { initResults } from './results';
 import { mountExplore } from './explore';
 import { mountSplashCursor } from './splash-cursor';
 import { mountStage } from './stage';
@@ -40,6 +41,7 @@ document.querySelectorAll('.scene').forEach((scene) =>
 );
 
 initDemo(reducedMotion);
+initResults();
 mountStage(reducedMotion);
 mountExplore(reducedMotion);
 

@@ -18,6 +18,7 @@ What the tests cover: exact result labels; no Pass with any missing evidence or 
 ## Browser checks (actually performed)
 
 - Desktop 1280×800 and 1440×900 (emulated, final black-and-white build): the hero is centred, the drone is gloss black with white light and smoke, and the header turns solid on scroll. The assembly intro plays (body → arms → motors → propellers, each labelled as it lands), then the headline appears. Scroll captions move through airframe → body shell → arms → motors → propeller. Camera poses, focus highlight, separated arms and part labels follow the active caption.
+- Exploded view: at ≈45% scroll progress the shell and arms are separated with the Body shell and Arms labels showing. At ≈97% all four groups are separated, all labels show, the caption reads "Every part the inspection depends on." and the meter is full. The spread was tightened after this capture.
 - Explore plate: the tabs switch component, fly the camera to it and swap the card copy. The tool rail, turn bar and views respond. Viewer state reached `ready`.
 - Keyboard: focus on the viewer, then ArrowRight×3 and `+`×2 rotated and zoomed it.
 - Expanded view: Expand opens a modal dialog with focus on Close. Esc closes it, focus returns to Expand and the stage returns to the page.
@@ -38,4 +39,5 @@ What the tests cover: exact result labels; no Pass with any missing evidence or 
 - `screenshots/desktop-1440-hero.jpg`: final black-and-white hero after assembly, with the progress rail and scroll cue.
 - `screenshots/desktop-1440-hero-assembly.jpg`: the assembly intro in progress, parts labelled as they land.
 - `screenshots/desktop-1440-story-propeller.jpg`: the last story step, a propeller close-up with the resting-angle label.
+- `screenshots/desktop-1440-exploded-view.jpg`: the scroll-scrubbed exploded view near full separation (before the spread was tightened slightly).
 - `screenshots/desktop-1440-explore-propellers-blue-palette.jpg`: the explore plate, Propellers tab, captured before the final switch from blue to white light. The layout is unchanged.

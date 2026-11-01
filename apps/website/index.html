@@ -137,6 +137,32 @@
         </div>
       </section>
 
+      <!-- B2. Scroll-scrubbed exploded view. -->
+      <section class="exploded" id="exploded" aria-labelledby="exploded-title">
+        <div class="exploded__track">
+          <div class="exploded__sticky">
+            <figure class="stage stage--dark stage--cinema" data-viewer="exploded" data-state="poster">
+              <div class="stage__poster" aria-hidden="true">
+                <svg viewBox="-180 -180 360 360"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /></svg>
+              </div>
+              <div class="stage__canvas" data-canvas></div>
+              <div class="stage__tags" aria-hidden="true">
+                <span class="tag" data-anchor="body" data-at="0.12">Body shell</span>
+                <span class="tag" data-anchor="arm1" data-at="0.32">Arms</span>
+                <span class="tag" data-anchor="motor3" data-at="0.52">Motors</span>
+                <span class="tag" data-anchor="propTip0" data-at="0.72">Propellers</span>
+              </div>
+              <p class="visually-hidden" role="status" data-viewer-status></p>
+            </figure>
+            <div class="exploded__copy">
+              <h2 id="exploded-title" data-words>Taken apart.</h2>
+              <p data-exploded-line aria-live="polite">Scroll to separate every part. Scroll back to put it together.</p>
+            </div>
+            <div class="exploded__meter" aria-hidden="true"><span data-exploded-meter></span></div>
+          </div>
+        </div>
+      </section>
+
       <!-- B (interactive). Specimen-plate explorer. -->
       <section class="explore" id="explore" aria-labelledby="explore-title">
         <svg class="sprite" aria-hidden="true" focusable="false">

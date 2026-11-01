@@ -119,6 +119,7 @@ export class DroneViewer {
   private idle = 0;
   private lastInteraction = -Infinity;
   private assembly: { start: number; dur: number; landed: Set<PartKind> } | null = null;
+  private staged = { cur: 0, goal: 0 };
   private smoke: { sprite: THREE.Sprite; base: THREE.Vector3; spin: number; phase: number; opacity: number }[] = [];
 
   // Loop and lifecycle.
@@ -441,6 +442,13 @@ export class DroneViewer {
     this.touch();
   }
 
+  /** Scroll-scrubbed staged explode (0 = assembled, 1 = every group separated). */
+  setStaged(p: number) {
+    this.staged.goal = Math.min(1, Math.max(0, p));
+    if (this.opts.reducedMotion) this.staged.cur = this.staged.goal;
+    this.kick();
+  }
+
   /** Glide to a pose and straighten any hand rotation on the way. */
   flyTo(p: Pose) {
     this.turn = null;
@@ -638,6 +646,10 @@ export class DroneViewer {
       }
 
     this.asset?.setExplode?.(c.explode);
+    if (this.asset?.setExplodeStaged && Math.abs(this.staged.cur - this.staged.goal) > 1e-4) {
+      this.staged.cur = rm ? this.staged.goal : damp(this.staged.cur, this.staged.goal, 6, dt);
+      this.asset.setExplodeStaged(this.staged.cur);
+    }
     if (this.asset?.setRestingAngle)
       this.rest.forEach((r, i) => {
         if (Math.abs(r.cur - r.goal) > 1e-4) {

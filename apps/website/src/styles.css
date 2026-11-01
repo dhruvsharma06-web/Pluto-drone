@@ -708,6 +708,70 @@ main .step--hero p {
   z-index: 3;
 }
 
+/* ---------- exploded view (scroll-scrubbed) ---------- */
+
+.exploded {
+  background: #000;
+  color: var(--ink);
+}
+.exploded__track {
+  position: relative;
+  height: 340vh;
+}
+.exploded__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.exploded .stage {
+  position: absolute;
+  inset: 0;
+}
+.exploded__copy {
+  position: absolute;
+  z-index: 5;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: clamp(48px, 10vh, 120px);
+  text-align: center;
+  pointer-events: none;
+}
+.exploded__copy h2 {
+  font-size: clamp(3rem, 6vw + 0.4rem, 8rem);
+  font-weight: 790;
+  font-stretch: 115%;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+.exploded__copy p {
+  margin-top: 18px;
+  font-size: clamp(1.35rem, 0.9vw + 1rem, 1.9rem);
+  text-align: center !important;
+  color: var(--ink);
+}
+.exploded__copy p.is-swap {
+  animation: rise 500ms var(--ease-out) both;
+}
+.exploded__meter {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: clamp(24px, 4vh, 44px);
+  width: min(320px, 50vw);
+  height: 2px;
+  margin-left: calc(min(320px, 50vw) / -2);
+  background: #262626;
+}
+.exploded__meter span {
+  display: block;
+  height: 100%;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
 /* ---------- explore: specimen plate ---------- */
 
 .explore {
@@ -2300,6 +2364,7 @@ td:last-child {
     transition-delay: 0ms;
   }
   .out.is-entering > *,
+  .exploded__copy p.is-swap,
   .detail > *,
   .detail.leaving > *,
   .expanded[open] {

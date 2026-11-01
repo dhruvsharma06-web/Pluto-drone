@@ -2,6 +2,7 @@ import '@fontsource-variable/archivo/wdth.css';
 import './styles.css';
 import { initDemo } from './demo/demo';
 import { mountExplore } from './explore';
+import { mountExploded } from './exploded';
 import { initReveal } from './reveal';
 import { mountStory } from './story';
 
@@ -23,4 +24,5 @@ window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 initDemo(reducedMotion);
 mountStory(reducedMotion);
+mountExploded(reducedMotion);
 mountExplore(reducedMotion);

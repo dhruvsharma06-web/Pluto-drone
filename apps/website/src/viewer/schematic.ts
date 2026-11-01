@@ -189,7 +189,14 @@ export function createSchematicDrone(): DroneAsset {
 
   // Assembly: parts fly in from outside and land in order body → arms → motors → propellers.
   let explode = 0;
+  let staged = 0;
   let assembly = 1;
+  // Scroll-scrubbed exploded view: shell lifts first, propellers last, each travelling further.
+  const STAGE: Record<PartKind, number> = { body: 0, arm: 0.2, motor: 0.4, propeller: 0.6 };
+  const stageAmount = (k: PartKind) => {
+    const t = Math.min(1, Math.max(0, (staged - STAGE[k]) / 0.4));
+    return (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2) * 2.0;
+  };
   const rest = [0, 0, 0, 0];
   const DELAY: Record<PartKind, number> = { body: 0, arm: 0.14, motor: 0.3, propeller: 0.46 };
   const SPAN = 0.52;
@@ -198,7 +205,7 @@ export function createSchematicDrone(): DroneAsset {
   const apply = () => {
     for (const mv of movers) {
       const away = 1 - land(local(mv.kind));
-      mv.obj.position.copy(mv.base).addScaledVector(mv.dir, explode).addScaledVector(mv.from, away);
+      mv.obj.position.copy(mv.base).addScaledVector(mv.dir, Math.max(explode, stageAmount(mv.kind))).addScaledVector(mv.from, away);
       mv.obj.rotation.x = mv.tilt * away;
       mv.obj.visible = local(mv.kind) > 0 || assembly >= 1;
     }
@@ -221,6 +228,10 @@ export function createSchematicDrone(): DroneAsset {
     frontDefined: false,
     setExplode(t: number) {
       explode = t;
+      apply();
+    },
+    setExplodeStaged(p: number) {
+      staged = p;
       apply();
     },
     setAssembly(p: number) {

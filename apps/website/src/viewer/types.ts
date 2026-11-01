@@ -29,6 +29,8 @@ export interface DroneAsset {
   frontDefined: boolean;
   /** Present only when parts can actually be separated. 0 = assembled, 1 = separated. */
   setExplode?(amount: number): void;
+  /** Staged explode for scroll scrubbing: groups separate in order (shell first, propellers last). 0..1. */
+  setExplodeStaged?(progress: number): void;
   /** Present only when the asset can play an assembly sequence. 0 = scattered, 1 = assembled. Returns groups that have landed. */
   setAssembly?(progress: number): PartKind[];
   /** Rotates one propeller to a resting angle (motors stopped; used to show that resting angle is not an error). */

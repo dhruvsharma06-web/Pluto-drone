@@ -5,7 +5,6 @@ import 'package:inspection_contract/inspection_contract.dart';
 
 import 'presentation.dart';
 import 'theme.dart';
-import 'drone_stage.dart';
 
 Rect containedImageRect(Size viewport, Size image) {
   if (image.width <= 0 ||
@@ -77,58 +76,80 @@ class EvidenceView extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (image != null)
-                    InteractiveViewer(
-                        key: ValueKey(image.id),
-                        minScale: 1,
-                        maxScale: 3,
-                        child: Image.memory(
-                          image.bytes,
-                          fit: BoxFit.contain,
-                          gaplessPlayback: false,
-                          semanticLabel: 'Current drone inspection image',
-                          errorBuilder: (_, error, trace) =>
-                              const _EmptyCanvas(invalidImage: true),
-                          frameBuilder: (context, child, frame, loaded) =>
-                              frame == null && !loaded
-                                  ? const Center(
-                                      child: Text(
-                                        'Loading image',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    )
-                                  : Stack(
-                                      fit: StackFit.expand,
-                                      children: [
-                                        child,
-                                        if (result != null &&
-                                            result!.inputId == image.id)
-                                          for (final motor in result!.motors)
-                                            if (motor['finding'] != 'match' ||
-                                                selectedMotor ==
-                                                    motor['motor_id'])
-                                              if (motorBoxRect(
-                                                      motor['bbox'], rect)
-                                                  case final Rect bounds)
-                                                _MotorTarget(
-                                                  bounds: bounds,
-                                                  motor: motor,
-                                                  selected: selectedMotor ==
-                                                      motor['motor_id'],
-                                                  onSelected: onMotorSelected,
-                                                ),
-                                      ],
-                                    ),
-                        ))
+                    Image.memory(
+                      image.bytes,
+                      fit: BoxFit.contain,
+                      gaplessPlayback: false,
+                      semanticLabel: 'Current drone inspection image',
+                      errorBuilder: (_, error, trace) =>
+                          const _EmptyCanvas(invalidImage: true),
+                      frameBuilder: (context, child, frame, loaded) =>
+                          frame == null && !loaded
+                              ? const Center(
+                                  child: Text(
+                                    'Loading image',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                )
+                              : InteractiveViewer(
+                                  minScale: 1,
+                                  maxScale: 4,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      child,
+                                      if (result != null &&
+                                          result!.inputId == image.id)
+                                        for (final motor in result!.motors)
+                                          if (motorBoxRect(motor['bbox'], rect)
+                                              case final Rect bounds)
+                                            _MotorTarget(
+                                              bounds: bounds,
+                                              motor: motor,
+                                              selected: selectedMotor ==
+                                                  motor['motor_id'],
+                                              onSelected: onMotorSelected,
+                                            ),
+                                    ],
+                                  )),
+                    )
                   else if (cameraPreview != null)
                     cameraPreview!
                   else
-                    DroneStage(
-                        processing: state.phase == InspectionPhase.processing),
-                  if (state.phase == InspectionPhase.processing &&
-                      (image != null || cameraPreview != null))
-                    const Positioned.fill(
-                      child: IgnorePointer(child: ProcessingSweep()),
+                    const _EmptyCanvas(),
+                  Positioned(
+                    left: 12,
+                    bottom: 12,
+                    right: 12,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: cameraGround,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 7,
+                          ),
+                          child: Text(
+                            state.phase == InspectionPhase.processing
+                                ? 'Checking the installation…'
+                                : image != null
+                                    ? 'Full image · no crop'
+                                    : cameraPreview != null
+                                        ? 'Live view'
+                                        : 'Camera not started',
+                            style: const TextStyle(
+                              color: Color(0xffe1e7ed),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
+                  ),
                 ],
               );
             },
@@ -159,7 +180,7 @@ class _EmptyCanvas extends StatelessWidget {
             else
               const Icon(
                 Icons.broken_image_outlined,
-                color: Color(0xffffffff),
+                color: Color(0xffc5cdd6),
                 size: 36,
               ),
             const SizedBox(height: 16),
@@ -170,7 +191,7 @@ class _EmptyCanvas extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -181,8 +202,8 @@ class _EmptyCanvas extends StatelessWidget {
                   : 'Even light. Steady camera. Motors stopped.',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color(0xffffffff),
-                fontSize: 18,
+                color: Color(0xffb9c3cd),
+                fontSize: 15,
                 height: 1.5,
               ),
             ),
@@ -197,7 +218,7 @@ class _FramingGuide extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = const Color(0xffffffff)
+      ..color = const Color(0xff77848f)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
     final c = Offset(size.width / 2, size.height / 2);
@@ -239,6 +260,12 @@ class _MotorTarget extends StatelessWidget {
   Widget build(BuildContext context) {
     final id = motorText(motor, 'motor_id');
     if (id == null) return const SizedBox.shrink();
+    final c = Theme.of(context).colorScheme;
+    final color = switch (motor['finding']) {
+      'match' => c.good,
+      'mismatch' => c.bad,
+      _ => inspectionInk,
+    };
     final symbol = switch (motor['finding']) {
       'match' => Icons.check,
       'mismatch' => Icons.close,
@@ -246,44 +273,66 @@ class _MotorTarget extends StatelessWidget {
     };
     return Positioned.fromRect(
       rect: bounds,
-      child: Semantics(
-        label: '$id, ${motor['finding']}. Show motor guidance',
-        button: true,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            key: ValueKey('motor-box-$id'),
-            onTap: () => onSelected(id),
-            child: Container(
-              decoration: BoxDecoration(
-                border:
-                    Border.all(color: Colors.white, width: selected ? 4 : 3),
+      child: CustomPaint(
+        painter: _EvidenceOutline(
+            color: color,
+            unknown:
+                motor['finding'] != 'match' && motor['finding'] != 'mismatch',
+            selected: selected),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Semantics(
+            label: '$id, ${motor['finding']}. Show motor guidance',
+            child: IconButton.filledTonal(
+              tooltip: id,
+              onPressed: () => onSelected(id),
+              style: IconButton.styleFrom(
+                backgroundColor: cameraGround,
+                foregroundColor: Colors.white,
               ),
-              // Dual contrast keeps boxes visible on dark or light evidence.
-              foregroundDecoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 1)),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: ColoredBox(
-                  color: Colors.black,
-                  child: Padding(
-                    padding: const EdgeInsets.all(3),
-                    child: bounds.width >= 90 && bounds.height >= 36
-                        ? Text(id,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700))
-                        : Icon(symbol, color: Colors.white, size: 18),
-                  ),
-                ),
-              ),
+              icon: Icon(symbol, size: 18),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Black outer stroke stays visible on bright evidence; dashed white means unknown.
+class _EvidenceOutline extends CustomPainter {
+  const _EvidenceOutline(
+      {required this.color, required this.unknown, required this.selected});
+  final Color color;
+  final bool unknown, selected;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+          (Offset.zero & size).deflate(3), const Radius.circular(5)));
+    canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.black
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = selected ? 7 : 6);
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = selected ? 3 : 2;
+    if (!unknown) {
+      canvas.drawPath(path, stroke);
+      return;
+    }
+    for (final metric in path.computeMetrics()) {
+      for (double d = 0; d < metric.length; d += 12) {
+        canvas.drawPath(
+            metric.extractPath(d, math.min(d + 7, metric.length)), stroke);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_EvidenceOutline old) =>
+      color != old.color || unknown != old.unknown || selected != old.selected;
 }

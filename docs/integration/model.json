@@ -1,0 +1,15 @@
+{
+  "model": "YOLO11s propeller detector (classes: 0 propeller_cw, 1 propeller_ccw)",
+  "engine_version": "pluto-yolo11s-propeller-1.1.0",
+  "file": "apps/mobile/assets/models/propeller.onnx (not committed; ships inside the APK)",
+  "sha256": "97a6ccf8ebafdf17655a459b1e5c6913474af27342b185f841c5dbe5b58f52ae",
+  "input": "1x3x640x640 RGB letterbox, /255; output 1x6x8400",
+  "training": "seed 10 photos (guide-based labels) + 10 verified top-down photos (geometry labels), 4x 90-degree rotations, no flips (flips swap CW/CCW); fine-tuned from COCO yolo11s",
+  "evaluation": {
+    "heldout_top_down_3_photos": {"precision": 0.769, "recall": 0.917, "mAP50": 0.917, "mAP50_95": 0.576},
+    "earlier_heldout_test_photo": {"mAP50": 0.912},
+    "engine_on_heldout_top_down": "4 pass, 2 unable_to_verify (missed propeller / low-confidence type), 0 wrong verdicts",
+    "caveat": "Very small held-out set; labels are AI-proposed from the user's guide and arm-mount geometry, not independently reviewed."
+  },
+  "device_check": "Installed on CPH2691 (Android, arm64): upload of a held-out top-down photo returned pass with 4/4 motors matching; partial-drone photo returned unable_to_verify."
+}

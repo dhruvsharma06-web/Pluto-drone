@@ -38,7 +38,7 @@ carry CCW). This is a user-supplied reference, not an organizer-published config
 
 `apps/mobile/lib/assistant.dart`: every real result is spoken offline (flutter_tts) with
 retake guidance for blur/darkness/incomplete/unsupported views. "Explain" sends only the result
-summary (status, reasons, motor findings — no photo) to Gemini `gemini-2.5-flash`. The key is a
+summary (status, reasons, motor findings — no photo) to Gemini (`gemini-3.8-flash`, falling back to `gemini-flash-latest` and `gemini-flash-lite-latest` on 503). The key is a
 build-time define and must never be committed:
 
     flutter build apk --release --target-platform android-arm64 --dart-define=GEMINI_API_KEY=<key>

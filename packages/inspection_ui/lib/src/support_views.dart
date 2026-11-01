@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inspection_contract/inspection_contract.dart';
 
 import 'presentation.dart';
+import 'theme.dart';
 
 class GuideView extends StatelessWidget {
   const GuideView({super.key});
@@ -77,27 +78,27 @@ class _GuideRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 24),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
-              size: 23,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: Theme.of(context).textTheme.titleSmall),
-                  const SizedBox(height: 5),
-                  Text(body),
-                ],
-              ),
-            ),
-          ],
-        ),
+        child: DecoratedBox(
+            decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: inspectionLine))),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: Theme.of(context).textTheme.titleSmall),
+                      const SizedBox(height: 5),
+                      Text(body,
+                          style: const TextStyle(color: inspectionMuted)),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ],
+            )),
       );
 }
 
@@ -116,7 +117,7 @@ class ProjectView extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         const Text(
-          'Pluto Inspection compares visible propeller installation with a supplied reference. The vision implementation and validation belong to the project’s core modules.',
+          'Pluto Inspector compares visible propeller installation with a supplied reference. The vision implementation and validation belong to the project’s core modules.',
         ),
         const SizedBox(height: 28),
         Text(

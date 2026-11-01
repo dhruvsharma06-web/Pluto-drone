@@ -8,11 +8,6 @@
         "name": "pointer-press",
         "value": "scale(.98), 100ms press / 140ms release, Cubic(.23,1,.32,1)",
         "purpose": "Pointer feedback only; disabled for Remove Animations."
-      },
-      {
-        "name": "inspection-feedback",
-        "value": "180ms eased viewpoint return and status-emblem settling; 2200ms processing scan cycle",
-        "purpose": "Direct drag uses immediate tracking. Continuous scan only during processing; reduced motion is static. Status text and motor findings remain immediate."
       }
     ],
     "breakpoints": [
@@ -29,11 +24,11 @@
   },
   "components": [],
   "narrative": {
-    "northStar": "Jet black. Amethyst light. Cyan precision.",
-    "overview": "User-referenced black/amethyst/cyan palette, large type and concise native controls.",
+    "northStar": "Evidence in view",
+    "overview": "The user-approved graphite-and-ice direction is expressed through native Material 3 components.",
     "keyCharacteristics": [
       "Real image evidence paired with motor findings.",
-      "Amethyst actions, restrained cyan accents, exact outcome names and icons.",
+      "Quiet native navigation, blue primary action, semantic result colours.",
       "System scaling and separate light/dark palettes."
     ],
     "rules": [],

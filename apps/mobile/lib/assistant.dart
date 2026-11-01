@@ -9,7 +9,8 @@ import 'package:inspection_runtime/inspection_runtime.dart';
 
 /// Supplied at build time: --dart-define=GEMINI_API_KEY=... (never committed).
 const _geminiKey = String.fromEnvironment('GEMINI_API_KEY');
-const _geminiModel = 'gemini-2.5-flash';
+/// Tried in order; Gemini returns 503 under load, so fall through to the next.
+const _geminiModels = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
 
 /// Plain-language guidance for each engine reason code. Spoken offline.
 const reasonGuidance = <String, String>{
@@ -71,26 +72,34 @@ Future<String> explainWithGemini(VerificationResult r) async {
       'propellers have mirrored blade pitch; diagonal motors share a type. Use '
       'only the facts given; do not invent findings. Never suggest arming or '
       'spinning the motors. Plain text, no markdown.';
-  final response = await http
-      .post(
-          Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
-              '$_geminiModel:generateContent'),
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': _geminiKey,
-          },
-          body: jsonEncode({
-            'contents': [
-              {
-                'parts': [
-                  {'text': prompt}
+  http.Response? response;
+  for (final model in _geminiModels) {
+    try {
+      response = await http
+          .post(
+              Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
+                  '$model:generateContent'),
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': _geminiKey,
+              },
+              body: jsonEncode({
+                'contents': [
+                  {
+                    'parts': [
+                      {'text': prompt}
+                    ]
+                  }
                 ]
-              }
-            ]
-          }))
-      .timeout(const Duration(seconds: 20));
-  if (response.statusCode != 200) {
-    throw Exception('Gemini HTTP ${response.statusCode}');
+              }))
+          .timeout(const Duration(seconds: 12));
+    } on Exception {
+      response = null;
+    }
+    if (response?.statusCode == 200) break;
+  }
+  if (response == null || response.statusCode != 200) {
+    throw Exception('Gemini unavailable');
   }
   final body = jsonDecode(response.body) as Map<String, dynamic>;
   final parts = body['candidates'][0]['content']['parts'] as List;

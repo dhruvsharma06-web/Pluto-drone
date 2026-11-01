@@ -6,7 +6,13 @@ import 'presentation.dart';
 import 'support_views.dart';
 import 'theme.dart';
 import 'inspection_mark.dart';
-import 'motor_finding.dart';
+import 'capture_view.dart';
+import 'drone_stage.dart';
+import 'result_symbol.dart';
+import 'reveal.dart';
+import 'motor_detail.dart';
+import 'control_feedback.dart';
+import 'input_choices.dart';
 
 /// Drop-in presentation. The caller owns and disposes [controller].
 class InspectionApp extends StatelessWidget {
@@ -14,7 +20,7 @@ class InspectionApp extends StatelessWidget {
       {super.key,
       required this.controller,
       this.cameraPreview,
-      this.themeMode = ThemeMode.dark,
+      this.themeMode = ThemeMode.system,
       this.demoMode = false,
       this.developmentControls});
   final InspectionController controller;
@@ -27,7 +33,7 @@ class InspectionApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Pluto Inspection',
+      title: 'Pluto Inspector',
       theme: inspectionTheme(Brightness.light),
       darkTheme: inspectionTheme(Brightness.dark),
       themeMode: themeMode,
@@ -62,6 +68,44 @@ class _InspectionShellState extends State<_InspectionShell>
   int _destination = 0;
   bool _operation = false, _liveRequested = false, _fixtureSession = false;
   String? _actionError, _selectedMotor;
+  BuildContext? _detailContext;
+
+  void _closeDetails() {
+    final detail = _detailContext;
+    _detailContext = null;
+    if (detail != null && detail.mounted) {
+      final route = ModalRoute.of(detail);
+      if (route != null && route.isActive)
+        Navigator.of(detail).removeRoute(route);
+    }
+  }
+
+  Future<void> _showMotor(String id) async {
+    final result = _result;
+    if (result == null) return;
+    final motors = result.motors.where((m) => m['motor_id'] == id);
+    if (motors.isEmpty) return;
+    _closeDetails();
+    setState(() => _selectedMotor = id);
+    BuildContext? openedContext;
+    await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        sheetAnimationStyle: MediaQuery.disableAnimationsOf(context)
+            ? AnimationStyle.noAnimation
+            : const AnimationStyle(
+                duration: Duration(milliseconds: 300),
+                reverseDuration: Duration(milliseconds: 180)),
+        builder: (detail) {
+          openedContext = detail;
+          _detailContext = detail;
+          return MotorDetail(
+              motor: motors.first,
+              demo: widget.demoMode || result.evidenceSource == 'fixture');
+        });
+    if (identical(_detailContext, openedContext)) _detailContext = null;
+  }
 
   @override
   void initState() {
@@ -77,8 +121,13 @@ class _InspectionShellState extends State<_InspectionShell>
     _fixtureSession = _state.result?.evidenceSource == 'fixture';
     _subscription = widget.controller.states.listen((state) {
       if (!mounted) return;
+      if (!identical(state.result, _state.result) ||
+          state.phase != InspectionPhase.result ||
+          !state.safetyConfirmed) _closeDetails();
       setState(() {
         _state = state;
+        if (state.phase == InspectionPhase.result ||
+            state.phase == InspectionPhase.error) _liveRequested = false;
         if (state.result?.evidenceSource == 'fixture') _fixtureSession = true;
         if (state.result?.evidenceSource == 'real') _fixtureSession = false;
         if (state.result?.reasons.any((r) => [
@@ -90,6 +139,7 @@ class _InspectionShellState extends State<_InspectionShell>
             false) _liveRequested = false;
       });
     }, onError: (Object error) {
+      _closeDetails();
       if (mounted)
         setState(() {
           _blockedResult = _state.result;
@@ -104,6 +154,7 @@ class _InspectionShellState extends State<_InspectionShell>
   void didUpdateWidget(covariant _InspectionShell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
+      _closeDetails();
       _subscription?.cancel();
       _blockedResult = null;
       _actionError = null;
@@ -124,12 +175,15 @@ class _InspectionShellState extends State<_InspectionShell>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused) {
+      _closeDetails();
       if (mounted)
         setState(() {
           _blockedResult = _state.result;
           _selectedMotor = null;
         });
-      if (_liveRequested) {
+      // Permission dialogs can make the app inactive while the camera is
+      // initializing. Only actual backgrounding should cancel acquisition.
+      if (_liveRequested && state == AppLifecycleState.paused) {
         _liveRequested = false;
         unawaited(widget.controller.stopLive().catchError((Object _) {}));
       }
@@ -144,6 +198,7 @@ class _InspectionShellState extends State<_InspectionShell>
   Future<void> _run(Future<void> Function() action,
       {bool live = false, bool stopping = false}) async {
     if (_operation && !stopping) return;
+    _closeDetails();
     setState(() {
       _operation = true;
       _actionError = null;
@@ -167,6 +222,7 @@ class _InspectionShellState extends State<_InspectionShell>
   }
 
   Future<void> _confirm(bool value) async {
+    _closeDetails();
     setState(() {
       _blockedResult = _state.result;
       _actionError = null;
@@ -186,6 +242,7 @@ class _InspectionShellState extends State<_InspectionShell>
 
   void _selectMode(_InputMode mode) {
     if (mode == _mode) return;
+    _closeDetails();
     if (_liveRequested) {
       unawaited(_run(widget.controller.stopLive, stopping: true));
     }
@@ -203,29 +260,25 @@ class _InspectionShellState extends State<_InspectionShell>
     setState(() => _destination = index);
   }
 
-  void _showMotor(String id) {
-    final result = _result;
-    if (result == null) return;
-    final matches = result.motors.where((m) => m['motor_id'] == id);
-    if (matches.length != 1) return;
-    setState(() => _selectedMotor = id);
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: true,
-      constraints: BoxConstraints(
-          maxWidth: 640, maxHeight: MediaQuery.sizeOf(context).height * .85),
-      builder: (_) => MotorFindingSheet(
-          motor: matches.single, result: result, controller: widget.controller),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final result = _result;
     final demo = widget.demoMode || _fixtureSession;
+    if (_destination == 0 &&
+        _mode == _InputMode.live &&
+        _liveRequested &&
+        _state.safetyConfirmed &&
+        _state.image == null) {
+      return CaptureView(
+          preview: widget.cameraPreview,
+          busy: _operation || _state.phase == InspectionPhase.processing,
+          notice: demo
+              ? _DemoNotice(
+                  controls: widget.demoMode ? widget.developmentControls : null)
+              : null,
+          onClose: () => _run(widget.controller.stopLive, stopping: true));
+    }
     return LayoutBuilder(builder: (context, constraints) {
       final expanded = constraints.maxWidth >= 900;
       final page = switch (_destination) {
@@ -240,8 +293,7 @@ class _InspectionShellState extends State<_InspectionShell>
             error: _actionError,
             cameraPreview: widget.cameraPreview,
             selectedMotor: _selectedMotor,
-            onSelectMotor: (id) => setState(() => _selectedMotor = id),
-            onMotorBoxSelected: _showMotor,
+            onSelectMotor: _showMotor,
             onSelectMode: _selectMode,
             onConfirm: _confirm,
             onPrimary: () => _liveRequested
@@ -254,13 +306,13 @@ class _InspectionShellState extends State<_InspectionShell>
         appBar: AppBar(
             titleSpacing: expanded ? 24 : 20,
             title: Row(mainAxisSize: MainAxisSize.min, children: [
-              InspectionMark(color: colors.secondary, size: 28),
+              InspectionMark(color: colors.primary, size: 28),
               const SizedBox(width: 11),
               const Flexible(
-                  child: Text('Pluto Inspection',
+                  child: Text('Pluto Inspector',
                       style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
                           letterSpacing: -.3))),
             ])),
         bottomNavigationBar: expanded
@@ -320,9 +372,11 @@ class _InspectionShellState extends State<_InspectionShell>
                             child: ClipRRect(
                                 borderRadius:
                                     BorderRadius.circular(expanded ? 16 : 0),
-                                child: DecoratedBox(
-                                    decoration: inspectionBackdrop(colors),
-                                    child: page)))),
+                                child: ColoredBox(
+                                    color: colors.surfaceContainerLowest,
+                                    child: Reveal(
+                                        key: ValueKey(_destination),
+                                        child: page))))),
                   ])),
             ])),
       );
@@ -355,7 +409,7 @@ class _DemoNotice extends StatelessWidget {
                             child: Text('Demo · Simulated results',
                                 style: TextStyle(
                                     color: c.caution,
-                                    fontSize: 18,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500)))
                       ]),
                       if (controls != null)
@@ -377,7 +431,6 @@ class _InspectionView extends StatelessWidget {
       required this.cameraPreview,
       required this.selectedMotor,
       required this.onSelectMotor,
-      required this.onMotorBoxSelected,
       required this.onSelectMode,
       required this.onConfirm,
       required this.onPrimary});
@@ -388,7 +441,6 @@ class _InspectionView extends StatelessWidget {
   final String? error, selectedMotor;
   final Widget? cameraPreview;
   final ValueChanged<String> onSelectMotor;
-  final ValueChanged<String> onMotorBoxSelected;
   final ValueChanged<_InputMode> onSelectMode;
   final ValueChanged<bool> onConfirm;
   final VoidCallback onPrimary;
@@ -399,7 +451,7 @@ class _InspectionView extends StatelessWidget {
     final processing =
         error == null && (state.phase == InspectionPhase.processing || busy);
     final title =
-        result == null ? 'Inspect propellers' : resultLabel(result!.status);
+        result == null ? 'Inspect your drone' : resultLabel(result!.status);
     final heading =
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Semantics(
@@ -408,6 +460,11 @@ class _InspectionView extends StatelessWidget {
           child: Text(title,
               key: const ValueKey('inspection-heading'),
               style: Theme.of(context).textTheme.headlineSmall)),
+      if (result == null) ...[
+        const SizedBox(height: 12),
+        Text('Use the live camera or upload a photo.',
+            style: TextStyle(color: c.onSurfaceVariant, height: 1.45)),
+      ],
     ]);
     final resultPanel = result != null
         ? _ResultPanel(
@@ -425,38 +482,34 @@ class _InspectionView extends StatelessWidget {
             : state;
     final work =
         Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      SegmentedButton<_InputMode>(
-          segments: const [
-            ButtonSegment(value: _InputMode.live, label: Text('Live camera')),
-            ButtonSegment(value: _InputMode.photo, label: Text('Upload image'))
-          ],
-          selected: {
-            mode
-          },
-          showSelectedIcon: false,
-          onSelectionChanged:
-              processing && !live ? null : (s) => onSelectMode(s.first)),
+      InputChoices<_InputMode>(choices: const {
+        _InputMode.live: 'Live camera',
+        _InputMode.photo: 'Upload image'
+      }, selected: mode, onChanged: processing && !live ? null : onSelectMode),
       const SizedBox(height: 16),
-      EvidenceView(
-          state: inputState,
-          result: result,
-          cameraPreview: mode == _InputMode.live ? cameraPreview : null,
-          selectedMotor: selectedMotor,
-          onMotorSelected: onMotorBoxSelected),
-      const SizedBox(height: 16),
+      if (inputState.image != null)
+        EvidenceView(
+            state: inputState,
+            result: result,
+            cameraPreview: mode == _InputMode.live ? cameraPreview : null,
+            selectedMotor: selectedMotor,
+            onMotorSelected: onSelectMotor),
+      if (inputState.image != null) const SizedBox(height: 16),
       Material(
           color: c.surfaceContainerLow,
           borderRadius: BorderRadius.circular(12),
           clipBehavior: Clip.antiAlias,
-          child: CheckboxListTile(
+          child: ControlFeedback(
+              child: CheckboxListTile(
             key: const ValueKey('safety-confirmation'),
             value: state.safetyConfirmed,
             onChanged: (v) => onConfirm(v ?? false),
             controlAffinity: ListTileControlAffinity.trailing,
             contentPadding: const EdgeInsets.only(left: 16, right: 6),
-            title: Text('I confirm: disarmed, motors stopped.',
-                style: Theme.of(context).textTheme.titleSmall),
-          )),
+            title: Text(
+                'I confirm the drone is disarmed and every motor is stopped.',
+                style: Theme.of(context).textTheme.bodyMedium),
+          ))),
       const SizedBox(height: 12),
       _PressButton(
           onPressed: (!state.safetyConfirmed || processing && !live)
@@ -476,22 +529,6 @@ class _InspectionView extends StatelessWidget {
                           ? 'Choose image'
                           : 'Choose another image')
                       : 'Start live inspection'),
-      if (processing)
-        Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Row(children: [
-              if (MediaQuery.disableAnimationsOf(context))
-                const Icon(Icons.hourglass_top_outlined, size: 18)
-              else
-                const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
-              const SizedBox(width: 10),
-              const Expanded(
-                  child: Text('Inspecting visible propellers…',
-                      style: TextStyle(fontSize: 18))),
-            ])),
       if (error != null || state.phase == InspectionPhase.error)
         Padding(
             padding: const EdgeInsets.only(top: 16),
@@ -503,7 +540,7 @@ class _InspectionView extends StatelessWidget {
                                 .contains(state.message)
                             ? reasonGuidance(state.message)
                             : 'Inspection could not finish. Check permissions, or try a different photo.'),
-                    style: TextStyle(color: c.bad, height: 1.5)))),
+                    style: TextStyle(color: c.error, height: 1.5)))),
     ]);
     return LayoutBuilder(builder: (context, box) {
       final wide = box.maxWidth >= 760;
@@ -518,15 +555,18 @@ class _InspectionView extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        heading,
-                        const SizedBox(height: 20),
-                        if (wide && resultPanel != null)
+                        Reveal(key: ValueKey(title), child: heading),
+                        const SizedBox(height: 24),
+                        if (wide)
                           Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(flex: 6, child: work),
                                 const SizedBox(width: 24),
-                                Expanded(flex: 5, child: resultPanel)
+                                Expanded(
+                                    flex: 5,
+                                    child: resultPanel ??
+                                        DroneStage(processing: processing))
                               ])
                         else ...[
                           if (resultPanel != null) ...[
@@ -540,6 +580,8 @@ class _InspectionView extends StatelessWidget {
                                 result: result!,
                                 selectedMotor: selectedMotor,
                                 onSelect: onSelectMotor)
+                          else
+                            DroneStage(processing: processing)
                         ],
                       ]))));
     });
@@ -552,54 +594,31 @@ class _ResultSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme;
-    final (ink, bg, icon) = switch (result.status) {
-      VerificationStatus.pass => (
-          c.good,
-          c.goodSurface,
-          Icons.check_circle_outline
-        ),
-      VerificationStatus.incorrectInstallation => (
-          c.bad,
-          c.badSurface,
-          Icons.error_outline
-        ),
-      VerificationStatus.unableToVerify => (
-          c.caution,
-          c.cautionSurface,
-          Icons.visibility_off_outlined
-        )
-    };
     final reason = result.reasons.isEmpty ? null : result.reasons.first;
     final text = reason != null
         ? reasonGuidance(reason)
         : switch (result.status) {
             VerificationStatus.pass =>
-              'Visible checks match. Complete the full pre-flight procedure.',
+              'All required visible checks match. This does not replace the full pre-flight procedure.',
             VerificationStatus.incorrectInstallation =>
-              'Correct the indicated motor, then inspect again.',
+              'Review the affected motor below, correct its installation, then inspect again.',
             VerificationStatus.unableToVerify =>
-              'Retake a clearer image or check the supplied reference.'
+              'A complete installation check was not possible. Retake the image or check the reference.'
           };
     return DecoratedBox(
-        decoration:
-            BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(
+            color: c.surface,
+            border: Border.all(color: inspectionLine),
+            borderRadius: BorderRadius.circular(inspectionSurfaceRadius)),
         child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              TweenAnimationBuilder<double>(
-                  key: ValueKey(result.status),
-                  tween: Tween(begin: .92, end: 1),
-                  duration: Duration(
-                      milliseconds:
-                          MediaQuery.disableAnimationsOf(context) ? 0 : 180),
-                  curve: const Cubic(.23, 1, .32, 1),
-                  builder: (context, value, child) =>
-                      Transform.scale(scale: value, child: child),
-                  child: Icon(icon, color: ink, size: 26)),
+              ResultSymbol(status: result.status),
               const SizedBox(width: 12),
               Expanded(
                   child: Text(text,
-                      style: TextStyle(color: ink, height: 1.5, fontSize: 18))),
+                      style: TextStyle(
+                          color: c.onSurface, height: 1.5, fontSize: 16))),
             ])));
   }
 }
@@ -644,51 +663,51 @@ class _MotorFindings extends StatelessWidget {
       if (motors.isNotEmpty)
         Text(
             '${motors.where((m) => m['finding'] == 'match').length} of ${motors.length} visible findings match',
-            style: TextStyle(color: c.onSurfaceVariant, fontSize: 18)),
+            style: TextStyle(color: c.onSurfaceVariant, fontSize: 15)),
       const SizedBox(height: 12),
       for (final motor in motors)
         if (motorText(motor, 'motor_id') case final String id)
           Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Material(
-                  color: selectedMotor == id
-                      ? c.surfaceContainer
-                      : c.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(12),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            onTap: () =>
-                                onSelect(selectedMotor == id ? '' : id),
-                            title: Text(id,
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w500)),
-                            subtitle: Text(switch (motor['finding']) {
-                              'match' => 'Matches reference',
-                              'mismatch' => 'Installation mismatch',
-                              _ => 'Not verified'
-                            }),
-                            trailing: Icon(
-                                switch (motor['finding']) {
-                                  'match' => Icons.check_circle_outline,
-                                  'mismatch' => Icons.error_outline,
-                                  _ => Icons.help_outline
-                                },
-                                color: switch (motor['finding']) {
-                                  'match' => c.good,
-                                  'mismatch' => c.bad,
-                                  _ => c.caution
-                                })),
-                        if (selectedMotor == id ||
-                            motor['finding'] == 'mismatch')
-                          Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              child: MotorFindingDetails(motor: motor)),
-                      ]))),
+              child: Reveal(
+                  key: ValueKey('${result.inputId}-$id'),
+                  delayMs: motors.indexOf(motor) * 50,
+                  child: Material(
+                      color: selectedMotor == id
+                          ? c.surfaceContainer
+                          : c.surfaceContainerLow,
+                      shape: const Border(
+                          bottom: BorderSide(color: inspectionLine)),
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ControlFeedback(
+                                child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 4),
+                                    onTap: () => onSelect(id),
+                                    title: Text(id,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500)),
+                                    subtitle: Text(switch (motor['finding']) {
+                                      'match' => 'Matches reference',
+                                      'mismatch' => 'Installation mismatch',
+                                      _ => 'Not verified'
+                                    }),
+                                    trailing: Icon(
+                                        switch (motor['finding']) {
+                                          'match' => Icons.check_circle_outline,
+                                          'mismatch' => Icons.error_outline,
+                                          _ => Icons.help_outline
+                                        },
+                                        color: switch (motor['finding']) {
+                                          'match' => c.good,
+                                          'mismatch' => c.bad,
+                                          _ => c.caution
+                                        }))),
+                          ])))),
     ]);
   }
 }
@@ -716,13 +735,20 @@ class _PressButtonState extends State<_PressButton> {
       onPointerUp: (_) => _press(false),
       onPointerCancel: (_) => _press(false),
       child: AnimatedScale(
-          scale: pressed && widget.onPressed != null ? .98 : 1,
+          scale: pressed &&
+                  widget.onPressed != null &&
+                  !MediaQuery.disableAnimationsOf(context)
+              ? .97
+              : 1,
           duration: MediaQuery.disableAnimationsOf(context)
               ? Duration.zero
               : Duration(milliseconds: pressed ? 100 : 140),
           curve: const Cubic(.23, 1, .32, 1),
           child: FilledButton.icon(
               key: const ValueKey('primary-inspection-action'),
+              style: ButtonStyle(
+                  foregroundBuilder: (context, states, child) =>
+                      child ?? const SizedBox.shrink()),
               onPressed: widget.onPressed,
               icon: Icon(widget.icon, size: 20),
               label: Text(widget.label, textAlign: TextAlign.center))));

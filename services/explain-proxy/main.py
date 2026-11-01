@@ -7,32 +7,73 @@ never in the APK. No photo is ever received.
 """
 import json
 import os
+import time
+from collections import defaultdict, deque
+from typing import Annotated, Literal
 
 import httpx
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', '')
 GEMINI_KEY = os.environ.get('GEMINI_API_KEY', '')
 MODELS = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest']
 
-app = FastAPI(title='pluto-explain-proxy')
+RATE_LIMIT, RATE_WINDOW_S = 10, 60  # explanations per user per minute
+MAX_BODY_BYTES = 4096
+
+# No interactive docs in production; nothing to browse.
+app = FastAPI(title='pluto-explain-proxy', docs_url=None, redoc_url=None, openapi_url=None)
 _google_request = google_requests.Request()
+_calls: dict[str, deque] = defaultdict(deque)
+
+Code = Annotated[str, StringConstraints(pattern=r'^[A-Za-z0-9_]{1,64}$')]
+Type = Literal['cw', 'ccw'] | None
 
 
 class Motor(BaseModel):
-    motor: str | None = None
-    observed_type: str | None = None
-    expected_type: str | None = None
-    finding: str | None = None
+    model_config = ConfigDict(extra='forbid')
+    motor: Code | None = None
+    observed_type: Type = None
+    expected_type: Type = None
+    finding: Literal['match', 'mismatch', 'unknown'] | None = None
 
 
 class Summary(BaseModel):
-    status: str
-    reasons: list[str] = []
-    motors: list[Motor] = []
+    """Only short enumerated codes are accepted, so free text cannot reach the prompt."""
+    model_config = ConfigDict(extra='forbid')
+    status: Literal['pass', 'incorrectInstallation', 'unableToVerify',
+                    'incorrect_installation', 'unable_to_verify']
+    reasons: list[Code] = Field(default_factory=list, max_length=12)
+    motors: list[Motor] = Field(default_factory=list, max_length=8)
+
+
+@app.middleware('http')
+async def harden(request: Request, call_next):
+    if int(request.headers.get('content-length') or 0) > MAX_BODY_BYTES:
+        from fastapi.responses import JSONResponse
+        return JSONResponse({'detail': 'payload too large'}, status_code=413)
+    response = await call_next(request)
+    response.headers.update({
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'Referrer-Policy': 'no-referrer',
+        'Cache-Control': 'no-store',
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    })
+    return response
+
+
+def _rate_limited(uid: str) -> bool:
+    now, q = time.monotonic(), _calls[uid]
+    while q and now - q[0] > RATE_WINDOW_S:
+        q.popleft()
+    if len(q) >= RATE_LIMIT:
+        return True
+    q.append(now)
+    return False
 
 
 def prompt_for(summary: Summary) -> str:
@@ -60,8 +101,10 @@ async def explain(summary: Summary, authorization: str = Header(default='')):
             authorization.removeprefix('Bearer '), _google_request, audience=PROJECT_ID)
     except Exception:
         raise HTTPException(401, 'invalid token')
-    if not claims:
+    if not claims or not claims.get('email_verified', False):
         raise HTTPException(401, 'invalid token')
+    if _rate_limited(claims['sub']):
+        raise HTTPException(429, 'too many requests, try again in a minute')
     body = {'contents': [{'parts': [{'text': prompt_for(summary)}]}]}
     async with httpx.AsyncClient(timeout=12) as client:
         for model in MODELS:

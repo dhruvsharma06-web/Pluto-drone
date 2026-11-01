@@ -694,21 +694,12 @@ html[data-scene='flight'] .reticle.is-live {
 .flow {
   margin-top: 30px;
   border-top: 1px solid var(--line);
-  counter-reset: flow;
 }
 .flow li {
-  counter-increment: flow;
   display: grid;
-  grid-template-columns: 2.4rem 1fr;
-  column-gap: 12px;
+  grid-template-columns: 1fr;
   padding: 16px 0;
   border-bottom: 1px solid var(--line);
-}
-.flow li::before {
-  content: counter(flow);
-  grid-row: 1 / span 2;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
 }
 .flow b {
   font-weight: 600;

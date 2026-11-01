@@ -178,13 +178,6 @@ export function mountStage(reducedMotion: boolean) {
     viewShiftY: 0.02,
     assemble: true,
     onFrame: placeTags,
-    onLanded: (kind) => {
-      // Name each part as it locks into place during the opening.
-      const t = tags.find((x) => x.land === kind);
-      if (!t || active !== 'hero') return;
-      t.el.classList.add('is-on');
-      window.setTimeout(() => t.el.classList.remove('is-on'), 1400);
-    },
     onAssembled: () => {
       assembled = true;
       document.dispatchEvent(new Event('drone:assembled'));

@@ -19,11 +19,20 @@ const reveal = () => document.documentElement.classList.add('is-loaded');
 window.setTimeout(reveal, reducedMotion ? 0 : 4800);
 document.addEventListener('drone:assembled', reveal, { once: true });
 
-// Header turns solid once the page scrolls.
-const bar = document.querySelector<HTMLElement>('.bar');
-const onScroll = () => bar?.classList.toggle('is-scrolled', window.scrollY > 40);
-window.addEventListener('scroll', onScroll, { passive: true });
-onScroll();
+// Mirror the existing scene state in the header without changing scroll behavior.
+const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('.pill-nav a')];
+const syncNav = () => {
+  const scene = document.documentElement.dataset.scene ?? 'hero';
+  const target = scene === 'propeller' || scene === 'flight' ? 'apart' : scene;
+  navLinks.forEach((link) => {
+    if (link.hash === `#${target}`) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+};
+new MutationObserver(syncNav).observe(document.documentElement, {
+  attributes: true, attributeFilter: ['data-scene'],
+});
+syncNav();
 
 // Stagger order for each scene's entering copy.
 document.querySelectorAll('.scene').forEach((scene) =>

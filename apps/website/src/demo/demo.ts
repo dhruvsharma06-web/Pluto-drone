@@ -36,13 +36,13 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 
 function why(r: VerificationResult): string {
   const mism = r.motors.filter((m) => m.finding === 'mismatch').length;
-  if (r.status === 'pass') return 'Every required check was observable and every position matched the fixture reference.';
+  if (r.status === 'pass') return 'All required checks match the sample reference.';
   if (r.status === 'incorrect_installation')
-    return `The evidence was sufficient and ${mism === 1 ? 'one position confirmably differs' : `${mism} positions confirmably differ`} from the fixture reference.`;
-  if (r.reasons.includes('REFERENCE_NOT_CONFIGURED')) return 'There is no verified reference, so no position can be checked.';
+    return `${mism === 1 ? 'One position differs' : `${mism} positions differ`} from the sample reference.`;
+  if (r.reasons.includes('REFERENCE_NOT_CONFIGURED')) return 'A verified reference is needed to check the installation.';
   return mism
-    ? 'The image cannot support a full check. A confirmed partial finding is still listed, but no overall verdict is claimed.'
-    : 'The image cannot support a full check, so the app stops instead of guessing.';
+    ? 'Some findings are available, but a complete check is not possible.'
+    : 'The image does not provide enough evidence for a complete check.';
 }
 
 function map(r: VerificationResult): string {
@@ -88,14 +88,21 @@ function render(out: HTMLElement, r: VerificationResult, source: string, animate
         .join('')}</ul>`
     : '';
   out.innerHTML = `<div class="out out--${TONE[r.status]}${animate ? ' is-entering' : ''}">
-    <p class="out__source"><strong>Fixture</strong> · ${esc(source)} · evidence_source: ${esc(r.evidence_source)}</p>
+    <p class="out__source">Demo · Simulated results</p>
     <p class="out__verdict"><span class="glyph" aria-hidden="true">${GLYPH[r.status]}</span>${STATUS_LABEL[r.status]}</p>
-    <div class="out__why"><p>${why(r)}</p>${reasons}</div>
-    <div class="out__body">
-      <div>${map(r)}<p class="out__mapnote">Positions drawn for illustration only. Real motor identities come from the verified reference.</p></div>
-      ${findings(r)}
-    </div>
-    <details><summary>Result JSON (contract v1.0.0)</summary><pre>${esc(JSON.stringify(r, null, 2))}</pre></details>
+    <p class="out__why">${why(r)}</p>
+    <details class="out__details">
+      <summary>View example details</summary>
+      ${reasons}
+      <div class="out__body">
+        <div>${map(r)}<p class="out__mapnote">Illustrative positions · not a real motor map.</p></div>
+        ${findings(r)}
+      </div>
+      <details><summary>Technical data</summary>
+        <p class="out__mapnote">Fixture source: ${esc(source)}</p>
+        <pre>${esc(JSON.stringify(r, null, 2))}</pre>
+      </details>
+    </details>
   </div>`;
 }
 
@@ -132,7 +139,7 @@ export function initDemo(reducedMotion: boolean) {
   const show = (r: VerificationResult, source: string) => {
     clearTimeout(timer);
     if (reducedMotion) return render(out, r, source, false);
-    out.innerHTML = '<div class="out out--cleared"><p>Input changed — previous result cleared.</p></div>';
+    out.innerHTML = '<div class="out out--cleared"><p class="out__source">Demo · Simulated results</p><p>Updating example…</p></div>';
     timer = window.setTimeout(() => render(out, r, source, true), 220);
   };
 

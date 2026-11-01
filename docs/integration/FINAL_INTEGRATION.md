@@ -49,3 +49,13 @@ Without a key, or offline, the built-in guidance is shown instead.
 
 The ONNX model is distributed with the APK and recorded (path, SHA-256, metrics) in
 `docs/integration/model.json`; weights are not committed (repository rule on large binaries).
+
+## Deployed backend
+
+- GCP project `pluto-inspector-1101` (billing linked), Cloud Run service `pluto-explain-proxy`
+  in `asia-south1`: https://pluto-explain-proxy-619853330643.asia-south1.run.app
+- Public ingress; every `/explain` call must carry a Firebase ID token for project
+  `pluto-inspector-1101` (verified server-side; missing/invalid tokens return 401).
+- Gemini key in Secret Manager `gemini-api-key`, readable only by the Cloud Run service account.
+- App build: `--dart-define=EXPLAIN_PROXY_URL=<url>`. The app uses the proxy once Firebase is
+  configured (`android/app/google-services.json`); until then it falls back to the direct key.

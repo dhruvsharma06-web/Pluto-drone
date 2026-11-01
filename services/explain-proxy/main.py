@@ -46,8 +46,8 @@ def prompt_for(summary: Summary) -> str:
             'suggest arming or spinning the motors. Plain text, no markdown.')
 
 
-@app.get('/healthz')
-def healthz():
+@app.get('/health')  # /healthz is reserved by Cloud Run
+def health():
     return {'ok': True}
 
 

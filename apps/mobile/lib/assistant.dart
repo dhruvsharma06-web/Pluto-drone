@@ -68,7 +68,7 @@ Future<String> explainWithGemini(VerificationResult r) async {
         }
     ],
   };
-  if (_proxyUrl.isNotEmpty) {
+  if (_proxyUrl.isNotEmpty && firebaseReady) {
     final token = await idToken();
     final res = await http
         .post(Uri.parse('$_proxyUrl/explain'),

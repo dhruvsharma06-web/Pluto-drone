@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "description": "Website asset manifest (frontend/website). Only an entry with role 'drone-model' and status 'approved' replaces the illustrative schematic. See docs/website/ASSET_BRIEF.md.",
+  "assets": [
+    {
+      "id": "schematic-v1",
+      "role": "drone-schematic",
+      "status": "approved",
+      "kind": "procedural",
+      "source": "apps/website/src/viewer/schematic.ts (drawn in code by the website workstream)",
+      "basis": "Proportions eyeballed from team photos of the supplied drone shared on 2026-11-01; photos are not committed or published.",
+      "rights": "Original work for this project.",
+      "illustrative": true,
+      "establishes": "Nothing about exact geometry, motor identities, propeller types or orientation."
+    },
+    {
+      "id": "schematic-poster-v1",
+      "role": "fallback-poster",
+      "status": "approved",
+      "kind": "inline-svg",
+      "source": "index.html #drone-top symbol",
+      "rights": "Original work for this project.",
+      "illustrative": true
+    },
+    {
+      "id": "drone-model",
+      "role": "drone-model",
+      "status": "pending",
+      "path": null,
+      "front_defined": false,
+      "notes": "Awaiting an approved, rights-cleared model of the supplied drone. Do not use pluto-x-glb.zip (excluded: different problem statement)."
+    },
+    {
+      "id": "pluto-x-glb",
+      "role": "drone-model",
+      "status": "excluded",
+      "path": null,
+      "notes": "pluto-x-glb.zip belongs to another problem statement. Never import or reuse its geometry."
+    },
+    {
+      "id": "app-screenshots",
+      "role": "app-screenshots",
+      "status": "pending",
+      "path": null,
+      "notes": "Page shows labelled mockups until the app owner captures real Android screenshots."
+    }
+  ]
+}

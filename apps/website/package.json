@@ -1,0 +1,25 @@
+{
+  "name": "pluto-inspector-website",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Public overview website for the Pluto propeller installation verifier (frontend/website workstream).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "tsc --noEmit && vitest run && vite build"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.170.0",
+    "typescript": "5.6.3",
+    "vite": "6.0.7",
+    "vitest": "3.0.5"
+  }
+}

@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Pluto Inspector — propeller installation check</title>
+    <meta
+      name="description"
+      content="An Android app, in development, that checks a disarmed drone's propeller installation from a photo or the live camera and answers Pass, Incorrect Installation or Unable to Verify."
+    />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="grain" aria-hidden="true"></div>
+
+    <!-- Shared drawings. Top-view schematic: illustrative proportions only, no motor identities. -->
+    <svg class="sprite" aria-hidden="true" focusable="false">
+      <symbol id="prop" viewBox="-60 -60 120 120">
+        <path d="M6,-4 C20,-13 44,-13 54,-5 Q59,0 54,4 C44,8 22,7 6,4 Z" />
+        <path d="M6,-4 C20,-13 44,-13 54,-5 Q59,0 54,4 C44,8 22,7 6,4 Z" transform="rotate(180)" />
+        <circle r="7" />
+      </symbol>
+      <symbol id="drone-top" viewBox="-180 -180 360 360">
+        <g class="d-arms">
+          <path d="M38,60 L126,124 M-38,60 L-126,124 M-38,-64 L-126,-120 M38,-64 L126,-120" />
+        </g>
+        <rect class="d-body" x="-46" y="-100" width="92" height="196" rx="36" />
+        <g class="d-pods">
+          <circle cx="126" cy="124" r="12" /><circle cx="-126" cy="124" r="12" />
+          <circle cx="-126" cy="-120" r="12" /><circle cx="126" cy="-120" r="12" />
+        </g>
+        <g class="d-props">
+          <use href="#prop" x="66" y="64" width="120" height="120" transform="rotate(29 126 124)" />
+          <use href="#prop" x="-186" y="64" width="120" height="120" transform="rotate(126 -126 124)" />
+          <use href="#prop" x="-186" y="-180" width="120" height="120" transform="rotate(158 -126 -120)" />
+          <use href="#prop" x="66" y="-180" width="120" height="120" transform="rotate(63 126 -120)" />
+        </g>
+      </symbol>
+    </svg>
+
+    <header class="bar">
+      <a class="wordmark" href="#top" aria-label="Pluto Inspector, back to top">Pluto Inspector</a>
+      <nav aria-label="Sections">
+        <ul>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#results">Results</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#evidence">Evidence</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--small" href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">Source</a>
+    </header>
+
+    <main id="main">
+      <!-- A + B. Opening and scroll story: one full-screen cinematic stage, captions scroll over it. -->
+      <section class="story" id="top" aria-labelledby="hero-title">
+        <div class="story__stage">
+          <figure class="stage stage--dark stage--cinema" data-viewer="story" data-state="poster">
+            <div class="stage__poster" aria-hidden="true">
+              <svg viewBox="-180 -180 360 360"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /></svg>
+            </div>
+            <div class="stage__canvas" data-canvas></div>
+            <div class="hud" aria-hidden="true">
+              <span class="hud__corner hud__corner--tl"></span><span class="hud__corner hud__corner--tr"></span>
+              <span class="hud__corner hud__corner--bl"></span><span class="hud__corner hud__corner--br"></span>
+              <span class="hud__scan"></span>
+            </div>
+            <div class="stage__tags" aria-hidden="true">
+              <span class="tag" data-anchor="body" data-land="body">Body shell</span>
+              <span class="tag" data-anchor="arm0" data-land="arm">Arms</span>
+              <span class="tag" data-anchor="motor1" data-land="motor">Motors</span>
+              <span class="tag" data-anchor="propTip0" data-land="propeller">Propellers</span>
+              <span class="tag" data-anchor="body" data-steps="2">Body shell</span>
+              <span class="tag" data-anchor="arm1" data-steps="3">Arm</span>
+              <span class="tag" data-anchor="motor0" data-steps="4">Motor</span>
+              <span class="tag" data-anchor="propTip0" data-steps="5">Resting angle — not an error</span>
+            </div>
+            <figcaption class="stage__note">Illustrative schematic — not the supplied drone's measured geometry or motor map.</figcaption>
+            <p class="visually-hidden" role="status" data-viewer-status></p>
+          </figure>
+        </div>
+
+        <div class="story__steps">
+          <header class="step step--hero" data-step="0">
+            <h1 id="hero-title" class="display" data-words>Check the props before you fly.</h1>
+            <p class="lead">
+              An Android app that inspects a disarmed drone's propellers from a photo or the live camera — and answers
+              <strong>Pass</strong>, <strong>Incorrect Installation</strong> or <strong>Unable to Verify</strong>.
+            </p>
+            <div class="actions">
+              <a class="btn" href="#how">How a check works</a>
+              <a class="btn btn--quiet" href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">Source on GitHub</a>
+            </div>
+            <p class="availability"><span class="dot dot--pending" aria-hidden="true"></span>APK not released yet</p>
+          </header>
+
+          <article class="step" data-step="1" aria-labelledby="s1">
+            <h2 id="s1">The airframe.</h2>
+            <p>A small quadcopter, four arms in an X. Everything the app checks sits at the arm tips.</p>
+          </article>
+
+          <article class="step" data-step="2" aria-labelledby="s2">
+            <h2 id="s2">Body shell.</h2>
+            <p>Not checked itself — it tells the app where the drone is and, once the verified reference defines it, which way it faces.</p>
+          </article>
+
+          <article class="step" data-step="3" aria-labelledby="s3">
+            <h2 id="s3">Arms.</h2>
+            <p>Hide one and its motor cannot be checked. That ends in Unable to Verify, never a guess.</p>
+          </article>
+
+          <article class="step" data-step="4" aria-labelledby="s4">
+            <h2 id="s4">Motors.</h2>
+            <p>Four inspection points. Which motor is which comes from the verified reference — never from a drawing.</p>
+          </article>
+
+          <article class="step" data-step="5" aria-labelledby="s5">
+            <h2 id="s5">The propeller.</h2>
+            <p>Right type, right motor, right way up? That is the whole question. Where a blade comes to rest is never an error.</p>
+            <a class="text-link" href="#explore">Inspect it yourself</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- B (interactive). Explore viewer. -->
+      <section class="explore field-bench" id="explore" aria-labelledby="explore-title">
+        <div class="wrap explore__grid">
+          <div class="explore__copy">
+            <h2 id="explore-title" data-words>Inspect the schematic.</h2>
+            <p>
+              Drag to turn it, pick a component, or switch to low light to see why poor lighting is a reason to stop
+              rather than guess. Keyboard: arrow keys rotate, + and − zoom, 0 resets.
+            </p>
+            <fieldset class="parts" data-parts>
+              <legend>Component</legend>
+              <button type="button" class="chip" aria-pressed="true" data-part="">Whole drone</button>
+              <button type="button" class="chip" aria-pressed="false" data-part="body">Body shell</button>
+              <button type="button" class="chip" aria-pressed="false" data-part="arm">Arms</button>
+              <button type="button" class="chip" aria-pressed="false" data-part="motor">Motors</button>
+              <button type="button" class="chip" aria-pressed="false" data-part="propeller">Propellers</button>
+            </fieldset>
+            <div class="part-info" data-part-info aria-live="polite">
+              <h3 data-part-title>Whole drone</h3>
+              <p data-part-text>
+                A body shell with four arms in an X. The app inspects the four arm tips, where the motors and propellers
+                are.
+              </p>
+            </div>
+          </div>
+
+          <figure class="stage stage--light" data-viewer="explore" data-state="poster">
+            <div class="stage__poster" aria-hidden="true">
+              <svg viewBox="-180 -180 360 360"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /></svg>
+            </div>
+            <div
+              class="stage__canvas stage__canvas--interactive"
+              data-canvas
+              tabindex="0"
+              role="application"
+              aria-roledescription="3D viewer"
+              aria-label="Illustrative drone schematic. Arrow keys rotate, plus and minus zoom, 0 resets, T top view, S side view, P perspective."
+            ></div>
+            <p class="stage__hint" data-hint aria-hidden="true">Drag to turn</p>
+            <div class="toolbar" role="toolbar" aria-label="Viewer controls">
+              <div class="toolbar__group">
+                <button type="button" class="tool" data-view="perspective" aria-label="Perspective view">Perspective</button>
+                <button type="button" class="tool" data-view="top" aria-label="Top view">Top</button>
+                <button type="button" class="tool" data-view="side" aria-label="Side view">Side</button>
+                <button type="button" class="tool" data-act="turn" aria-label="Turn the drone once, 360 degrees">360°</button>
+              </div>
+              <div class="toolbar__group">
+                <button type="button" class="tool tool--icon" data-act="zoom-out" aria-label="Zoom out">−</button>
+                <button type="button" class="tool tool--icon" data-act="zoom-in" aria-label="Zoom in">+</button>
+                <button type="button" class="tool" data-act="close-up" aria-label="Close-up">Close-up</button>
+                <button type="button" class="tool" data-act="explode" aria-pressed="false" aria-label="Separate parts">Separate</button>
+                <button type="button" class="tool" data-act="light" aria-pressed="false" aria-label="Low light">Low light</button>
+                <button type="button" class="tool" data-act="reset" aria-label="Reset view">Reset</button>
+                <button type="button" class="tool" data-act="expand" aria-label="Expand viewer">Expand</button>
+              </div>
+            </div>
+            <figcaption class="stage__note">
+              Illustrative schematic. Front view appears once an approved model defines which end is the front.
+            </figcaption>
+            <p class="visually-hidden" role="status" data-viewer-status></p>
+          </figure>
+        </div>
+
+        <dialog class="expanded" data-expanded aria-labelledby="expanded-title">
+          <div class="expanded__bar">
+            <h2 id="expanded-title">Schematic, expanded</h2>
+            <p>Scroll or pinch to zoom here. Esc closes.</p>
+            <button type="button" class="btn btn--small" data-act="collapse">Close</button>
+          </div>
+          <div class="expanded__slot" data-expanded-slot></div>
+        </dialog>
+      </section>
+
+      <!-- C. Installation problems -->
+      <section class="problems field-paper" id="problems" aria-labelledby="problems-title">
+        <div class="wrap">
+          <h2 id="problems-title" class="section-title" data-words>What an inspection looks for.</h2>
+          <p class="section-lead">
+            Four kinds of problem, in plain terms. Which of them the app detects reliably on the real drone is still being
+            measured, and is reported under evidence below.
+          </p>
+
+          <ul class="problem-list">
+            <li class="problem" data-reveal>
+              <svg class="ill" viewBox="0 0 280 150" role="img" aria-labelledby="ill1">
+                <title id="ill1">A reference propeller beside the mirrored type, which does not match.</title>
+                <g class="ill-ref"><use href="#prop" x="20" y="15" width="120" height="120" transform="rotate(20 80 75)" /></g>
+                <g class="ill-fault"><use href="#prop" x="140" y="15" width="120" height="120" transform="translate(400 0) scale(-1 1) rotate(20 200 75)" /></g>
+                <text x="80" y="146" class="ill-label">Reference type</text>
+                <text x="200" y="146" class="ill-label">Fitted: mirrored</text>
+              </svg>
+              <div>
+                <h3>Wrong propeller type on a motor.</h3>
+                <p>
+                  A propeller made for the opposite spin direction is fitted to this motor. The app compares the type it
+                  sees with the type the verified reference lists for that motor.
+                </p>
+              </div>
+            </li>
+
+            <li class="problem" data-reveal>
+              <svg class="ill" viewBox="0 0 280 150" role="img" aria-labelledby="ill2">
+                <title id="ill2">Two propellers swapped between neighbouring motors.</title>
+                <g class="ill-ink"><circle cx="70" cy="70" r="12" /><circle cx="210" cy="70" r="12" /><path d="M82,70 L198,70" class="ill-line" /></g>
+                <g class="ill-fault">
+                  <use href="#prop" x="10" y="10" width="120" height="120" transform="rotate(-30 70 70)" />
+                  <use href="#prop" x="150" y="10" width="120" height="120" transform="translate(420 0) scale(-1 1) rotate(-30 210 70)" />
+                </g>
+                <path d="M100,30 C130,8 150,8 180,30 M180,30 l-10,-2 M180,30 l-3,-9" class="ill-arrow" />
+                <path d="M180,112 C150,134 130,134 100,112 M100,112 l10,2 M100,112 l3,9" class="ill-arrow" />
+                <text x="140" y="146" class="ill-label">Each fits some motor — not this one</text>
+              </svg>
+              <div>
+                <h3>Propellers swapped between motors.</h3>
+                <p>
+                  Each propeller is correct for some motor, just not the one it is on. Only checking every position
+                  against the verified configuration — not a generic quadcopter diagram — catches this.
+                </p>
+              </div>
+            </li>
+
+            <li class="problem" data-reveal>
+              <svg class="ill" viewBox="0 0 280 150" role="img" aria-labelledby="ill3">
+                <title id="ill3">Side view: a propeller seated correctly, and one seated upside down.</title>
+                <g class="ill-ref">
+                  <rect x="64" y="70" width="32" height="54" rx="6" />
+                  <path d="M30,60 Q55,50 80,62 Q105,74 130,64 L130,70 Q105,80 80,68 Q55,56 30,66 Z" />
+                  <circle cx="80" cy="54" r="7" />
+                </g>
+                <g class="ill-fault">
+                  <rect x="184" y="70" width="32" height="54" rx="6" />
+                  <path d="M150,66 Q175,76 200,64 Q225,52 250,62 L250,68 Q225,58 200,70 Q175,82 150,72 Z" />
+                  <circle cx="200" cy="80" r="7" />
+                </g>
+                <text x="80" y="146" class="ill-label">Seated as referenced</text>
+                <text x="200" y="146" class="ill-label">Upside down</text>
+              </svg>
+              <div>
+                <h3>Seated the wrong way up.</h3>
+                <p>
+                  Some installation errors change what the camera sees at the hub and blade edges. The app reports
+                  orientation only where the image actually shows it; pitch details a single photo cannot show are
+                  reported as unknown.
+                </p>
+              </div>
+            </li>
+
+            <li class="problem" data-reveal>
+              <svg class="ill" viewBox="0 0 280 150" role="img" aria-labelledby="ill4">
+                <title id="ill4">A camera frame that cuts off part of a blurred drone.</title>
+                <g class="ill-blur"><use href="#drone-top" x="70" y="10" width="200" height="200" /></g>
+                <path d="M40,20 h26 M40,20 v26 M240,20 h-26 M240,20 v26 M40,130 h26 M40,130 v-26 M240,130 h-26 M240,130 v-26" class="ill-frame" />
+                <text x="140" y="146" class="ill-label">Blurred, and one arm out of frame</text>
+              </svg>
+              <div>
+                <h3>Evidence that is not there.</h3>
+                <p>
+                  Blur, poor light, a cropped arm, an unsupported angle or a propeller that cannot be told apart hide the
+                  details a check depends on. These never become a Pass.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- D. Pipeline -->
+      <section class="how field-paper" id="how" aria-labelledby="how-title">
+        <div class="wrap how__grid">
+          <div class="how__head">
+            <h2 id="how-title" class="section-title" data-words>How a check works.</h2>
+            <p class="section-lead">
+              Six steps, handled by separate parts of the app so that the camera, the vision core and the screen can each
+              be tested and replaced on their own.
+            </p>
+          </div>
+          <ol class="pipeline">
+            <li data-reveal>
+              <span class="layer">Safety</span>
+              <h3>Disarm the drone and stop every motor.</h3>
+              <p>
+                The app walks through the procedure and asks you to confirm it. A tick box cannot prove the hardware is
+                disarmed, so the procedure comes first. The app never arms the drone or spins a motor.
+              </p>
+            </li>
+            <li data-reveal>
+              <span class="layer">Acquisition</span>
+              <h3>Choose the live camera or upload a photo.</h3>
+              <p>Both inputs lead to the same check. The Android runtime prepares an upright, unmirrored image.</p>
+            </li>
+            <li data-reveal>
+              <span class="layer">Acquisition</span>
+              <h3>Capture evidence the check can use.</h3>
+              <p>The whole drone in frame, in focus, in usable light, from a supported view.</p>
+            </li>
+            <li data-reveal>
+              <span class="layer">Vision core</span>
+              <h3>Locate and classify each propeller.</h3>
+              <p>
+                Find the motor positions, then read propeller type and any orientation detail the image actually shows.
+              </p>
+            </li>
+            <li data-reveal>
+              <span class="layer">Vision core</span>
+              <h3>Compare with the verified reference.</h3>
+              <p>Every observation is checked against the supplied drone's verified configuration. No reference, no verdict.</p>
+            </li>
+            <li data-reveal>
+              <span class="layer">App screen</span>
+              <h3>Show the result and what to fix.</h3>
+              <p>One of three results, the affected motor highlighted, and a correction where the evidence supports one.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>Pass ✓ · Incorrect Installation ✕ · Unable to Verify ? ·</span>
+          <span>Pass ✓ · Incorrect Installation ✕ · Unable to Verify ? ·</span>
+        </div>
+      </div>
+
+      <!-- E. Results and the fixture demo -->
+      <section class="results field-dark" id="results" aria-labelledby="results-title">
+        <div class="wrap">
+          <h2 id="results-title" class="section-title" data-words>Three results. Nothing in between.</h2>
+
+          <dl class="verdicts">
+            <div class="verdict verdict--pass" data-reveal>
+              <dt><span class="glyph" aria-hidden="true">✓</span>Pass</dt>
+              <dd>
+                Every required check was observable and every propeller matched the verified reference. A Pass is a visual
+                installation check, not general flight clearance.
+              </dd>
+            </div>
+            <div class="verdict verdict--fail" data-reveal>
+              <dt><span class="glyph" aria-hidden="true">✕</span>Incorrect Installation</dt>
+              <dd>The evidence was sufficient and at least one propeller confirmably differs from the reference.</dd>
+            </div>
+            <div class="verdict verdict--unable" data-reveal>
+              <dt><span class="glyph" aria-hidden="true">?</span>Unable to Verify</dt>
+              <dd>
+                No verified reference or engine, or the image could not support the check. Confirmed partial findings may
+                still be listed — but never a Pass.
+              </dd>
+            </div>
+          </dl>
+          <p class="aside">Loading and camera or device errors are separate screens, not results.</p>
+
+          <div class="demo" id="demo" aria-labelledby="demo-title">
+            <div class="demo__head">
+              <h3 id="demo-title">Try the rules.</h3>
+              <p class="fixture-flag">
+                <strong>Fixture demo.</strong> Made-up inputs run through the result rules from the shared contract. Nothing
+                here looks at a photo, and these are not predictions.
+              </p>
+            </div>
+
+            <div class="demo__grid">
+              <form class="demo__controls" data-demo-form>
+                <fieldset>
+                  <legend>Evidence in the image</legend>
+                  <label class="switch"><input type="checkbox" name="referenceLoaded" checked /><span>Verified reference loaded</span></label>
+                  <label class="switch"><input type="checkbox" name="wholeDrone" checked /><span>Whole drone in frame</span></label>
+                  <label class="switch"><input type="checkbox" name="inFocus" checked /><span>Image in focus</span></label>
+                  <label class="switch"><input type="checkbox" name="usableLight" checked /><span>Usable light</span></label>
+                  <label class="switch"><input type="checkbox" name="allClassified" checked /><span>Every propeller classified</span></label>
+                </fieldset>
+                <fieldset>
+                  <legend>Installation</legend>
+                  <label class="radio"><input type="radio" name="fault" value="none" checked /><span>All as referenced</span></label>
+                  <label class="radio"><input type="radio" name="fault" value="type" /><span>Wrong propeller type</span></label>
+                  <label class="radio"><input type="radio" name="fault" value="orientation" /><span>Upside down</span></label>
+                  <label class="select">
+                    <span>At position</span>
+                    <select name="faultMotor">
+                      <option>FIXTURE_1</option>
+                      <option>FIXTURE_2</option>
+                      <option>FIXTURE_3</option>
+                      <option>FIXTURE_4</option>
+                    </select>
+                  </label>
+                </fieldset>
+                <fieldset>
+                  <legend>Load a shared fixture file</legend>
+                  <div class="preset-row">
+                    <button type="button" class="chip" data-preset="pass">pass.json</button>
+                    <button type="button" class="chip" data-preset="incorrect">incorrect.json</button>
+                    <button type="button" class="chip" data-preset="unclear">unclear.json</button>
+                    <button type="button" class="chip" data-preset="pending">pending.json</button>
+                  </div>
+                </fieldset>
+              </form>
+
+              <div class="demo__out" data-demo-out aria-live="polite" aria-atomic="true">
+                <noscript><p>The fixture demo needs JavaScript. The three results are described above.</p></noscript>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- F. App preview (mockups) -->
+      <section class="preview field-paper" id="app" aria-labelledby="app-title">
+        <div class="wrap">
+          <h2 id="app-title" class="section-title" data-words>The app, screen by screen.</h2>
+          <p class="section-lead">
+            These are design mockups drawn for this page, not captured app screens. Screenshots from the Android build
+            replace them once the app is running on a device.
+          </p>
+          <ol class="phones">
+            <li class="phone" data-reveal>
+              <div class="phone__screen">
+                <p class="mock-flag">Mockup</p>
+                <p class="phone__title">Before you start</p>
+                <ul class="phone__list">
+                  <li>Disarm the drone</li>
+                  <li>Wait until every motor has stopped</li>
+                  <li>Disconnect power if the procedure says so</li>
+                </ul>
+                <p class="phone__btn">I have done this</p>
+              </div>
+              <p class="phone__caption">Safety procedure and confirmation</p>
+            </li>
+            <li class="phone" data-reveal>
+              <div class="phone__screen">
+                <p class="mock-flag">Mockup</p>
+                <p class="phone__title">Choose an input</p>
+                <div class="phone__choice"><span>Live camera</span><span>Upload a photo</span></div>
+                <p class="phone__small">Keep the whole drone in frame, in focus and in good light.</p>
+              </div>
+              <p class="phone__caption">Live camera or uploaded image</p>
+            </li>
+            <li class="phone" data-reveal>
+              <div class="phone__screen">
+                <p class="mock-flag">Mockup</p>
+                <p class="phone__title">Result</p>
+                <p class="phone__verdict">Incorrect Installation</p>
+                <svg class="phone__map" viewBox="-180 -180 360 360" aria-hidden="true"><use href="#drone-top" x="-180" y="-180" width="360" height="360" /><circle cx="126" cy="124" r="34" class="phone__ring" /></svg>
+                <p class="phone__small">FIXTURE_1: swap for the type the reference lists.</p>
+              </div>
+              <p class="phone__caption">Result, affected motor and guidance</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- G. Architecture -->
+      <section class="arch field-bench" id="architecture" aria-labelledby="arch-title">
+        <div class="wrap arch__grid">
+          <div>
+            <h2 id="arch-title" class="section-title" data-words>Built as separate parts, on purpose.</h2>
+            <p class="section-lead">
+              Detection and verification never depend on the screen or the phone. Each layer meets the next through a
+              versioned contract, so the vision core can be reused on other platforms later. Android is the only target
+              today; nothing else has been tested.
+            </p>
+          </div>
+          <ol class="stack">
+            <li class="stack__item" data-reveal>
+              <h3>App screens</h3>
+              <p>Flutter presentation: safety steps, input choice, results.</p>
+              <code>packages/inspection_ui</code>
+            </li>
+            <li class="stack__joint">InspectionController · contract v1.0.0</li>
+            <li class="stack__item" data-reveal>
+              <h3>Acquisition and Android runtime</h3>
+              <p>Camera and upload, image preparation, lifecycle, stale-result suppression.</p>
+              <code>packages/inspection_runtime · apps/mobile</code>
+            </li>
+            <li class="stack__joint">VerificationEngine · VerificationResult schema</li>
+            <li class="stack__item stack__item--core" data-reveal>
+              <h3>Vision and verification core</h3>
+              <p>Locates and classifies propellers, compares them with the reference, returns a structured result.</p>
+              <code>vision/ · ml/</code>
+            </li>
+            <li class="stack__item" data-reveal>
+              <h3>Reference configuration</h3>
+              <p>The supplied drone's verified motor, type and orientation map. Pending verification.</p>
+              <code>reference/config · contracts/reference.schema.json</code>
+            </li>
+            <li class="stack__item" data-reveal>
+              <h3>Dataset and evaluation</h3>
+              <p>Labelled real photos, separate train, validation and test groups if a model is trained.</p>
+              <code>datasets/ · ml/</code>
+            </li>
+            <li class="stack__item stack__item--aside" data-reveal>
+              <h3>This website</h3>
+              <p>Independent of the app. Explains the project; runs no detection.</p>
+              <code>apps/website</code>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- H. Evidence and limitations -->
+      <section class="evidence field-paper" id="evidence" aria-labelledby="evidence-title">
+        <div class="wrap">
+          <h2 id="evidence-title" class="section-title" data-words>What is proven so far.</h2>
+          <div class="evidence__grid">
+            <div class="evidence__metrics">
+              <h3>Measured results</h3>
+              <p class="big-statement">None yet.</p>
+              <p>
+                Detection quality, how often unclear images are correctly refused, and timing on a phone will appear here
+                once the vision workstream evaluates on a held-out test set of real photographs of the supplied drone. No
+                figure on this page is estimated or simulated.
+              </p>
+              <h3>In the repository today</h3>
+              <ul class="ticks">
+                <li>Versioned result and reference schemas, with labelled fixture files.</li>
+                <li>A contract checker for those files.</li>
+                <li>A safe app scaffold that answers Unable to Verify until a reference and engine exist.</li>
+                <li>This website, with tests for its fixture demo.</li>
+              </ul>
+            </div>
+            <div class="evidence__table">
+              <h3>Requirements and evidence</h3>
+              <table>
+                <caption class="visually-hidden">Project requirements and the state of their evidence</caption>
+                <thead>
+                  <tr><th scope="col">Requirement</th><th scope="col">Evidence</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Live camera and uploaded image</td><td><span class="dot dot--pending"></span>Pending</td></tr>
+                  <tr><td>Propeller position, type and visible orientation</td><td><span class="dot dot--pending"></span>Pending</td></tr>
+                  <tr><td>Comparison with the verified reference</td><td><span class="dot dot--pending"></span>Pending reference</td></tr>
+                  <tr><td>Affected motor and correction</td><td><span class="dot dot--pending"></span>Pending</td></tr>
+                  <tr><td>Exactly three results</td><td><span class="dot dot--partial"></span>In contract; app pending</td></tr>
+                  <tr><td>No Pass on inadequate evidence</td><td><span class="dot dot--partial"></span>In contract; app pending</td></tr>
+                  <tr><td>Disarmed, motors stopped, no control</td><td><span class="dot dot--pending"></span>Pending</td></tr>
+                  <tr><td>Core separate from UI and platform</td><td><span class="dot dot--partial"></span>Structure in place</td></tr>
+                  <tr><td>Labelled real dataset and tests</td><td><span class="dot dot--pending"></span>Pending</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h3 class="limits-title">Known limits</h3>
+          <ul class="limits">
+            <li><strong>Blur and poor light</strong> hide the details a check needs.</li>
+            <li><strong>Occlusion and framing</strong>: a hidden or cropped arm leaves a motor unchecked.</li>
+            <li><strong>Unsupported views</strong>: only the views listed in the verified reference count.</li>
+            <li><strong>Uncertain classification</strong> is reported as unknown, not guessed.</li>
+            <li><strong>Unobservable orientation</strong>: some pitch details cannot be seen in one image.</li>
+            <li><strong>The reference itself</strong>: every verdict is only as right as the verified configuration.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- I. Resources -->
+      <section class="resources field-dark" id="resources" aria-labelledby="resources-title">
+        <div class="wrap">
+          <h2 id="resources-title" class="section-title" data-words>Resources.</h2>
+          <ul class="res-list">
+            <li class="res">
+              <h3>Source code</h3>
+              <p>Complete modular source: app, vision core, contracts, docs and this site.</p>
+              <a class="res__link" href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">github.com/dhruvsharma06-web/Pluto-drone</a>
+            </li>
+            <li class="res">
+              <h3>Technical documentation</h3>
+              <p>Architecture and the shared result contract. Being expanded during the build.</p>
+              <span class="res__links">
+                <a class="res__link" href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/ARCHITECTURE.md" rel="noopener">Architecture</a>
+                <a class="res__link" href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/CONTRACT.md" rel="noopener">Contract v1.0.0</a>
+              </span>
+            </li>
+            <li class="res">
+              <h3>Reference configuration</h3>
+              <p>A placeholder with no motor mapping exists; the verified configuration is pending.</p>
+              <a class="res__link" href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/reference/config/pending.json" rel="noopener">pending.json (placeholder)</a>
+            </li>
+            <li class="res res--pending">
+              <h3>Android APK</h3>
+              <p>Not released. A download appears here when the app owner publishes a build.</p>
+              <span class="res__state"><span class="dot dot--pending" aria-hidden="true"></span>Not available yet</span>
+            </li>
+            <li class="res res--pending">
+              <h3>Labelled dataset</h3>
+              <p>Real photographs of the supplied drone with motor positions, propeller classes and error categories.</p>
+              <span class="res__state"><span class="dot dot--pending" aria-hidden="true"></span>Not available yet</span>
+            </li>
+            <li class="res res--pending">
+              <h3>Validation report</h3>
+              <p>Method, measured results and limitations from the held-out test set.</p>
+              <span class="res__state"><span class="dot dot--pending" aria-hidden="true"></span>Not available yet</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- J. Team -->
+      <section class="team field-paper" id="team" aria-labelledby="team-title">
+        <div class="wrap team__grid">
+          <h2 id="team-title" class="section-title" data-words>Four people, five workstreams.</h2>
+          <ul class="team__list">
+            <li><h3>Drone research</h3><p>Evidence about the supplied drone and its reference.</p></li>
+            <li><h3>App interface and website</h3><p>Flutter screens and this page.</p></li>
+            <li><h3>App runtime and integration</h3><p>Camera, Android build, release.</p></li>
+            <li><h3>Vision, data and evaluation</h3><p>Detection, dataset, testing.</p></li>
+          </ul>
+          <p class="team__note">Names will be added when the team confirms them.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot field-dark">
+      <div class="wrap">
+        <p class="foot__mark">Pluto Inspector</p>
+        <div class="foot__row">
+          <p>
+            Inspect with the drone disarmed and every motor stopped. A Pass is a visual installation check, not flight
+            clearance.
+          </p>
+          <p>
+            The drone on this page is an illustrative schematic. No approved 3D model, real screenshots or measured
+            results are shown yet.
+          </p>
+          <p><a href="https://github.com/dhruvsharma06-web/Pluto-drone" rel="noopener">Source on GitHub</a> · <a href="#top">Back to top</a></p>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

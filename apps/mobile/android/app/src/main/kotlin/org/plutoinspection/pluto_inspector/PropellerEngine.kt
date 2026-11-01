@@ -29,10 +29,11 @@ import kotlin.math.sqrt
  */
 class PropellerEngine(context: Context) {
     companion object {
-        const val ENGINE_VERSION = "pluto-yolo11n-propeller-1.0.0"
+        const val ENGINE_VERSION = "pluto-yolo11s-propeller-1.1.0"
         const val INPUT = 640
         const val CONF = 0.35f
-        const val MIN_CLASS_CONF = 0.50f
+        const val MIN_CLASS_CONF = 0.40f
+        const val MISMATCH_CONF = 0.60f  // a mismatch verdict needs a confident type
         const val IOU = 0.5f
         const val BLUR_MIN = 60.0      // Laplacian variance on 320px grey (sharp photos >= 134, blurred <= 12)
         const val DARK_MAX = 45.0      // mean grey below => too dark
@@ -53,7 +54,7 @@ class PropellerEngine(context: Context) {
     fun close() = session.close()
 
     data class Det(val x1: Float, val y1: Float, val x2: Float, val y2: Float,
-                   val cls: Int, val conf: Float) {
+                   val cls: Int, val conf: Float, val scores: FloatArray) {
         val cx get() = (x1 + x2) / 2
         val cy get() = (y1 + y2) / 2
     }
@@ -96,7 +97,8 @@ class PropellerEngine(context: Context) {
                 ((d.y2 / h).coerceIn(0f, 1f) - y).toDouble().coerceAtLeast(1e-4))
         }
 
-        val assignment = if (dets.size == 4) assignMotors(bmp, dets) else null
+        val typed = if (dets.size == 4) ttaTypes(bmp, dets) else dets
+        val assignment = if (typed.size == 4) assignMotors(bmp, typed) else null
         if (dets.size == 4 && assignment == null) reasons += "UNSUPPORTED_VIEW_TOP_DOWN_REQUIRED"
 
         val motors = mutableListOf<Map<String, Any?>>()
@@ -120,8 +122,14 @@ class PropellerEngine(context: Context) {
             if (reasons.isEmpty()) reasons += "MOTOR_ASSIGNMENT_FAILED"
             return result("unable_to_verify", reasons.distinct(), motors, false)
         }
-        val status = if (motors.all { it["finding"] == "match" }) "pass" else "incorrect_installation"
-        return result(status, emptyList(), motors, true)
+        val pass = motors.all { it["finding"] == "match" }
+        if (!pass && assignment!!.any { (id, d) -> TYPES[d.cls] != refMotors[id]!!["expected_type"] && d.conf < MISMATCH_CONF }) {
+            // Never claim a wrong installation from an uncertain type: ask for a retake.
+            val unknown = motors.map { it + mapOf("observed_type" to null, "observed_orientation" to null,
+                "finding" to "unknown", "correction_code" to null) }
+            return result("unable_to_verify", listOf("LOW_CONFIDENCE_CLASSIFICATION"), unknown, false)
+        }
+        return result(if (pass) "pass" else "incorrect_installation", emptyList(), motors, true)
     }
 
     private fun grey(bmp: Bitmap, target: Int): Triple<FloatArray, Int, Int> {
@@ -185,12 +193,35 @@ class PropellerEngine(context: Context) {
             if (conf < CONF) continue
             val cx = (raw[0][a] - padX) / scale; val cy = (raw[1][a] - padY) / scale
             val bw = raw[2][a] / scale; val bh = raw[3][a] / scale
-            cands += Det(cx - bw / 2, cy - bh / 2, cx + bw / 2, cy + bh / 2, best, conf)
+            val sc = FloatArray(raw.size - 4) { raw[4 + it][a] }
+            cands += Det(cx - bw / 2, cy - bh / 2, cx + bw / 2, cy + bh / 2, best, conf, sc)
         }
         // Class-agnostic NMS: one physical propeller gets one type.
         val keep = mutableListOf<Det>()
         for (d in cands.sortedByDescending { it.conf }) if (keep.none { iou(it, d) > IOU }) keep += d
         return keep
+    }
+
+    /** Average type scores over 90-degree rotations; rotation preserves CW/CCW chirality. */
+    private fun ttaTypes(bmp: Bitmap, dets: List<Det>): List<Det> {
+        val acc = dets.map { it.scores.copyOf() }
+        for (k in 1..3) {
+            // Counter-clockwise rotation, matching (x, y) -> (y, w - x) per step.
+            val m = android.graphics.Matrix().apply { postRotate(-90f * k) }
+            val rot = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, m, true)
+            val rd = detect(rot)
+            dets.forEachIndexed { i, d ->
+                var x = d.cx; var y = d.cy; var w = bmp.width.toFloat(); var h = bmp.height.toFloat()
+                repeat(k) { val nx = y; val ny = w - x; x = nx; y = ny; val t = w; w = h; h = t }
+                rd.filter { x in it.x1..it.x2 && y in it.y1..it.y2 }
+                    .minByOrNull { abs(it.cx - x) + abs(it.cy - y) }
+                    ?.let { r -> for (c in acc[i].indices) acc[i][c] += r.scores[c] }
+            }
+        }
+        return dets.mapIndexed { i, d ->
+            val best = acc[i].indices.maxByOrNull { acc[i][it] }!!
+            d.copy(cls = best, conf = acc[i][best] / 4f)
+        }
     }
 
     private fun iou(a: Det, b: Det): Float {
@@ -228,7 +259,7 @@ class PropellerEngine(context: Context) {
         val theta = 0.5 * atan2(2 * sxy, sxx - syy)
         val l1 = (sxx + syy) / 2 + sqrt(((sxx - syy) / 2) * ((sxx - syy) / 2) + sxy * sxy)
         val l2 = (sxx + syy) / 2 - sqrt(((sxx - syy) / 2) * ((sxx - syy) / 2) + sxy * sxy)
-        if (l2 <= 0 || l1 / l2 < 1.6) return null // body not clearly elongated: not top-down
+        if (l2 <= 0 || l1 / l2 < 1.4 || l1 / l2 > 4.5) return null // top-down body 1.5-4; side views 6+
         var dx = cos(theta); var dy = sin(theta)
         // Head = wider end: compare body width across the axis at each end.
         var wPlus = 0.0; var wMinus = 0.0; var cPlus = 0; var cMinus = 0
@@ -251,14 +282,14 @@ class PropellerEngine(context: Context) {
         }
         if (out.size != 4) return null
         // Perspective check: in a true top-down view opposite sides of the
-        // propeller rectangle have similar lengths.
+        // propeller rectangle have similar lengths (top-down >= 0.90, angled shots <= 0.88 on real photos).
         fun dist(a: String, b: String): Float {
             val p = out.getValue(a); val q = out.getValue(b)
             return sqrt((p.cx - q.cx) * (p.cx - q.cx) + (p.cy - q.cy) * (p.cy - q.cy))
         }
         val pairs = listOf(dist("front_left", "front_right") to dist("rear_left", "rear_right"),
             dist("front_left", "rear_left") to dist("front_right", "rear_right"))
-        if (pairs.any { (a, b) -> min(a, b) / max(a, b) < 0.8f }) return null
+        if (pairs.any { (a, b) -> min(a, b) / max(a, b) < 0.89f }) return null
         return out
     }
 }

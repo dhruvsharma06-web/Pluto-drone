@@ -191,24 +191,42 @@
           </div>
         </dl>
 
-        <div class="shots" id="demo" data-in>
-          <p class="shots__flag">Real screens from the Android app, running the on-device model.</p>
-          <ol class="shots__row">
-            <li class="shot">
-              <div class="shot__phone"><img src="./app/signin.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Pluto Inspector sign-in screen with email and password fields" /></div>
-              <p class="shot__cap"><b>Sign in</b> Email and password, per inspector.</p>
+        <div class="cases-wrap" id="demo" data-in>
+          <p class="cases__lead">Captured from the Android app on a real phone, running the on-device model.</p>
+          <ol class="cases">
+            <li class="case case--pass">
+              <figure class="case__shot"><img src="./app/case-pass.jpg" width="640" height="942" loading="lazy" decoding="async" alt="App showing Pass with all four propellers ticked" /></figure>
+              <div class="case__body">
+                <h3 class="case__title">Pass</h3>
+                <p class="case__line">All four propellers found and matched to the reference.</p>
+                <details class="case__explain">
+                  <summary>What the app says</summary>
+                  <p>All four motors have the correct propellers installed. The rear left is counter-clockwise, the rear right is clockwise, the front left is clockwise, and the front right is counter-clockwise. You do not need to swap any propellers or retake the photo.</p>
+                </details>
+              </div>
             </li>
-            <li class="shot">
-              <div class="shot__phone"><img src="./app/inspect.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Inspect screen with live camera, upload and the disarmed-motors confirmation" /></div>
-              <p class="shot__cap"><b>Inspect</b> Live camera or an uploaded photo, after confirming the motors are stopped.</p>
+            <li class="case case--fail">
+              <figure class="case__shot"><img src="./app/case-fail.jpg" width="640" height="942" loading="lazy" decoding="async" alt="App showing Incorrect Installation with the front-left propeller marked" /></figure>
+              <div class="case__body">
+                <h3 class="case__title">Incorrect Installation</h3>
+                <p class="case__line">The exact motor to fix is marked, with the correct propeller type.</p>
+                <details class="case__explain">
+                  <summary>What the app says</summary>
+                  <p>The front left motor has a mismatch. It currently has a counter-clockwise propeller, but it needs a clockwise one. Remove the incorrect propeller from the front left motor and replace it with a clockwise propeller.</p>
+                </details>
+                <p class="case__note">Test photo edited to mirror one propeller, simulating a swap.</p>
+              </div>
             </li>
-            <li class="shot shot--pass">
-              <div class="shot__phone"><img src="./app/pass.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Pass result with all four propellers boxed and matching the reference" /></div>
-              <p class="shot__cap"><b>Pass</b> All four propellers found and matched to the reference.</p>
-            </li>
-            <li class="shot shot--unable">
-              <div class="shot__phone"><img src="./app/unable.jpg" width="540" height="1140" loading="lazy" decoding="async" alt="Unable to Verify result asking for a clearer top-down photo" /></div>
-              <p class="shot__cap"><b>Unable to Verify</b> Partial or unclear photos are refused, with spoken retake guidance.</p>
+            <li class="case case--unable">
+              <figure class="case__shot"><img src="./app/case-unable.jpg" width="640" height="942" loading="lazy" decoding="async" alt="App showing Unable to Verify for a close-up of one propeller" /></figure>
+              <div class="case__body">
+                <h3 class="case__title">Unable to Verify</h3>
+                <p class="case__line">Incomplete, blurry or dark photos are refused, never guessed.</p>
+                <details class="case__explain">
+                  <summary>What the app says</summary>
+                  <p>The detector could not verify the propeller status because the drone view is incomplete. No specific propeller needs to be swapped yet. Retake the photo top-down, with the whole drone visible, the camera steady and good lighting.</p>
+                </details>
+              </div>
             </li>
           </ol>
         </div>
@@ -286,9 +304,9 @@
             <a class="btn-pill btn-pill--secondary" href="https://github.com/dhruvsharma06-web/Pluto-drone/blob/main/docs/ARCHITECTURE.md" rel="noopener">Architecture <svg class="ico"><use href="#i-arrow" /></svg></a>
           </div>
           <div>
-            <h3>Validation pending</h3>
-            <p>Accuracy and timing will be published after testing on real photos of the supplied drone.</p>
-            <p class="muted">APK, dataset and validation downloads will be linked when released.</p>
+            <h3>Validation</h3>
+            <p>Detection mAP50 <b>0.92</b> on held-out top-down photos. Unclear views are refused rather than guessed.</p>
+            <a class="btn-pill" href="https://drive.google.com/file/d/1Zk_aKgV7bGit6zT3m8CKHxTwAGRKyXny/view" rel="noopener">Download APK <svg class="ico"><use href="#i-arrow" /></svg></a>
           </div>
           <div>
             <h3>Explore the source</h3>

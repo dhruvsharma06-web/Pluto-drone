@@ -21,8 +21,8 @@ Shared hackathon skeleton for an Android Flutter app with an OpenCV/ML core and 
 
 ## Layout and checks
 
-- `apps/mobile/`: generated Android Flutter wrapper; owned by app developer.
-- `packages/inspection_ui/`: Flutter presentation; owned by frontend developer.
+- `apps/mobile/`: generated Android Flutter wrapper;  owned by app developer.
+- `packages/inspection_ui/`: Flutter presentation;  owned by frontend developer.
 - `packages/inspection_runtime/`: controller/acquisition/engine adapters; app developer.
 - `packages/inspection_contract/`, `contracts/`: shared v1 boundary and labelled fixtures.
 - `apps/website/`: independent website; frontend developer using Claude.
